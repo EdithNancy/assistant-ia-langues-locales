@@ -1,0 +1,7 @@
+data/
+models/*.bin
+models/*.pt
+*.onnx
+.env
+__pycache__/
+node_modules/
