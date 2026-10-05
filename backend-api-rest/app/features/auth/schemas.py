@@ -1,0 +1,40 @@
+from typing import Literal
+from pydantic import BaseModel, EmailStr, Field, field_validator
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str = Field(min_length=1, max_length=128)
+
+class RefreshRequest(BaseModel):
+    refresh_token: str
+
+class TokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    expires_in: int
+
+class SocialNonceRequest(BaseModel):
+    provider: Literal["google", "apple"]
+
+class SocialNonceResponse(BaseModel):
+    nonce: str
+    expires_in: int
+
+class SocialLoginRequest(BaseModel):
+    provider: Literal["google", "apple"]
+    id_token: str = Field(min_length=1, max_length=8192)
+    nonce: str = Field(min_length=32, max_length=128)
+    full_name: str | None = Field(default=None, min_length=2, max_length=150)
+    phone_number: str | None = Field(default=None, min_length=7, max_length=32,
+                                     pattern=r"^\+?[0-9][0-9\s().-]*$")
+
+    @field_validator("phone_number", mode="before")
+    @classmethod
+    def normalize_phone_number(cls, value: object) -> object:
+        if not isinstance(value, str):
+            return value
+        normalized = "".join(character for character in value if character not in " ().-")
+        if not 7 <= len(normalized.lstrip("+")) <= 15:
+            raise ValueError("Le numéro doit contenir entre 7 et 15 chiffres.")
+        return normalized
