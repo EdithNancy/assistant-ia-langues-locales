@@ -1,0 +1,6 @@
+{
+  "name": "IvoirAI - Langues Ivoiriennes & Assistant Vocal",
+  "description": "Assistant vocal et tuteur culturel en Baoulé et Dioula avec apprentissage immersif, reconnaissance des intonations et traduction contextuelle.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
