@@ -1,15 +1,24 @@
 import { ChatMessage, LearningModule, QuizQuestion, VocabularyItem } from '../types';
+import logo from '../assets/images/logo.svg';
+import edithProfile from '../assets/images/profile.jpg';
+import ayaAvatar from '../assets/images/avatar.jpg';
+import baouleTextile from '../assets/images/textile.jpg';
+import marketStall from '../assets/images/marché.jpg';
+import elders from '../assets/images/notable.jpg';
+import family from '../assets/images/famille.jpg';
+import goldWeights from '../assets/images/cultures.jpg';
+
 
 export const BRAND_ASSETS = {
-  logo: 'https://lh3.googleusercontent.com/aida/AEtjO1Wa-6F7ts_PyPCo6vnMMISIL66RDu4AHgO6jBmh8c-f00FyjxPGArjckaLUGnmKUEuoJQqm1xtPDtxeNW3I2uuhfg6r5LUrphmg70zgcnNamz8c33d9RLysibLwYcFEEVeenrLekebShbEP8QlborhmzBZya4DGOs0iZJO2kXPKwoyJR8s70yMQa96dXQSsITg_dASX11cCX9lAHyMEpa1lgNiLohGT8wivvPfrQ2HGjDwd5LoD5mrFRd8',
-  edithProfile: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDcCkT8BwN559-zNhv06RTLGYjezpBj83LdCPStwpAaK7b-X3XIKBt6_9b-E8jqoz9DjlVZFdqvgcCxSNMPfV233dbomUB1LMsU3t7xNCWj39hQYGohQmvMpHd8H3HR9-2XljNG6xaLh9xOlBehpRTC_DYdtijF38I30l_h65FlTvIO01mBfcWKXu-ArvgbSQXSBTN9ls0zQDkUEJGgC9anb8hk0O4ZtHULD8ML3kG2cRb7fpVcXtgL',
-  ayaAvatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAghRT5oYJ6kB_jsWkFmB0Ojke69aU6VXzrjQum42gtHoVPLI0q_tbcKOAITRzNmVuD-eSwillqtf9lviHaBv_PHJ7AKka56HFolJ-Yejy0niU9p19F8jHC-j0syk3jo9fok2CDDAOK8L0lKvozOYIjIlcnFReUaMr3mUw87z65PcwJL8LjZkXjEdvQnCDT3USFAEYO06wJW91dSOHy4f8ayMyquVGH_QCt5-8pz0rw6qWc5v9Rpb-a',
-  baouleTextile: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDGzgrOdZ6wXPjmFjcnPtcFet89GnTcy9yBeEWEPXHQGSANXJKAQYkbqzwbUPUNmUxaws7yuvW9dR-YQojCxrBydPqacv4J3VW_sSd3wVs-UaoPFXkmeYRlN4BVeaa9lXJR-j2_sA8k5SRkAObHpsZVjONRNMlxhLG14Qr2j6f-uk8zNYgcqMXIByw7HikXPz1tjbZTnVuWA97wAvC1CJFfiVi2Rz9eQYbgsbyBITfnkhjsy2FYVDw-',
-  marketStall: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAHf9PhK-SyFRIg8UUDUQXfTcwR0YDZHsRs2C_1a3vgSgsiGWQgZ72ximJ_dI-_8N9JXflXPJ9NkRfdVXo4T7rSHG5-nOy64GfkEXKWCxU54FEKWS1b_Pe1nhMs2EgPDDna_LmDmfK4suZQeDbFtjxPznmJdE3J05mpm70jHu2kb38L7XXq2G5d_Ig6YAsQIzcqSkmOQXiScopYeQiDGrZTJrOZQ0mPjhqfEM0224O42CfQP69KMm5G',
-  elders: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBBBO-rvUUu3v64l6Virm7qyNpEYPVJJ7TEaNOvgdZBqWhHMuSl4Y1Orzcq4mN9YStKsawJtTbH4xW1KPDY3VSXT2mNGNpRsOZWmcSuQrm3F8MqQWz_bm3hI73ssKJHlYGvblZNmdeUVpJpJGjWiucEwNIB5WXgrVu3-pzTu2mP-MMYtyUpeyJXKSa00NMm1sthdWYMA7ETFiCl1oevMBGSUyhipTEpOo0jMje2GIU3MmhsdNua31la',
-  family: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCfhOwkKWrx4DGhqBbwx0DK3QyBckljX-iArtH0jiFqZfScgOB_amk3sNfUduOPd9SzGSTBLtlFmMCN75gK9l5-H1PnXSsHY71B4v9Iuv6XdBAIst2C3trYwpfAyr8fje-p8A7NneoIQ2N3CpU9TYDvOP59i83649ORQxWurcGeZYHUesX7tvYiJS0wgnJz0qJ5v2_jRfS_3HS-byflJdoDVdBmrtio9YZjdicZXSSyUUych9HCC9hY',
-  goldWeights: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC7bixoEih0ikXhe6MwPuFZAxY4Dhpj77SNVbGc07duSRS2xlLNBz1EAxBCocu-TC6kYRHwIdbfFtvkIlkVDHsafRXm3aQ3hmV-joXeTtK-VvWfK8llNKasDFxts0pLrGKMJ6D_mtYfpTsKpI1tkv8GgWADNH2wKzQ1OT_v86pcj06Rg64CCSknjN7rpgj2rjD9va9NByi8KKjPtcPU1146aZn_GXRtS3VVpx0T8bR8gO3xssKtuXTO',
-};
+  logo,
+  edithProfile,
+  ayaAvatar,
+  baouleTextile,
+  marketStall,
+  elders,
+  family,
+  goldWeights
+} as const;
 
 export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
   {

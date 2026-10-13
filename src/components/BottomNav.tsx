@@ -77,6 +77,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
 
         {/* Apprendre */}
         <button
+          disabled
           onClick={() => onTabChange('apprendre')}
           className={`flex flex-col items-center justify-center min-w-[56px] h-12 transition-all duration-200 ${
             currentTab === 'apprendre'

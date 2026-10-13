@@ -65,48 +65,13 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
       {/* Top User Profile & Welcome Bar */}
       <section className="flex items-center justify-between bg-white p-4 rounded-3xl shadow-[0_4px_20px_-2px_rgba(0,75,73,0.05)] border border-[#edeef0]/60">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="relative flex-shrink-0 cursor-pointer" onClick={onOpenProfile}>
-            <img
-              alt="Portrait Edith"
-              className="w-13 h-13 rounded-full object-cover shadow-sm ring-2 ring-[#004b49]/15"
-              src={BRAND_ASSETS.edithProfile}
-            />
-            <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#62fae3] rounded-full ring-2 ring-white shadow-xs"></span>
-          </div>
-
-          <div className="flex flex-col min-w-0">
-            <h2 className="text-base font-bold text-[#1a1c1d] truncate">
-              Akwaba, Edith 👋
-            </h2>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#ffdbd2] text-[#3c0800] text-[11px] font-bold">
-                <span className="material-symbols-outlined text-[12px] fill">stars</span>
-                Niveau Intermédiaire
-              </span>
-              <span className="text-[11px] text-[#3f4948] font-semibold">
-                B2 • 840 XP
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => showToast('Vous avez 2 nouvelles leçons recommandées')}
-            aria-label="Notifications"
-            className="relative w-10 h-10 rounded-full flex items-center justify-center text-[#3f4948] hover:bg-[#edeef0] transition-colors"
-          >
-            <span className="material-symbols-outlined text-[22px]">notifications</span>
-            <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-[#9e4229]"></span>
-          </button>
-          <button
-            onClick={onOpenProfile}
-            aria-label="Paramètres du compte"
-            className="w-10 h-10 rounded-full flex items-center justify-center text-[#3f4948] hover:bg-[#edeef0] transition-colors"
-          >
-            <span className="material-symbols-outlined text-[22px]">settings</span>
-          </button>
+        <div className="flex flex-col min-w-0">
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#3f4948]">
+            Bienvenue
+          </p>
+          <h2 className="text-2xl font-bold text-[#1a1c1d] truncate mt-1">
+            Akwaba, Edith
+          </h2>
         </div>
       </section>
 
@@ -314,6 +279,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         <div className="flex items-center justify-between px-1">
           <h3 className="text-sm font-bold text-[#1a1c1d]">Pratique Rapide</h3>
           <button
+            disabled
             onClick={() => onNavigateTab('apprendre')}
             className="text-xs text-[#9e4229] font-bold hover:underline"
           >
@@ -381,7 +347,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       </section>
 
       {/* Cultural Inspiration & Visual Strip */}
-      <section
+      {/* <section
         onClick={onOpenStoryModal}
         className="bg-white p-4 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] flex items-center gap-4 cursor-pointer hover:shadow-md transition-all border border-[#edeef0]/60 group"
       >
@@ -403,7 +369,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             Découvrez les proverbes ancestraux tissés dans les motifs traditionnels avec l'écoute guidée.
           </p>
         </div>
-      </section>
+      </section> */}
 
       {/* Recent Discussions Section */}
       <section className="flex flex-col gap-2">

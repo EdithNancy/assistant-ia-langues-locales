@@ -218,7 +218,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
             <img
               alt="Aya AI Avatar"
               className="w-10 h-10 rounded-full object-cover bg-[#b1eeea] p-0.5 shadow-xs ring-1 ring-[#004b49]/20"
-              src={BRAND_ASSETS.logo}
+              src={BRAND_ASSETS.ayaAvatar}
             />
             <span
               className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#62fae3] border-2 border-white flex items-center justify-center"

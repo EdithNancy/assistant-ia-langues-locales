@@ -120,15 +120,6 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
     <div className="fixed inset-0 z-50 bg-[#f9f9fb] flex flex-col justify-between overflow-y-auto animate-in fade-in duration-300">
       {/* Top Header Bar */}
       <div className="w-full bg-[#f9f9fb]/90 backdrop-blur-md px-4 pt-3 pb-2 border-b border-[#edeef0]">
-        <div className="flex items-center justify-between text-xs font-semibold text-[#1a1c1d] mb-2">
-          <span>9:41</span>
-          <div className="flex items-center gap-1 opacity-70">
-            <span className="material-symbols-outlined text-[14px]">signal_cellular_alt</span>
-            <span className="material-symbols-outlined text-[14px]">wifi</span>
-            <span className="material-symbols-outlined text-[16px]">battery_full</span>
-          </div>
-        </div>
-
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button
@@ -169,47 +160,24 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
       <div className="flex-1 max-w-md w-full mx-auto px-4 py-4 flex flex-col justify-between gap-4">
         {/* Floating Session Context Controls */}
         <div className="flex items-center justify-between w-full">
-          <button
-            onClick={onClose}
-            aria-label="Réduire la session"
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-[#edeef0] hover:bg-[#e2e2e4] active:scale-95 text-[#1a1c1d] transition-all shadow-xs"
-          >
-            <span className="material-symbols-outlined text-[22px]">keyboard_arrow_down</span>
-          </button>
-
           {/* Center Status: Live Timer Pill & Dialect selector */}
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#e2e2e4] shadow-xs">
+          <div className="flex items-center gap-2 w-full">
+            <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-[#e2e2e4] shadow-xs flex-1 min-w-0">
               <span className="w-2 h-2 rounded-full bg-[#9e4229] animate-ping"></span>
               <span className="w-2 h-2 rounded-full bg-[#9e4229] -ml-3.5"></span>
-              <span className="text-[11px] font-bold text-[#1a1c1d] tracking-wide uppercase">
+              <span className="text-[11px] font-bold text-[#1a1c1d] tracking-wide uppercase whitespace-nowrap">
                 En direct • {formatTimer(seconds)}
               </span>
             </div>
 
             <button
               onClick={toggleDialect}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#003331] text-white text-xs font-bold active:scale-95 transition-all shadow-sm"
+              className="flex items-center justify-center gap-1 px-3 py-1.5 rounded-full bg-[#003331] text-white text-xs font-bold active:scale-95 transition-all shadow-sm flex-1 min-w-0"
             >
-              <span>{currentDialect === 'dioula' ? 'Dioula (Mandé)' : 'Baoulé (Akan)'}</span>
-              <span className="material-symbols-outlined text-[16px]">arrow_drop_down</span>
+              <span className="truncate">{currentDialect === 'dioula' ? 'Dioula (Mandé)' : 'Baoulé (Akan)'}</span>
+              {/* <span className="material-symbols-outlined text-[16px]">arrow_drop_down</span> */}
             </button>
           </div>
-
-          {/* Speaker Switch Button */}
-          <button
-            onClick={() => setIsSpeakerOn(!isSpeakerOn)}
-            aria-label="Changer la sortie audio"
-            className={`w-10 h-10 flex items-center justify-center rounded-full transition-all shadow-xs active:scale-95 ${
-              isSpeakerOn
-                ? 'bg-[#edeef0] text-[#1a1c1d]'
-                : 'bg-[#ffdad6] text-[#ba1a1a]'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[20px]">
-              {isSpeakerOn ? 'volume_up' : 'phone_in_talk'}
-            </span>
-          </button>
         </div>
 
         {/* AI Companion Avatar Badge */}

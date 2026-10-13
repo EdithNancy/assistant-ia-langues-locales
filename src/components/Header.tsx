@@ -12,20 +12,9 @@ export const Header: React.FC<HeaderProps> = ({
   title,
   onOpenNotifications,
   onOpenProfile,
-  currentTime = '9:41',
 }) => {
   return (
-    <header className="fixed top-0 w-full z-40 bg-[#f9f9fb]/90 backdrop-blur-xl border-b border-[#edeef0]/60 transition-all">
-      {/* Mobile OS Status Bar */}
-      <div className="h-6 px-4 flex items-center justify-between text-[#1a1c1d] text-xs font-semibold select-none">
-        <span className="tracking-tight">{currentTime}</span>
-        <div className="flex items-center gap-1.5 opacity-80">
-          <span className="material-symbols-outlined text-[14px]">signal_cellular_alt</span>
-          <span className="material-symbols-outlined text-[14px]">wifi</span>
-          <span className="material-symbols-outlined text-[16px]">battery_full</span>
-        </div>
-      </div>
-
+    <header className="fixed top-0 left-1/2 w-full max-w-md -translate-x-1/2 z-40 bg-[#f9f9fb]/90 backdrop-blur-xl border-b border-[#edeef0]/60 transition-all">
       {/* Main Top Bar */}
       <div className="h-14 px-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
