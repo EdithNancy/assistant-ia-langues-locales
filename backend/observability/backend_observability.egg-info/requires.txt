@@ -1,0 +1,8 @@
+opentelemetry-api<2,>=1.28
+opentelemetry-sdk<2,>=1.28
+opentelemetry-exporter-otlp-proto-http<2,>=1.28
+opentelemetry-instrumentation-fastapi<1,>=0.49b0
+opentelemetry-instrumentation-httpx<1,>=0.49b0
+opentelemetry-instrumentation-logging<1,>=0.49b0
+opentelemetry-instrumentation-sqlalchemy<1,>=0.49b0
+prometheus-client<1,>=0.21

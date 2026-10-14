@@ -1,0 +1,14 @@
+
+fastapi
+uvicorn[standard]
+sqlalchemy>=2.0
+psycopg[binary]
+pydantic-settings
+httpx>=0.27
+slowapi>=0.1.10,<0.2
+redis>=5,<7
+alembic
+email-validator>=2.2
+python-jose[cryptography]>=3.3
+pwdlib[argon2]>=0.2
+-e ../observability

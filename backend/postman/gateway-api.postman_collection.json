@@ -1,0 +1,1261 @@
+{
+  "info": {
+    "_postman_id": "69d51f2e-7815-4b74-90d3-e493f7db83f2",
+    "name": "Assistant IA Langues Locales - API Gateway",
+    "description": "Collection de tests HTTP pour appeler les API exclusivement via le Gateway. Base URL par défaut : http://localhost:8000. Importez cette collection dans Postman, vérifiez que le backend Compose est démarré, puis envoyez les requêtes pertinentes individuellement. L'inscription crée un utilisateur de test avec une adresse unique; la connexion stocke automatiquement accessToken et refreshToken. Certains endpoints administratifs et Learning nécessitent des rôles/permissions dédiés. Les actions de révocation invalident les jetons : choisissez-en une seule et exécutez-la après les autres tests. Le WebSocket conversationnel se teste séparément dans Postman avec ws://localhost:8000/ws/conversation?token={{accessToken}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('Le Gateway retourne un identifiant de requête', function () {",
+          "    pm.expect(pm.response.headers.get('X-Request-ID')).to.be.a('string').and.not.empty;",
+          "});"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testEmail",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testPhone",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "conversationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "scenarioId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "attemptId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "entryId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sourceLanguageId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "targetLanguageId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Gateway",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Liveness du processus Gateway."
+          },
+          "response": []
+        },
+        {
+          "name": "Readiness check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ready",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ready"
+              ]
+            },
+            "description": "Vérifie Redis et la disponibilité des services Identity, Conversation et Learning."
+          },
+          "response": []
+        },
+        {
+          "name": "Prometheus metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/metrics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "metrics"
+              ]
+            },
+            "description": "Retourne les métriques Prometheus exposées par le Gateway."
+          },
+          "response": []
+        },
+        {
+          "name": "Route protégée sans jeton (401 attendu)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "me"
+              ]
+            },
+            "description": "Vérifie que le Gateway refuse un endpoint protégé sans authentification."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authentification",
+      "item": [
+        {
+          "name": "Register - créer un utilisateur de test",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const id = pm.variables.replaceIn('{{$guid}}').replace(/-/g, '').slice(0, 12);",
+                  "pm.collectionVariables.set('testEmail', `gateway.${id}@example.com`);",
+                  "pm.collectionVariables.set('testPhone', `+22501${Date.now().toString().slice(-8)}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Inscription créée (HTTP 201)', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('La réponse contient le profil créé', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('id');",
+                  "    pm.expect(body).to.have.property('email', pm.collectionVariables.get('testEmail'));",
+                  "    pm.collectionVariables.set('userId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Utilisateur Postman\",\n  \"email\": \"{{testEmail}}\",\n  \"phone_number\": \"{{testPhone}}\",\n  \"password\": \"MotDePassePostman123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Crée un compte avec email et téléphone uniques générés juste avant l'envoi. L'API Gateway transmet la requête à Identity."
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Connexion réussie (HTTP 200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('La réponse contient les deux jetons', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.access_token).to.be.a('string').and.not.empty;",
+                  "    pm.expect(body.refresh_token).to.be.a('string').and.not.empty;",
+                  "    pm.collectionVariables.set('accessToken', body.access_token);",
+                  "    pm.collectionVariables.set('refreshToken', body.refresh_token);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"MotDePassePostman123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "À lancer après Register. Sauvegarde automatiquement access_token et refresh_token pour les requêtes suivantes."
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh access token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Renouvellement réussi (HTTP 200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "if (body.access_token) pm.collectionVariables.set('accessToken', body.access_token);",
+                  "if (body.refresh_token) pm.collectionVariables.set('refreshToken', body.refresh_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Renouvelle les jetons et met à jour automatiquement les variables de collection."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Identity",
+      "item": [
+        {
+          "name": "Mon profil",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mon solde de jetons",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/me/tokens",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "me",
+                "tokens"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lister mes sessions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Liste des sessions reçue (HTTP 200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const sessions = pm.response.json();",
+                  "if (Array.isArray(sessions) && sessions.length > 0) {",
+                  "    pm.collectionVariables.set('sessionId', sessions[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sessions"
+              ]
+            },
+            "description": "Sauvegarde la première session dans sessionId pour pouvoir révoquer une session précise."
+          },
+          "response": []
+        },
+        {
+          "name": "Lister les utilisateurs (permission users.read)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users?offset=0&limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "offset",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "Endpoint administratif. Un compte standard ne possède pas users.read et recevra 403."
+          },
+          "response": []
+        },
+        {
+          "name": "Lister les rôles (permission roles.read)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/roles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "roles"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lister les permissions (permission permissions.read)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/permissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "permissions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lister les événements d'usage (permission usage.read)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/usage/events?offset=0&limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "usage",
+                "events"
+              ],
+              "query": [
+                {
+                  "key": "offset",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "Endpoint administratif. Nécessite la permission usage.read."
+          },
+          "response": []
+        },
+        {
+          "name": "Lister les langues",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/data/languages?active_only=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "data",
+                "languages"
+              ],
+              "query": [
+                {
+                  "key": "active_only",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Créer une langue source (permission data.manage)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const suffix = pm.variables.replaceIn('{{$guid}}').replace(/-/g, '').slice(0, 8);",
+                  "pm.collectionVariables.set('sourceLanguageCode', `x${suffix}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Langue source créée (HTTP 201)', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('sourceLanguageId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"{{sourceLanguageCode}}\",\n  \"name\": \"Langue source de test\",\n  \"native_name\": \"Langue source de test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/data/languages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "data",
+                "languages"
+              ]
+            },
+            "description": "Endpoint d'écriture réservé à un compte doté de data.manage. Lancez cette requête et celle de la langue cible avant la création d'une entrée."
+          },
+          "response": []
+        },
+        {
+          "name": "Créer une langue cible (permission data.manage)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const suffix = pm.variables.replaceIn('{{$guid}}').replace(/-/g, '').slice(0, 8);",
+                  "pm.collectionVariables.set('targetLanguageCode', `y${suffix}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Langue cible créée (HTTP 201)', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('targetLanguageId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"{{targetLanguageCode}}\",\n  \"name\": \"Langue cible de test\",\n  \"native_name\": \"Langue cible de test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/data/languages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "data",
+                "languages"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Rechercher une entrée de vocabulaire",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/data/entries?q=bonjour&kind=word&offset=0&limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "data",
+                "entries"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "bonjour"
+                },
+                {
+                  "key": "kind",
+                  "value": "word"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Créer une entrée de vocabulaire (permission data.manage)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Entrée créée (HTTP 201)', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('entryId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source_language_id\": \"{{sourceLanguageId}}\",\n  \"target_language_id\": \"{{targetLanguageId}}\",\n  \"source_text\": \"Bonjour\",\n  \"target_text\": \"Hello\",\n  \"kind\": \"word\",\n  \"pronunciation\": \"bohn-zhoor\",\n  \"example_source\": \"Bonjour, comment allez-vous ?\",\n  \"example_target\": \"Hello, how are you?\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/data/entries",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "data",
+                "entries"
+              ]
+            },
+            "description": "Nécessite data.manage et les variables sourceLanguageId et targetLanguageId créées par les requêtes précédentes."
+          },
+          "response": []
+        },
+        {
+          "name": "Modifier une entrée de vocabulaire (permission data.manage)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"target_text\": \"Hello (test mis à jour)\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/data/entries/{{entryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "data",
+                "entries",
+                "{{entryId}}"
+              ]
+            },
+            "description": "Nécessite data.manage et une variable entryId obtenue avec la requête de création."
+          },
+          "response": []
+        },
+        {
+          "name": "Supprimer une entrée de vocabulaire (permission data.manage)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/data/entries/{{entryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "data",
+                "entries",
+                "{{entryId}}"
+              ]
+            },
+            "description": "Nécessite data.manage et entryId. Suppression définitive de l'entrée créée pour le test."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Conversations",
+      "item": [
+        {
+          "name": "Créer une conversation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Conversation créée (HTTP 201)', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('conversationId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Conversation de test Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "conversations",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lister mes conversations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "conversations",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lire une conversation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations/{{conversationId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "conversations",
+                "{{conversationId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Envoyer un message texte",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Bonjour, comment dit-on merci dans cette langue ?\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations/{{conversationId}}/messages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "conversations",
+                "{{conversationId}}",
+                "messages"
+              ]
+            },
+            "description": "Nécessite une conversation existante. La réponse Dialogue dépend de la configuration du fournisseur IA."
+          },
+          "response": []
+        },
+        {
+          "name": "Supprimer une conversation",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations/{{conversationId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "conversations",
+                "{{conversationId}}"
+              ]
+            },
+            "description": "Supprime la conversation de test et ses messages."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Learning - PRO / ADMIN",
+      "description": "Ces requêtes exigent un compte portant l'un des rôles PRO, ADMIN ou SUPER_ADMIN. La création d'un scénario est réservée à ADMIN ou SUPER_ADMIN. Un compte nouvellement inscrit peut vérifier le contrôle d'accès du Gateway en attendant une réponse 403.",
+      "item": [
+        {
+          "name": "Lister les scénarios publiés",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/learning/scenarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "learning",
+                "scenarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Révocation - choisir une seule action, à faire en dernier",
+              "description": "Ces opérations révoquent la session courante ou toutes les sessions. N'en lancez qu'une seule et ne les exécutez qu'après les autres tests, car elles invalident accessToken.",
+              "item": [
+                {
+                  "name": "Logout - session courante",
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                          "pm.test('Déconnexion réussie (HTTP 204)', function () {",
+                          "    pm.response.to.have.status(204);",
+                          "});",
+                          "pm.collectionVariables.unset('accessToken');",
+                          "pm.collectionVariables.unset('refreshToken');"
+                        ]
+                      }
+                    }
+                  ],
+                  "request": {
+                    "method": "POST",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/auth/logout",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "auth",
+                        "logout"
+                      ]
+                    },
+                    "description": "Révoque uniquement cette session et efface les jetons sauvegardés dans la collection."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Logout all - toutes les sessions",
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                          "pm.test('Déconnexion globale réussie (HTTP 204)', function () {",
+                          "    pm.response.to.have.status(204);",
+                          "});",
+                          "pm.collectionVariables.unset('accessToken');",
+                          "pm.collectionVariables.unset('refreshToken');"
+                        ]
+                      }
+                    }
+                  ],
+                  "request": {
+                    "method": "POST",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/auth/logout-all",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "auth",
+                        "logout-all"
+                      ]
+                    },
+                    "description": "Révoque toutes les sessions du compte et efface les jetons sauvegardés dans la collection. Ne pas exécuter après Logout."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Révoquer une session par ID",
+                  "request": {
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/sessions/{{sessionId}}",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "sessions",
+                        "{{sessionId}}"
+                      ]
+                    },
+                    "description": "Nécessite sessionId obtenu avec « Lister mes sessions ». Si cette session est celle du jeton courant, accessToken deviendra inutilisable."
+                  },
+                  "response": []
+                }
+              ]
+            },
+        {
+          "name": "Créer un scénario (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Scénario créé (HTTP 201)', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('scenarioId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Salutations - scénario Postman\",\n  \"description\": \"Exercice de test via le Gateway\",\n  \"level\": \"debutant\",\n  \"objectives\": [\"Saluer\", \"Se présenter\"],\n  \"published\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/learning/scenarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "learning",
+                "scenarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Démarrer une tentative",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Tentative créée (HTTP 201)', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('attemptId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scenario_id\": \"{{scenarioId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/learning/attempts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "learning",
+                "attempts"
+              ]
+            },
+            "description": "À lancer après avoir renseigné scenarioId, par exemple avec « Créer un scénario (ADMIN) »."
+          },
+          "response": []
+        },
+        {
+          "name": "Lister mes tentatives",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/learning/attempts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "learning",
+                "attempts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Terminer une tentative",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"score\": 85\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/learning/attempts/{{attemptId}}/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "learning",
+                "attempts",
+                "{{attemptId}}",
+                "complete"
+              ]
+            },
+            "description": "À lancer après « Démarrer une tentative »."
+          },
+          "response": []
+        },
+        {
+          "name": "Consulter ma progression",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/learning/progress",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "learning",
+                "progress"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
