@@ -93,10 +93,13 @@ services:
       dockerfile: conversation/Dockerfile
     environment:
       DATABASE_URL: postgresql+asyncpg://${CONVERSATION_DB_USER:-app}:${CONVERSATION_DB_PASSWORD:?Définir CONVERSATION_DB_PASSWORD dans le fichier .env}@conversation-db:5432/conversation
+      IDENTITY_URL: http://identity:8001
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       OTEL_SERVICE_NAME: conversation
     depends_on:
       conversation-db:
+        condition: service_healthy
+      identity:
         condition: service_healthy
       otel-collector:
         condition: service_started

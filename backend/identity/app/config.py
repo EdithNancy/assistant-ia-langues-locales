@@ -1,6 +1,12 @@
 from functools import lru_cache
+from pathlib import Path
+
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_BACKEND_ENV_PATH = Path(__file__).resolve().parents[2] / ".env"
+_IDENTITY_ENV_PATH = Path(__file__).resolve().parents[1] / ".env"
+
 
 class Settings(BaseSettings):
     APP_NAME: str = "IA Langues Locales CI"
@@ -17,11 +23,15 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=15, ge=1)
     REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=30, ge=1)
     FREE_TOKEN_GRANT: int = Field(default=1000, ge=1)
-    FREE_TOKEN_REFILL_DAYS: int = Field(default=30, ge=1)
+    FREE_TOKEN_REFILL_DAYS: int = Field(default=1, ge=1)
     GOOGLE_CLIENT_IDS: str = ""
     APPLE_CLIENT_IDS: str = ""
     CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:5173"]
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=(str(_IDENTITY_ENV_PATH), str(_BACKEND_ENV_PATH)),
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
     @field_validator("JWT_SECRET_KEY")
     @classmethod

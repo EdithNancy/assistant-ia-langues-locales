@@ -131,6 +131,22 @@ def test_authentication_and_token_balance_work_over_http(api_client: TestClient)
     assert balance["has_tokens"] is True
     assert balance["total_tokens"] == settings.FREE_TOKEN_GRANT
 
+    consume_url = "/api/v1/users/me/tokens/consume"
+    denied_consume_response = api_client.post(
+        consume_url,
+        headers=authorization,
+        json={"credit_tokens": 37},
+    )
+    assert denied_consume_response.status_code == 403
+
+    consume_response = api_client.post(
+        consume_url,
+        headers={**authorization, "X-Token-Usage-Source": "conversation"},
+        json={"credit_tokens": 37},
+    )
+    assert consume_response.status_code == 200
+    assert consume_response.json()["free_tokens_remaining"] == settings.FREE_TOKEN_GRANT - 37
+
     refresh_response = api_client.post(
         "/api/v1/auth/refresh",
         json={"refresh_token": tokens["refresh_token"]},

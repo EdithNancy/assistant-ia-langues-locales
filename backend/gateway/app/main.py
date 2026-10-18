@@ -151,14 +151,32 @@ async def gateway(service: str, request: Request, path: str = ""):
         token = bearer(request.headers.get("Authorization"))
 
         if not token:
+            log.warning(
+                "Gateway authentication rejected service=%s method=%s "
+                "reason=missing_bearer rid=%s",
+                service,
+                request.method,
+                request.state.request_id,
+            )
             raise HTTPException(
                 status_code=401,
                 detail="Authentification requise",
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-        user = decode_token(token)
-        await check_session(request, user)
+        try:
+            user = decode_token(token)
+            await check_session(request, user)
+        except HTTPException as exc:
+            log.warning(
+                "Gateway authentication rejected service=%s method=%s "
+                "reason=%s rid=%s",
+                service,
+                request.method,
+                exc.detail,
+                request.state.request_id,
+            )
+            raise
         check_role(user, route.roles)
 
     # Limitation du nombre de requêtes
@@ -179,6 +197,15 @@ async def gateway(service: str, request: Request, path: str = ""):
             {"detail": "Trop de requêtes"},
             status_code=429,
             headers={"Retry-After": str(retry)},
+        )
+
+    if service == "conversations" and "//" in request.url.path:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Identifiant de conversation manquant. Créez ou sélectionnez "
+                "une conversation avant d'envoyer un message."
+            ),
         )
 
     # Construire l'URL du service en aval
@@ -236,4 +263,4 @@ async def websocket_gateway(ws: WebSocket, name: str):
     params = {k: v for k, v in ws.query_params.items() if k != "token"}
     if params:
         upstream = f"{upstream}?{urlencode(params)}"
-    await proxy_websocket(ws, upstream, user, uuid.uuid4().hex)
+    await proxy_websocket(ws, upstream, user, uuid.uuid4().hex, f"Bearer {token}")

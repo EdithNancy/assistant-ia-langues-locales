@@ -59,6 +59,20 @@ directement les ports Identity, Conversation ou Learning. Si un reverse proxy
 est placé devant la Gateway, configurez `GATEWAY_TRUSTED_PROXIES` avec ses
 adresses exactes ; ne le réglez pas à `*`.
 
+Hors Compose, utilisez `backend/.env` comme source commune de
+`JWT_SECRET_KEY`, `JWT_ALGORITHM` et `JWT_AUDIENCE` pour Identity et la Gateway.
+Identity peut aussi lire `identity/.env`, mais les valeurs communes de
+`backend/.env` y sont prioritaires; les variables exportées dans chaque
+processus restent prioritaires sur les fichiers. Évitez de définir une ancienne
+valeur `JWT_KEY` différente. En Compose, `backend/.env` est également la source
+commune transmise aux deux services.
+
+Si la Gateway est lancée directement sur l'hôte, son service Conversation doit
+être joignable sur `http://127.0.0.1:8002` (défaut de la Gateway) ou être
+configuré avec `CONVERSATION_URL`. Dans Compose, cette variable est définie
+automatiquement sur `http://conversation:8002`, nom DNS valable uniquement dans
+le réseau Compose.
+
 ## Parcours de test via la Gateway
 
 Une collection Postman couvrant les principales routes Gateway est disponible dans
@@ -90,6 +104,75 @@ protégée :
 curl -i http://localhost:8000/api/conversations/ \
   -H 'Authorization: Bearer <access_token>'
 ```
+
+Chaque échange doit cibler une conversation créée au préalable. Conservez son
+`id` comme conversation active et réutilisez-le pour le texte ou le vocal :
+
+```bash
+curl -i http://localhost:8000/api/conversations/ \
+  -H 'Authorization: Bearer <access_token>' \
+  -H 'Content-Type: application/json' \
+  -d '{"title":"Ma conversation"}'
+
+curl -i http://localhost:8000/api/conversations/<conversation_id>/messages \
+  -H 'Authorization: Bearer <access_token>' \
+  -H 'Content-Type: application/json' \
+  -d '{"content":"Bonjour"}'
+
+curl -i http://localhost:8000/api/conversations/<conversation_id>/messages \
+  -H 'Authorization: Bearer <access_token>'
+```
+
+Le `GET` liste, dans l'ordre chronologique, les messages de l'utilisateur et
+les réponses de l'IA. Il renvoie `404` si la conversation n'existe pas ou
+n'appartient pas à l'utilisateur.
+
+L'utilisateur peut faire une requête soit en écrivant, soit en parlant. Le
+parcours vocal est prioritaire : le client transmet l'audio de l'utilisateur,
+Conversation le transcrit et le traite comme une requête, puis renvoie la
+réponse sous forme de texte et d'audio synthétisé. Le texte du transcript et
+celui de la réponse sont aussi disponibles pour affichage ou sous-titrage.
+Pour parler, connectez le WebSocket Gateway avec ce même identifiant :
+`ws://localhost:8000/ws/conversation?token=<access_token>&conversation_id=<conversation_id>`.
+Une connexion sans conversation ou vers une conversation qui n'appartient pas
+à l'utilisateur est refusée. Envoyez les trames audio de la parole puis
+`{"type":"end_of_speech"}` pour lancer la requête. Le transcript et la réponse
+IA sont enregistrés comme messages de cette conversation; les événements
+WebSocket incluent `conversation_id`.
+
+Pour tester un fichier vocal depuis Postman, utilisez plutôt
+`POST /api/conversations/<conversation_id>/messages/audio` et choisissez un
+fichier dans le champ `audio` de type fichier (`multipart/form-data`) :
+
+```bash
+curl -i http://localhost:8000/api/conversations/<conversation_id>/messages/audio \
+  -H 'Authorization: Bearer <access_token>' \
+  -F 'audio=@./question.wav'
+```
+
+La réponse JSON contient la transcription, le texte de réponse et
+`audio_output_base64`, à décoder côté client. Ne définissez pas manuellement
+`Content-Type`, car la boundary multipart doit être ajoutée par le client.
+Cette route partage la limite de 50 tours vocaux quotidiens du WebSocket.
+Les implémentations STT/TTS actuelles sont des mocks; pour obtenir une sortie
+réellement lisible, branchez un moteur TTS et précisez son format audio.
+
+Les comptes gratuits reçoivent 1 000 jetons, rechargés à minuit UTC
+(minuit à Abidjan), sans report du solde gratuit inutilisé. Chaque échange
+Conversation débite les jetons d'entrée et de réponse du modèle; le solde
+gratuit est consommé avant le solde acheté. Tant que `MockDialogue` est utilisé,
+le débit est une estimation lexicale temporaire. Un adaptateur de modèle réel
+doit fournir ses compteurs d'entrée et de sortie. Les échanges texte exposent
+le débit de crédits dans `X-Credit-Tokens-Charged`. `Authorization: Bearer`
+contient uniquement le JWT d'authentification; le corps interne de débit
+transporte séparément `credit_tokens`. Le comptage du modèle est signalé par
+`X-Model-Token-Usage-Estimated` lorsqu'il s'agit encore de l'estimation du mock.
+
+En mode gratuit, les comptes sans rôle `PRO` sont limités à 500 requêtes de
+message texte et 50 tours vocaux par jour UTC, tous deux remis à zéro à minuit
+UTC. Les requêtes qui dépassent ces limites reçoivent `429` (avec `Retry-After`
+pour le texte); les tours WebSocket reçoivent un événement `error` de statut
+`429`. Ces plafonds ne s'appliquent pas aux comptes `PRO` ni aux administrateurs.
 
 La Gateway retourne `401` pour un jeton absent/invalide, `403` pour un rôle
 non autorisé, `429` lorsque la limite est dépassée, `502` si l'upstream est

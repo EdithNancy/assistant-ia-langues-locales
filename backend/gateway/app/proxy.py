@@ -13,7 +13,8 @@ HOP_BY_HOP = {
     "te", "trailers", "transfer-encoding", "upgrade", "host", "content-length",
 }
 FORWARDED_HEADERS = {"forwarded", "x-forwarded-for", "x-forwarded-host",
-                     "x-forwarded-port", "x-forwarded-proto", "x-real-ip"}
+                     "x-forwarded-port", "x-forwarded-proto", "x-real-ip",
+                     "x-token-usage-source"}
 
 
 def _excluded_headers(headers) -> set[str]:
@@ -67,12 +68,20 @@ async def forward(client: httpx.AsyncClient, request: Request, url: str,
                              headers=out_headers, background=BackgroundTask(resp.aclose))
 
 
-async def proxy_websocket(ws: WebSocket, upstream_url: str, user: User, request_id: str):
+async def proxy_websocket(
+    ws: WebSocket,
+    upstream_url: str,
+    user: User,
+    request_id: str,
+    authorization: str,
+):
     """Relais bidirectionnel texte/binaire (audio temps réel) client <-> service aval."""
     await ws.accept()
     try:
+        headers = user_headers(user, request_id)
+        headers["Authorization"] = authorization
         async with websockets.connect(
-            upstream_url, additional_headers=user_headers(user, request_id),
+            upstream_url, additional_headers=headers,
             max_size=1_000_000, ping_interval=20,
         ) as upstream:
             async def client_to_upstream():

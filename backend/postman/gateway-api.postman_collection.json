@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "69d51f2e-7815-4b74-90d3-e493f7db83f2",
     "name": "Assistant IA Langues Locales - API Gateway",
-    "description": "Collection de tests HTTP pour appeler les API exclusivement via le Gateway. Base URL par défaut : http://localhost:8000. Importez cette collection dans Postman, vérifiez que le backend Compose est démarré, puis envoyez les requêtes pertinentes individuellement. L'inscription crée un utilisateur de test avec une adresse unique; la connexion stocke automatiquement accessToken et refreshToken. Certains endpoints administratifs et Learning nécessitent des rôles/permissions dédiés. Les actions de révocation invalident les jetons : choisissez-en une seule et exécutez-la après les autres tests. Le WebSocket conversationnel se teste séparément dans Postman avec ws://localhost:8000/ws/conversation?token={{accessToken}}.",
+    "description": "Collection de tests des API via le Gateway. L'utilisateur peut faire une requête en parlant (parcours vocal privilégié : audio en entrée, transcription, réponse audio et texte) ou en écrivant. Base URL par défaut : http://localhost:8000. Importez cette collection dans Postman, vérifiez que le backend Compose est démarré, puis envoyez les requêtes pertinentes individuellement. L'inscription crée un utilisateur de test avec une adresse unique; la connexion stocke automatiquement accessToken et refreshToken. En mode gratuit, un compte sans rôle PRO est limité à 500 messages texte et 50 tours vocaux par jour UTC. Certains endpoints administratifs et Learning nécessitent des rôles/permissions dédiés. Les actions de révocation invalident les jetons : choisissez-en une seule et exécutez-la après les autres tests. Pour tester le parcours vocal dans Postman, créez une conversation via POST /api/conversations, puis ouvrez le WebSocket ws://localhost:8000/ws/conversation?token={{accessToken}}&conversation_id={{conversationId}} et envoyez l'audio parlé suivi de end_of_speech. Le serveur renvoie le transcript, le texte de réponse et l'audio de la réponse.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -32,6 +32,11 @@
     {
       "key": "baseUrl",
       "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "wsBaseUrl",
+      "value": "ws://localhost:8000",
       "type": "string"
     },
     {
@@ -384,9 +389,39 @@
         },
         {
           "name": "Mon solde de jetons",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Le solde de jetons est accessible (HTTP 200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const balance = pm.response.json();",
+                  "pm.test('Le solde contient les champs attendus', function () {",
+                  "    pm.expect(balance.total_tokens).to.be.a('number');",
+                  "    pm.expect(balance.free_tokens_remaining).to.be.a('number');",
+                  "    pm.expect(balance.purchased_tokens_remaining).to.be.a('number');",
+                  "    pm.expect(balance.has_tokens).to.be.a('boolean');",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "url": {
               "raw": "{{baseUrl}}/api/users/me/tokens",
               "host": [
@@ -398,7 +433,8 @@
                 "me",
                 "tokens"
               ]
-            }
+            },
+            "description": "Utilise explicitement le Bearer Token enregistré par la requête de connexion. Exécutez d'abord « Connexion » pour renseigner accessToken."
           },
           "response": []
         },
@@ -821,6 +857,16 @@
     },
     {
       "name": "Conversations",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{accessToken}}",
+            "type": "string"
+          }
+        ]
+      },
       "item": [
         {
           "name": "Créer une conversation",
@@ -909,6 +955,27 @@
           "response": []
         },
         {
+          "name": "Lister les messages d'une conversation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations/{{conversationId}}/messages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "conversations",
+                "{{conversationId}}",
+                "messages"
+              ]
+            },
+            "description": "Retourne dans l'ordre les messages envoyés par l'utilisateur et les réponses de l'IA. Accessible uniquement au propriétaire de la conversation."
+          },
+          "response": []
+        },
+        {
           "name": "Envoyer un message texte",
           "request": {
             "method": "POST",
@@ -939,7 +1006,68 @@
                 "messages"
               ]
             },
-            "description": "Nécessite une conversation existante. La réponse Dialogue dépend de la configuration du fournisseur IA."
+            "description": "Nécessite une conversation existante. En mode gratuit, la limite est de 500 requêtes par jour UTC. La réponse Dialogue dépend de la configuration du fournisseur IA."
+          },
+          "response": []
+        },
+        {
+          "name": "Envoyer un message vocal (fichier audio form-data)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "audio",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations/{{conversationId}}/messages/audio",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "conversations",
+                "{{conversationId}}",
+                "messages",
+                "audio"
+              ]
+            },
+            "description": "Sélectionnez un fichier audio dans le champ form-data « audio ». Exécutez d'abord « Connexion » et « Créer une conversation ». La réponse contient la transcription, le texte de l'assistant et audio_output_base64 (à décoder côté client). En mode gratuit : 50 requêtes audio par jour UTC. Ne définissez pas manuellement Content-Type : Postman doit ajouter la boundary multipart."
+          },
+          "response": []
+        },
+        {
+          "name": "Parler à l'assistant et recevoir une réponse vocale",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{wsBaseUrl}}/ws/conversation?token={{accessToken}}&conversation_id={{conversationId}}",
+              "host": [
+                "{{wsBaseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "conversation"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}"
+                },
+                {
+                  "key": "conversation_id",
+                  "value": "{{conversationId}}"
+                }
+              ]
+            },
+            "description": "Parcours vocal de bout en bout : la personne parle, le client envoie l'audio, le serveur transcrit et traite la requête, puis renvoie une réponse en audio et en texte. Exécutez d'abord « Connexion » et « Créer une conversation ». Ouvrez cette connexion WebSocket, envoyez une ou plusieurs trames audio binaires puis le message JSON {\"type\":\"end_of_speech\"}. Le serveur renvoie transcript, reply, les trames audio de la réponse, puis done. Le texte permet aussi l'affichage ou le sous-titrage. En mode gratuit : 50 tours vocaux par jour UTC. Dans Postman, utilisez le compositeur WebSocket; wsBaseUrl vaut ws://localhost:8000 par défaut."
           },
           "response": []
         },

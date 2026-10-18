@@ -4,7 +4,21 @@
 Étape 3 : remplacer par des clients HTTP/gRPC vers les vrais services,
 sans toucher au reste du code (même interface).
 """
+import re
+from dataclasses import dataclass
 from typing import AsyncIterator, Protocol
+
+
+@dataclass(frozen=True)
+class DialogueReply:
+    content: str
+    input_tokens: int
+    output_tokens: int
+    estimated_usage: bool = False
+
+    @property
+    def total_tokens(self) -> int:
+        return self.input_tokens + self.output_tokens
 
 
 class STT(Protocol):
@@ -12,7 +26,7 @@ class STT(Protocol):
 
 
 class Dialogue(Protocol):
-    async def reply(self, history: list[dict]) -> str: ...
+    async def reply(self, history: list[dict]) -> DialogueReply: ...
 
 
 class TTS(Protocol):
@@ -25,9 +39,22 @@ class MockSTT:
 
 
 class MockDialogue:
-    async def reply(self, history: list[dict]) -> str:
+    async def reply(self, history: list[dict]) -> DialogueReply:
         last = history[-1]["content"] if history else ""
-        return f"Je t'ai entendu : {last}"
+        answer = f"Je t'ai entendu : {last}"
+        prompt = "\n".join(
+            f"{item['role']}: {item['content']}" for item in history
+        )
+        return DialogueReply(
+            content=answer,
+            input_tokens=_estimate_tokens(prompt),
+            output_tokens=_estimate_tokens(answer),
+            estimated_usage=True,
+        )
+
+
+def _estimate_tokens(text: str) -> int:
+    return len(re.findall(r"\w+|[^\w\s]", text, flags=re.UNICODE))
 
 
 class MockTTS:

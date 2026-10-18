@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, time, timedelta, timezone
 
 from fastapi import HTTPException
 from sqlalchemy import select
@@ -26,27 +26,29 @@ class TokenService:
         refill_at = wallet.next_free_refill_at
         if refill_at.tzinfo is None:
             refill_at = refill_at.replace(tzinfo=timezone.utc)
+        if now.tzinfo is None:
+            now = now.replace(tzinfo=timezone.utc)
+        now = now.astimezone(timezone.utc)
+        refill_at = refill_at.astimezone(timezone.utc)
         if now < refill_at:
             return
 
-        interval_seconds = settings.FREE_TOKEN_REFILL_DAYS * 24 * 60 * 60
-        elapsed_seconds = (now - refill_at).total_seconds()
-        periods = int(elapsed_seconds // interval_seconds) + 1
         delta = settings.FREE_TOKEN_GRANT - wallet.free_tokens_remaining
         wallet.free_tokens_remaining = settings.FREE_TOKEN_GRANT
-        wallet.next_free_refill_at = refill_at + timedelta(
-            days=settings.FREE_TOKEN_REFILL_DAYS * periods
+        tomorrow = now.date() + timedelta(days=1)
+        wallet.next_free_refill_at = datetime.combine(
+            tomorrow, time.min, tzinfo=timezone.utc
         )
         if delta:
             db.add(TokenTransaction(
                 user_id=wallet.user_id,
                 bucket="free",
                 amount=delta,
-                reason="monthly_refill",
+                reason="daily_refill",
             ))
             db.add(UsageEvent(
                 id=uuid.uuid4(),
-                event_type="tokens.monthly_refill",
+                event_type="tokens.daily_refill",
                 user_id=wallet.user_id,
                 method="INTERNAL",
                 route="token_wallet",
@@ -70,13 +72,18 @@ class TokenService:
         return int(balance["total_tokens"]) >= amount
 
     @staticmethod
-    def consume_tokens(db: Session, user_id: uuid.UUID, amount: int) -> None:
-        if amount < 1:
-            raise ValueError("amount must be a positive integer")
+    def consume_credit_tokens(
+        db: Session, user_id: uuid.UUID, credit_tokens: int
+    ) -> dict[str, object]:
+        """Debit conversational credits; authentication credentials are never wallet units."""
+        if credit_tokens < 1:
+            raise ValueError("credit_tokens must be a positive integer")
         wallet = TokenService._get_wallet(db, user_id)
         TokenService._refresh_free_tokens(db, wallet, datetime.now(timezone.utc))
-        available = wallet.free_tokens_remaining + wallet.purchased_tokens_remaining
-        if available < amount:
+        available_credit_tokens = (
+            wallet.free_tokens_remaining + wallet.purchased_tokens_remaining
+        )
+        if available_credit_tokens < credit_tokens:
             db.add(UsageEvent(
                 id=uuid.uuid4(),
                 event_type="tokens.consume_denied",
@@ -85,13 +92,16 @@ class TokenService:
                 route="token_wallet",
                 status_code=402,
                 duration_ms=0,
-                details={"requested": amount, "available": available},
+                details={
+                    "requested_credit_tokens": credit_tokens,
+                    "available_credit_tokens": available_credit_tokens,
+                },
             ))
             db.commit()
             raise HTTPException(402, "Tokens insuffisants. Attendez le prochain renouvellement.")
 
-        free_used = min(wallet.free_tokens_remaining, amount)
-        paid_used = amount - free_used
+        free_used = min(wallet.free_tokens_remaining, credit_tokens)
+        paid_used = credit_tokens - free_used
         wallet.free_tokens_remaining -= free_used
         wallet.purchased_tokens_remaining -= paid_used
         if free_used:
@@ -111,12 +121,13 @@ class TokenService:
             status_code=200,
             duration_ms=0,
             details={
-                "amount": amount,
-                "free_tokens": free_used,
-                "purchased_tokens": paid_used,
+                "credit_tokens": credit_tokens,
+                "free_credit_tokens": free_used,
+                "purchased_credit_tokens": paid_used,
             },
         ))
         db.commit()
+        return TokenService._as_balance(wallet)
 
     @staticmethod
     def grant_purchased_tokens(

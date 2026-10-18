@@ -1,7 +1,7 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
-from sqlalchemy import DateTime, ForeignKey, String, Text
+from sqlalchemy import Date, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .db import Base
@@ -33,3 +33,16 @@ class Message(Base):
     content: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
     conversation: Mapped[Conversation] = relationship(back_populates="messages")
+
+
+class DailyUsage(Base):
+    __tablename__ = "daily_usage"
+    __table_args__ = (
+        UniqueConstraint("user_id", "usage_date", "kind", name="uq_daily_usage_user_date_kind"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    user_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    usage_date: Mapped[date] = mapped_column(Date, nullable=False)
+    kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

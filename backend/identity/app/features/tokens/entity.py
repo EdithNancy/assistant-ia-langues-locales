@@ -23,9 +23,8 @@ class TokenWallet(Base):
 
     @staticmethod
     def next_refill_time() -> datetime:
-        from app.config import settings
-
-        return datetime.now(timezone.utc) + timedelta(days=settings.FREE_TOKEN_REFILL_DAYS)
+        tomorrow = datetime.now(timezone.utc).date() + timedelta(days=1)
+        return datetime(tomorrow.year, tomorrow.month, tomorrow.day, tzinfo=timezone.utc)
 
 
 class TokenTransaction(Base):

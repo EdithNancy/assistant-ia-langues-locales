@@ -1,10 +1,11 @@
 import os
+from app.config import settings
 from app.core.database import SessionLocal
 from app.core.security import hash_password
 from app.features.permissions.entity import Permission  # noqa: F401 - enregistre le modèle ORM
 from app.features.roles.entity import Role
+from app.features.tokens.entity import TokenTransaction, TokenWallet
 from app.features.users.entity import User
-from app.features.sessions.entity import UserSession
 
 
 def main():
@@ -23,9 +24,23 @@ def main():
         role = db.query(Role).filter_by(code="SUPER_ADMIN").first()
         if role is None:
             raise SystemExit("Lancer d'abord python -m scripts.seed_rbac")
-        db.add(User(full_name=name.strip(), email=email.lower().strip(),
+        user = User(full_name=name.strip(), email=email.lower().strip(),
                     password_hash=hash_password(password), is_active=True,
-                    is_verified=True, roles=[role]))
+                    is_verified=True, roles=[role])
+        db.add(user)
+        db.flush()
+        db.add(TokenWallet(
+            user_id=user.id,
+            free_tokens_remaining=settings.FREE_TOKEN_GRANT,
+            purchased_tokens_remaining=0,
+            next_free_refill_at=TokenWallet.next_refill_time(),
+        ))
+        db.add(TokenTransaction(
+            user_id=user.id,
+            bucket="free",
+            amount=settings.FREE_TOKEN_GRANT,
+            reason="signup_grant",
+        ))
         db.commit()
     print("Super administrateur créé.")
 

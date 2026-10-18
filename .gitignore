@@ -87,9 +87,3 @@ temp/
 .cache/
 
 # =========================
-# IDE et système
-# =========================
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db

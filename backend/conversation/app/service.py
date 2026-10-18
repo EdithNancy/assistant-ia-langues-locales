@@ -31,3 +31,12 @@ async def history(session: AsyncSession, cid: str) -> list[dict]:
     rows = (await session.execute(
         select(Message).where(Message.conversation_id == cid).order_by(Message.id))).scalars()
     return [{"role": m.role, "content": m.content} for m in rows]
+
+
+async def list_messages(session: AsyncSession, cid: str) -> list[Message]:
+    rows = await session.scalars(
+        select(Message)
+        .where(Message.conversation_id == cid)
+        .order_by(Message.id)
+    )
+    return list(rows)

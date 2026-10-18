@@ -1,9 +1,33 @@
 import os
 from dataclasses import dataclass, field
+from pathlib import Path
+
+from dotenv import dotenv_values
+
+
+_BACKEND_ENV_PATH = Path(__file__).resolve().parents[2] / ".env"
+_IDENTITY_ENV_PATH = Path(__file__).resolve().parents[2] / "identity" / ".env"
 
 
 def _env(name: str, default: str = "") -> str:
     return os.environ.get(name, default)
+
+
+def _dotenv_env(path: Path, name: str) -> str | None:
+    value = dotenv_values(path).get(name)
+    return value if isinstance(value, str) else None
+
+
+def _jwt_env(name: str, *, legacy_name: str | None = None, default: str = "") -> str:
+    if name in os.environ:
+        return os.environ[name]
+    for path in (_BACKEND_ENV_PATH, _IDENTITY_ENV_PATH):
+        value = _dotenv_env(path, name)
+        if value is not None:
+            return value
+    if legacy_name:
+        return os.environ.get(legacy_name, default)
+    return default
 
 
 @dataclass(frozen=True)
@@ -15,9 +39,9 @@ class Route:
 
 @dataclass(frozen=True)
 class Settings:
-    jwt_algorithm: str = _env("JWT_ALGORITHM", "HS256")
-    jwt_key: str = _env("JWT_KEY")
-    jwt_audience: str | None = _env("JWT_AUDIENCE") or None
+    jwt_algorithm: str = _jwt_env("JWT_ALGORITHM", default="HS256")
+    jwt_key: str = _jwt_env("JWT_SECRET_KEY", legacy_name="JWT_KEY")
+    jwt_audience: str | None = _jwt_env("JWT_AUDIENCE") or None
     redis_url: str | None = _env("REDIS_URL") or None
     rate_limit: int = int(_env("RATE_LIMIT", "120"))
     rate_window: int = int(_env("RATE_WINDOW", "60"))
@@ -59,7 +83,7 @@ class Settings:
             "sessions": Route(f"{identity}/api/v1/sessions"),
             "usage": Route(f"{identity}/api/v1/usage"),
             "data": Route(f"{identity}/api/v1/data"),
-            "conversations": Route(_env("CONVERSATION_URL", "http://conversation:8002")),
+            "conversations": Route(_env("CONVERSATION_URL", "http://127.0.0.1:8002")),
             "learning": Route(
                 _env("LEARNING_URL", "http://learning:8003"),
                 roles=frozenset({"pro", "admin", "super_admin"}),
@@ -69,7 +93,7 @@ class Settings:
     @property
     def ws_routes(self) -> dict[str, str]:
         """/ws/<nom> -> URL WebSocket en aval."""
-        conv = _env("CONVERSATION_URL", "http://conversation:8002")
+        conv = _env("CONVERSATION_URL", "http://127.0.0.1:8002")
         return {"conversation": conv.replace("http", "ws", 1) + "/ws"}
 
 

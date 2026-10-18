@@ -1,4 +1,5 @@
 import base64
+import os
 import unittest
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -29,6 +30,7 @@ from app.features.usage.entity import UsageEvent
 from app.features.users.entity import User
 from app.features.users.schemas import UserRegister
 from app.features.users.service import UserService
+from scripts import create_super_admin
 
 
 class TokenWalletTests(unittest.TestCase):
@@ -42,6 +44,7 @@ class TokenWalletTests(unittest.TestCase):
         self.db = Session(self.engine, expire_on_commit=False)
         self.db.add_all([
             Role(code="USER", name="Utilisateur"),
+            Role(code="SUPER_ADMIN", name="Super administrateur"),
             Permission(code="test", name="Test"),
         ])
         self.user = User(
@@ -74,7 +77,7 @@ class TokenWalletTests(unittest.TestCase):
         settings.GOOGLE_CLIENT_IDS = self.original_google_client_ids
 
     def test_balance_and_atomic_consumption(self) -> None:
-        TokenService.consume_tokens(self.db, self.user.id, 250)
+        TokenService.consume_credit_tokens(self.db, self.user.id, 250)
         balance = TokenService.get_balance(self.db, self.user.id)
 
         self.assertEqual(balance["free_tokens_remaining"], 750)
@@ -83,28 +86,65 @@ class TokenWalletTests(unittest.TestCase):
         usage_event = self.db.scalar(select(UsageEvent).where(
             UsageEvent.event_type == "tokens.consumed"
         ))
-        self.assertEqual(usage_event.details["amount"], 250)
+        self.assertEqual(usage_event.details["credit_tokens"], 250)
 
-    def test_refill_resets_free_allowance_without_carryover(self) -> None:
+    def test_bootstrap_super_admin_receives_token_wallet(self) -> None:
+        email = f"{uuid.uuid4()}@example.com"
+        with (
+            patch.dict(os.environ, {
+                "BOOTSTRAP_ADMIN_NAME": "Bootstrap Admin",
+                "BOOTSTRAP_ADMIN_EMAIL": email,
+                "BOOTSTRAP_ADMIN_PASSWORD": "secure-test-password",
+            }),
+            patch.object(create_super_admin, "SessionLocal", return_value=self.db),
+        ):
+            create_super_admin.main()
+
+        user = self.db.scalar(select(User).where(User.email == email))
+        self.assertIsNotNone(user)
+        assert user is not None
+        wallet = self.db.get(TokenWallet, user.id)
+        self.assertIsNotNone(wallet)
+        assert wallet is not None
+        self.assertEqual(wallet.free_tokens_remaining, settings.FREE_TOKEN_GRANT)
+        grant = self.db.scalar(select(TokenTransaction).where(
+            TokenTransaction.user_id == user.id,
+            TokenTransaction.reason == "signup_grant",
+        ))
+        self.assertIsNotNone(grant)
+
+    def test_refill_resets_free_allowance_at_utc_midnight_without_carryover(self) -> None:
         wallet = self.db.get(TokenWallet, self.user.id)
         wallet.free_tokens_remaining = 12
-        wallet.next_free_refill_at = datetime.now(timezone.utc) - timedelta(seconds=1)
+        now = datetime(2026, 10, 15, 0, 0, tzinfo=timezone.utc)
+        wallet.next_free_refill_at = now
         self.db.commit()
 
-        balance = TokenService.get_balance(self.db, self.user.id)
+        TokenService._refresh_free_tokens(self.db, wallet, now)
+        self.db.commit()
 
-        self.assertEqual(balance["free_tokens_remaining"], settings.FREE_TOKEN_GRANT)
-        self.assertEqual(balance["purchased_tokens_remaining"], 0)
-        refill_at = balance["next_free_refill_at"]
-        if refill_at.tzinfo is None:
-            refill_at = refill_at.replace(tzinfo=timezone.utc)
-        self.assertGreater(refill_at, datetime.now(timezone.utc))
+        self.assertEqual(wallet.free_tokens_remaining, settings.FREE_TOKEN_GRANT)
+        self.assertEqual(wallet.purchased_tokens_remaining, 0)
+        self.assertEqual(
+            wallet.next_free_refill_at,
+            datetime(2026, 10, 16, 0, 0, tzinfo=timezone.utc),
+        )
         self.assertEqual(
             self.db.scalar(select(TokenTransaction).where(
-                TokenTransaction.reason == "monthly_refill"
+                TokenTransaction.reason == "daily_refill"
             )).amount,
             settings.FREE_TOKEN_GRANT - 12,
         )
+
+    def test_free_tokens_do_not_refill_before_utc_midnight(self) -> None:
+        wallet = self.db.get(TokenWallet, self.user.id)
+        wallet.free_tokens_remaining = 12
+        wallet.next_free_refill_at = datetime(2026, 10, 16, 0, 0, tzinfo=timezone.utc)
+        now = datetime(2026, 10, 15, 23, 59, tzinfo=timezone.utc)
+
+        TokenService._refresh_free_tokens(self.db, wallet, now)
+
+        self.assertEqual(wallet.free_tokens_remaining, 12)
 
     def test_purchased_tokens_are_spent_after_free_tokens(self) -> None:
         reference = f"payment-{uuid.uuid4()}"
@@ -112,7 +152,9 @@ class TokenWalletTests(unittest.TestCase):
             self.db, self.user.id, 50, reference
         )
         TokenService.grant_purchased_tokens(self.db, self.user.id, 50, reference)
-        TokenService.consume_tokens(self.db, self.user.id, settings.FREE_TOKEN_GRANT + 20)
+        TokenService.consume_credit_tokens(
+            self.db, self.user.id, settings.FREE_TOKEN_GRANT + 20
+        )
         balance = TokenService.get_balance(self.db, self.user.id)
 
         self.assertEqual(balance["free_tokens_remaining"], 0)
@@ -135,7 +177,9 @@ class TokenWalletTests(unittest.TestCase):
 
     def test_insufficient_balance_does_not_debit_tokens(self) -> None:
         with self.assertRaises(HTTPException) as error:
-            TokenService.consume_tokens(self.db, self.user.id, settings.FREE_TOKEN_GRANT + 1)
+            TokenService.consume_credit_tokens(
+                self.db, self.user.id, settings.FREE_TOKEN_GRANT + 1
+            )
 
         self.assertEqual(error.exception.status_code, 402)
         self.assertEqual(
