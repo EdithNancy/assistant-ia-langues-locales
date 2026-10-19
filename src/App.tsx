@@ -7,10 +7,15 @@ import { TraduireTab } from './components/TraduireTab';
 import { ApprendreTab } from './components/ApprendreTab';
 import { VoiceSessionModal } from './components/VoiceSessionModal';
 import { ProfileModal, StoryModal, VocabularyModal } from './components/Modals';
+import { LoginPage } from './components/auth/LoginPage';
+import { RegisterPage } from './components/auth/RegisterPage';
 import { Language } from './types';
 import { soundEngine } from './utils/audio';
 
+type AuthView = 'login' | 'register' | 'authenticated';
+
 export default function App() {
+  const [authView, setAuthView] = useState<AuthView>('login');
   const [currentTab, setCurrentTab] = useState<TabKey>('accueil');
   const [currentLanguage, setCurrentLanguage] = useState<Language>('baoule');
   const [isVoiceSessionOpen, setIsVoiceSessionOpen] = useState(false);
@@ -54,6 +59,35 @@ export default function App() {
     setCurrentTab('discussions');
     showNotification(`Ouverture de la discussion : ${title}`);
   };
+
+  const handleAuthenticated = (lang: Language) => {
+    setCurrentLanguage(lang);
+    setAuthView('authenticated');
+    window.scrollTo({ top: 0 });
+    showNotification(lang === 'dioula' ? 'I ni ce ! Bienvenue sur IvoirAI' : 'Akwaba ! Bienvenue sur IvoirAI');
+  };
+
+  if (authView !== 'authenticated') {
+    const goTo = (view: AuthView) => {
+      setAuthView(view);
+      window.scrollTo({ top: 0 });
+    };
+    return (
+      <div className="min-h-screen bg-[#f9f9fb] text-[#1a1c1d] flex flex-col items-center">
+        <div className="w-full max-w-md min-h-screen bg-[#f9f9fb] relative shadow-[0_0_50px_rgba(0,51,49,0.08)]">
+          {authView === 'login' ? (
+            <LoginPage onAuthenticated={handleAuthenticated} onGoToRegister={() => goTo('register')} />
+          ) : (
+            <RegisterPage
+              onAuthenticated={handleAuthenticated}
+              onGoToLogin={() => goTo('login')}
+              onBack={() => goTo('login')}
+            />
+          )}
+        </div>
+      </div>
+    );
+  }
 
   const getHeaderTitle = () => {
     switch (currentTab) {
