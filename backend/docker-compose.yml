@@ -15,7 +15,7 @@ services:
       REDIS_URL: redis://:${REDIS_PASSWORD:?Définir REDIS_PASSWORD dans le fichier .env}@redis:6379/0
       RATE_LIMIT: ${RATE_LIMIT:-120}
       RATE_WINDOW: ${RATE_WINDOW:-60}
-      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      CORS_ORIGINS: ${GATEWAY_CORS_ORIGINS:-http://localhost:5173}
       UPSTREAM_TIMEOUT: ${UPSTREAM_TIMEOUT:-30}
       FORWARDED_ALLOW_IPS: ${GATEWAY_TRUSTED_PROXIES:-127.0.0.1}
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -60,7 +60,7 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:?Définir JWT_SECRET_KEY dans le fichier .env}
       JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
       JWT_AUDIENCE: ${JWT_AUDIENCE:-}
-      CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:5173"]}
+      CORS_ORIGINS: ${IDENTITY_CORS_ORIGINS:-["http://localhost:5173"]}
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       OTEL_SERVICE_NAME: identity
     depends_on:

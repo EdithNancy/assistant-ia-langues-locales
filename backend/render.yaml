@@ -1,0 +1,75 @@
+services:
+  # 1. Gateway (point d'entrée public)
+  - type: web
+    name: gateway
+    runtime: docker
+    plan: free
+    dockerfilePath: ./gateway/Dockerfile
+    dockerContext: .
+    healthCheckPath: /ready
+    envVars:
+      - key: IDENTITY_URL
+        value: https://identity-xxxx.onrender.com # À remplacer après création
+      - key: CONVERSATION_URL
+        value: https://conversation-xxxx.onrender.com
+      - key: LEARNING_URL
+        value: https://learning-xxxx.onrender.com
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: gateway-redis
+          property: connectionString
+      - key: CORS_ORIGINS
+        value: https://ton-frontend.vercel.app,http://localhost:3000
+      - key: OTEL_SDK_DISABLED
+        value: "true"
+      - key: JWT_SECRET_KEY
+        sync: false # Tu le rempliras dans le dashboard
+
+  # 2. Identity
+  - type: web
+    name: identity
+    runtime: docker
+    plan: free
+    dockerfilePath: ./identity/Dockerfile
+    dockerContext: .
+    healthCheckPath: /ready
+    envVars:
+      - key: DATABASE_URL
+        sync: false # À remplir avec l'URL Supabase + search_path=identity
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: OTEL_SDK_DISABLED
+        value: "true"
+
+  # 3. Conversation
+  - type: web
+    name: conversation
+    runtime: docker
+    plan: free
+    dockerfilePath: ./conversation/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: DATABASE_URL
+        sync: false # URL Supabase + search_path=conversation
+      - key: OTEL_SDK_DISABLED
+        value: "true"
+
+  # 4. Learning
+  - type: web
+    name: learning
+    runtime: docker
+    plan: free
+    dockerfilePath: ./learning/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: DATABASE_URL
+        sync: false # URL Supabase + search_path=learning
+      - key: OTEL_SDK_DISABLED
+        value: "true"
+
+  # 5. Redis (Key Value)
+  - type: keyvalue
+    name: gateway-redis
+    plan: free
+    ipAllowList: []

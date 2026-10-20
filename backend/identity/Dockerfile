@@ -17,6 +17,7 @@ RUN apt-get update \
 COPY observability /srv/observability
 COPY identity /srv/identity
 WORKDIR /srv/identity
+RUN pip install --no-cache-dir /srv/observability
 RUN pip install --no-cache-dir -r requirements.txt \
     && useradd --system --uid 10001 --create-home app \
     && chown -R app:app /srv/identity

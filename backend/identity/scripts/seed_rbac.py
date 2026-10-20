@@ -5,13 +5,17 @@ from app.features.users.entity import User
 from app.features.sessions.entity import UserSession
 from app.features.roles.entity import Role
 from app.features.permissions.entity import Permission
+from app.features.auth.social import FederatedIdentity
 
 PERMISSIONS = [
     ("users.read", "Lire les utilisateurs"), ("users.create", "Créer des utilisateurs"),
-    ("users.update", "Modifier les utilisateurs"), ("users.disable", "Désactiver les utilisateurs"),
+    ("users.update", "Modifier les utilisateurs"), ("users.disable",
+                                                    "Désactiver les utilisateurs"),
     ("roles.read", "Lire les rôles"), ("roles.manage", "Gérer les rôles"),
-    ("permissions.read", "Lire les permissions"), ("permissions.manage", "Gérer les permissions"),
-    ("sessions.read_all", "Lire toutes les sessions"), ("sessions.revoke_all", "Révoquer toutes les sessions"),
+    ("permissions.read", "Lire les permissions"), ("permissions.manage",
+                                                   "Gérer les permissions"),
+    ("sessions.read_all", "Lire toutes les sessions"), ("sessions.revoke_all",
+                                                        "Révoquer toutes les sessions"),
     ("corpus.validate", "Valider le corpus"), ("assistant.use", "Utiliser l'assistant"),
     ("data.manage", "Gérer les langues et le vocabulaire"),
     ("usage.read", "Consulter les journaux d'utilisation"),
@@ -29,6 +33,7 @@ ROLE_PERMISSIONS = {
 }
 ROLE_NAMES = {"USER": "Utilisateur", "LINGUIST": "Linguiste", "MODERATOR": "Modérateur",
               "PRO": "Professionnel", "ADMIN": "Administrateur", "SUPER_ADMIN": "Super administrateur"}
+
 
 def main():
     with SessionLocal() as db:
@@ -48,6 +53,7 @@ def main():
             role.permissions = [permissions[p] for p in ROLE_PERMISSIONS[code]]
         db.commit()
     print("Rôles et permissions initialisés.")
+
 
 if __name__ == "__main__":
     main()

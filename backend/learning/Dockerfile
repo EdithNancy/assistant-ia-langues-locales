@@ -5,6 +5,7 @@ WORKDIR /srv
 COPY observability /srv/observability
 COPY learning /srv/learning
 WORKDIR /srv/learning
+RUN pip install --no-cache-dir /srv/observability
 RUN pip install --no-cache-dir -r requirements.txt \
     && useradd --system --uid 10001 --create-home app
 USER 10001

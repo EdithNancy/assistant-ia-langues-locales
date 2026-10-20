@@ -11,4 +11,3 @@ alembic
 email-validator>=2.2
 python-jose[cryptography]>=3.3
 pwdlib[argon2]>=0.2
--e ../observability
