@@ -46,11 +46,13 @@ async def health():
 
 
 @app.get("/ready")
-async def readiness():
+async def ready(request: Request):
     try:
-        async with engine.connect() as connection:
-            await connection.execute(text("SELECT 1"))
-    except SQLAlchemyError:
+        # Vérifie la connexion DB
+        await request.app.state.db.execute(text("SELECT 1"))
+        # Vérifie Redis si utilisé
+        await request.app.state.redis.ping()
+    except Exception:
         return JSONResponse({"status": "not_ready"}, status_code=503)
     return {"status": "ready"}
 

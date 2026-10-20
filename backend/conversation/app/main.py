@@ -20,7 +20,8 @@ async def lifespan(app: FastAPI):
         trust_env=False,
     )
     try:
-        async with engine.begin() as conn:  # dev : création auto. Plus tard : migrations Alembic.
+        # dev : création auto. Plus tard : migrations Alembic.
+        async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
         yield
     finally:
@@ -39,11 +40,13 @@ async def health():
 
 
 @app.get("/ready")
-async def readiness():
+async def ready(request: Request):
     try:
-        async with engine.connect() as connection:
-            await connection.execute(text("SELECT 1"))
-    except SQLAlchemyError:
+        # Vérifie la connexion DB
+        await request.app.state.db.execute(text("SELECT 1"))
+        # Vérifie Redis si utilisé
+        await request.app.state.redis.ping()
+    except Exception:
         return JSONResponse({"status": "not_ready"}, status_code=503)
     return {"status": "ready"}
 
