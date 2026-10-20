@@ -17,7 +17,7 @@ services:
       - key: REDIS_URL
         fromService:
           type: keyvalue
-          name: djorssi-express.redis # <-- Nom exact avec le point
+          name: djorssi-express-redis
           property: connectionString
       - key: CORS_ORIGINS
         value: https://ton-frontend.vercel.app,http://localhost:3000
