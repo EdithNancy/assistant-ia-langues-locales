@@ -13,7 +13,7 @@ from redis.asyncio import Redis
 from redis.exceptions import RedisError, ResponseError
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
-from starlette.concurrency import run_in_threadpool
+# from starlette.concurrency import run_in_threadpool  <-- SUPPRIMÉ
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
@@ -130,11 +130,10 @@ def health():
 @app.get("/ready", tags=["Health"])
 async def readiness(request: Request):
     try:
-        def check_database() -> None:
-            with engine.connect() as connection:
-                connection.execute(text("SELECT 1"))
+        # Utilisation de "async with" car engine est un AsyncEngine
+        async with engine.connect() as connection:
+            await connection.execute(text("SELECT 1"))
 
-        await run_in_threadpool(check_database)
         await request.app.state.redis.ping()
     except (SQLAlchemyError, RedisError):
         logger.exception("Identity readiness check failed")
