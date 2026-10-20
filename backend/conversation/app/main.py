@@ -10,6 +10,7 @@ from . import api, ws
 from . import config
 from .db import Base, engine
 from backend_observability import instrument_app
+from app.usage_limits import limiter  # adapte le chemin
 
 
 @asynccontextmanager
@@ -34,11 +35,13 @@ observability = instrument_app(app, "conversation", engine=engine)
 
 
 @app.get("/health")
+@limiter.exempt
 async def health():
     return {"status": "ok"}
 
 
 @app.get("/ready")
+@limiter.exempt
 async def ready():
     try:
         async with engine.connect() as conn:
