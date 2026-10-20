@@ -7,7 +7,8 @@ from typing import Any, Protocol
 
 from redis.asyncio import Redis
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession  # <-- Import modifié
+from sqlalchemy.orm import selectinload
 
 from app.features.usage.entity import UsageEvent
 
@@ -74,9 +75,12 @@ async def enqueue_usage_event(redis: UsageStream, event: dict[str, Any]) -> str:
     return event_id
 
 
-def persist_usage_event(db: Session, fields: dict[str, Any]) -> None:
+# --- MODIFIÉ : Devient asynchrone ---
+async def persist_usage_event(db: AsyncSession, fields: dict[str, Any]) -> None:
     event_id = uuid.UUID(_decode(fields["id"]))
-    if db.get(UsageEvent, event_id) is not None:
+
+    # En async, on utilise await db.get()
+    if await db.get(UsageEvent, event_id) is not None:
         return
 
     raw_user_id = _decode(fields.get("user_id", ""))
@@ -100,7 +104,7 @@ def persist_usage_event(db: Session, fields: dict[str, Any]) -> None:
         created_at=created_at,
     )
     db.add(event)
-    db.commit()
+    await db.commit()  # <-- await
 
 
 def _decode(value: Any) -> str:
@@ -137,7 +141,8 @@ async def run_usage_log_worker(redis: Redis, stop_event: asyncio.Event) -> None:
 
             for message_id, fields in messages:
                 try:
-                    await asyncio.to_thread(_persist_usage_event, SessionLocal, fields)
+                    # --- MODIFIÉ : Appel direct sans to_thread ---
+                    await _persist_usage_event(SessionLocal, fields)
                 except (SQLAlchemyError, ValueError, KeyError, TypeError):
                     logger.exception(
                         "Failed to persist usage event %s; it remains queued for retry.",
@@ -147,13 +152,15 @@ async def run_usage_log_worker(redis: Redis, stop_event: asyncio.Event) -> None:
                 await redis.xack(USAGE_EVENTS_STREAM, USAGE_EVENTS_GROUP, message_id)
                 await redis.xdel(USAGE_EVENTS_STREAM, message_id)
         except RedisError:
-            logger.exception("Usage-log Redis worker failed; retrying shortly.")
+            logger.exception(
+                "Usage-log Redis worker failed; retrying shortly.")
             await asyncio.sleep(2)
 
 
-def _persist_usage_event(session_factory, fields: dict[str, Any]) -> None:
-    with session_factory() as db:
-        persist_usage_event(db, fields)
+# --- MODIFIÉ : Devient asynchrone et utilise AsyncSession ---
+async def _persist_usage_event(session_factory, fields: dict[str, Any]) -> None:
+    async with session_factory() as db:
+        await persist_usage_event(db, fields)
 
 
 async def enqueue_request_usage(
