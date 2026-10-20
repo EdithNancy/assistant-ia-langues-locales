@@ -1,55 +1,53 @@
 # Charger tous les modèles avant d'utiliser SQLAlchemy
-from app.core.database import SessionLocal
-from app.core.database import Base
-from app.features.users.entity import User
-from app.features.sessions.entity import UserSession
-from app.features.roles.entity import Role
-from app.features.permissions.entity import Permission
-from app.features.auth.social import FederatedIdentity, SocialAuthNonce
-from app.features.tokens.entity import TokenTransaction, TokenWallet
-from app.features.data.entity import Language, VocabularyEntry
-from app.features.usage.entity import UsageEvent
-from app.config import settings
+import asyncio
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from sqlalchemy.engine import Connection
+from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
+
+from app.config import settings
+from app.core.database import Base
+from app.features.users.entity import User  # noqa: F401
+from app.features.sessions.entity import UserSession  # noqa: F401
+from app.features.roles.entity import Role  # noqa: F401
+from app.features.permissions.entity import Permission  # noqa: F401
+from app.features.auth.social import FederatedIdentity, SocialAuthNonce  # noqa: F401
+from app.features.tokens.entity import TokenTransaction, TokenWallet  # noqa: F401
+from app.features.data.entity import Language, VocabularyEntry  # noqa: F401
+from app.features.usage.entity import UsageEvent  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL.replace("%", "%%"))
+
+
+def _async_url(url: str) -> str:
+    """Force le driver asyncpg (Render fournit postgres:// ou postgresql://)."""
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+    elif url.startswith("postgresql://"):
+        url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    # asyncpg n'accepte pas sslmode=..., il utilise ssl=...
+    url = url.replace("sslmode=", "ssl=")
+    return url
+
+
+config.set_main_option(
+    "sqlalchemy.url", _async_url(settings.DATABASE_URL).replace("%", "%%")
+)
 
 # Interpret the config file for Python logging.
-# This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
-
 target_metadata = Base.metadata
-# target_metadata = None
-
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
 
 
 def run_migrations_offline() -> None:
-    """Run migrations in 'offline' mode.
-
-    This configures the context with just a URL
-    and not an Engine, though an Engine is acceptable
-    here as well.  By skipping the Engine creation
-    we don't even need a DBAPI to be available.
-
-    Calls to context.execute() here emit the given string to the
-    script output.
-
-    """
+    """Run migrations in 'offline' mode."""
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
@@ -62,26 +60,30 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
-def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
+def do_run_migrations(connection: Connection) -> None:
+    context.configure(connection=connection, target_metadata=target_metadata)
 
-    In this scenario we need to create an Engine
-    and associate a connection with the context.
+    with context.begin_transaction():
+        context.run_migrations()
 
-    """
-    connectable = engine_from_config(
+
+async def run_async_migrations() -> None:
+    """Crée un moteur async et exécute les migrations via run_sync."""
+    connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
 
-    with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+    async with connectable.connect() as connection:
+        await connection.run_sync(do_run_migrations)
 
-        with context.begin_transaction():
-            context.run_migrations()
+    await connectable.dispose()
+
+
+def run_migrations_online() -> None:
+    """Run migrations in 'online' mode."""
+    asyncio.run(run_async_migrations())
 
 
 if context.is_offline_mode():
