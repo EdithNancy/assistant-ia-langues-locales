@@ -26,7 +26,7 @@ async def lifespan(app: FastAPI):
     try:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
-        async with SessionLocal() as session:  # scénarios d'exemple au premier démarrage
+        async with SessionLocal() as session:
             if (await session.execute(select(func.count()).select_from(Scenario))).scalar_one() == 0:
                 session.add_all(Scenario(**s) for s in SEED)
                 await session.commit()
@@ -46,13 +46,12 @@ async def health():
 
 
 @app.get("/ready")
-async def ready(request: Request):
+async def ready():
     try:
-        # Vérifie la connexion DB
-        await request.app.state.db.execute(text("SELECT 1"))
-        # Vérifie Redis si utilisé
-        await request.app.state.redis.ping()
-    except Exception:
+        # Vérifie la connexion DB directement via engine
+        async with engine.connect() as conn:
+            await conn.execute(text("SELECT 1"))
+    except SQLAlchemyError:
         return JSONResponse({"status": "not_ready"}, status_code=503)
     return {"status": "ready"}
 
