@@ -73,6 +73,12 @@ async def run_async_migrations() -> None:
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
+        # 👇 AJOUTE CES LIGNES
+        connect_args={
+            "server_settings": {
+                "search_path": "identity"
+            }
+        }
     )
 
     async with connectable.connect() as connection:
