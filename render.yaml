@@ -2,6 +2,7 @@ services:
   # 1. Gateway (point d'entrée public)
   - type: web
     name: gateway
+    region: virginia
     runtime: docker
     plan: free
     dockerfilePath: ./backend/gateway/Dockerfile
@@ -29,6 +30,7 @@ services:
   # 2. Identity
   - type: web
     name: identity
+    region: virginia
     runtime: docker
     plan: free
     dockerfilePath: ./backend/identity/Dockerfile
@@ -45,6 +47,7 @@ services:
   # 3. Conversation
   - type: web
     name: conversation
+    region: virginia
     runtime: docker
     plan: free
     dockerfilePath: ./backend/conversation/Dockerfile
@@ -60,6 +63,7 @@ services:
   # 4. Learning
   - type: web
     name: learning
+    region: virginia
     runtime: docker
     plan: free
     dockerfilePath: ./backend/learning/Dockerfile
