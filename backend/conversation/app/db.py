@@ -10,7 +10,7 @@ engine = create_async_engine(
     config.DATABASE_URL,
     connect_args={
         "server_settings": {
-            "search_path": "learning"  # <-- Remplace par "identity" ou "conversation"
+            "search_path": "conversation"  # <-- Remplace par "identity" ou "conversation"
         }
     }
 )
