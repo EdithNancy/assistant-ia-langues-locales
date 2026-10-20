@@ -9,22 +9,22 @@ services:
     healthCheckPath: /ready
     envVars:
       - key: IDENTITY_URL
-        value: https://identity-xxxx.onrender.com # À remplacer après création
+        sync: false
       - key: CONVERSATION_URL
-        value: https://conversation-xxxx.onrender.com
+        sync: false
       - key: LEARNING_URL
-        value: https://learning-xxxx.onrender.com
+        sync: false
       - key: REDIS_URL
         fromService:
           type: keyvalue
-          name: djorssi-express-redis
+          name: djorssi-express.redis # <-- Nom exact avec le point
           property: connectionString
       - key: CORS_ORIGINS
         value: https://ton-frontend.vercel.app,http://localhost:3000
       - key: OTEL_SDK_DISABLED
         value: "true"
       - key: JWT_SECRET_KEY
-        sync: false # Tu le rempliras dans le dashboard
+        sync: false
 
   # 2. Identity
   - type: web
@@ -36,7 +36,7 @@ services:
     healthCheckPath: /ready
     envVars:
       - key: DATABASE_URL
-        sync: false # À remplir avec l'URL Supabase + search_path=identity
+        sync: false
       - key: JWT_SECRET_KEY
         sync: false
       - key: OTEL_SDK_DISABLED
@@ -51,7 +51,9 @@ services:
     dockerContext: ./backend
     envVars:
       - key: DATABASE_URL
-        sync: false # URL Supabase + search_path=conversation
+        sync: false
+      - key: IDENTITY_URL
+        sync: false
       - key: OTEL_SDK_DISABLED
         value: "true"
 
@@ -64,6 +66,6 @@ services:
     dockerContext: ./backend
     envVars:
       - key: DATABASE_URL
-        sync: false # URL Supabase + search_path=learning
+        sync: false
       - key: OTEL_SDK_DISABLED
         value: "true"
