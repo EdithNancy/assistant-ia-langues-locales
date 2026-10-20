@@ -1,0 +1,11 @@
+# Installer PyTorch CUDA 12.8 avant ce fichier (voir INSTALLATION_PC.md).
+# Python 3.10 ou 3.11 recommandé. Redémarrer le noyau après installation.
+torch==2.7.1
+transformers==4.44.2
+peft==0.12.0
+accelerate==0.34.2
+sentencepiece==0.2.0
+pandas>=2.1,<2.3
+numpy>=1.26,<2
+sacrebleu==2.4.3
+ipykernel>=6.29,<8
