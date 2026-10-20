@@ -1,8 +1,6 @@
-from collections.abc import Generator
-from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, Session
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
+from sqlalchemy.orm import DeclarativeBase
 from app.config import settings
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 
 class Base(DeclarativeBase):
@@ -14,17 +12,22 @@ engine = create_async_engine(
     settings.DATABASE_URL,
     connect_args={
         "server_settings": {
-            "search_path": "identity"  # <-- Remplace par "identity" ou "conversation"
+            "search_path": "identity"
         }
     }
 )
+
+# On utilise AsyncSession, pas Session
 SessionLocal = async_sessionmaker(
-    bind=engine, class_=Session, autoflush=False, expire_on_commit=False)
+    bind=engine,
+    class_=AsyncSession,
+    autoflush=False,
+    expire_on_commit=False
+)
+
+# La fonction doit être asynchrone (async def) pour être utilisée avec await
 
 
-def get_db() -> Generator[Session, None, None]:
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+async def get_db():
+    async with SessionLocal() as session:
+        yield session
