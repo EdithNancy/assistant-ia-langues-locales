@@ -1,11 +1,16 @@
+import asyncio
+
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
+
 from app.core.database import SessionLocal
 
 # Charger tous les modèles SQLAlchemy avant les requêtes
-from app.features.users.entity import User
-from app.features.sessions.entity import UserSession
+from app.features.users.entity import User  # noqa: F401
+from app.features.sessions.entity import UserSession  # noqa: F401
 from app.features.roles.entity import Role
 from app.features.permissions.entity import Permission
-from app.features.auth.social import FederatedIdentity
+from app.features.auth.social import FederatedIdentity  # noqa: F401
 
 PERMISSIONS = [
     ("users.read", "Lire les utilisateurs"), ("users.create", "Créer des utilisateurs"),
@@ -35,25 +40,36 @@ ROLE_NAMES = {"USER": "Utilisateur", "LINGUIST": "Linguiste", "MODERATOR": "Mod�
               "PRO": "Professionnel", "ADMIN": "Administrateur", "SUPER_ADMIN": "Super administrateur"}
 
 
-def main():
-    with SessionLocal() as db:
+async def main():
+    async with SessionLocal() as db:
         permissions = {}
         for code, name in PERMISSIONS:
-            obj = db.query(Permission).filter_by(code=code).first()
+            result = await db.execute(select(Permission).filter_by(code=code))
+            obj = result.scalar_one_or_none()
             if obj is None:
                 obj = Permission(code=code, name=name)
                 db.add(obj)
             permissions[code] = obj
-        db.flush()
+        await db.flush()
+
         for code, name in ROLE_NAMES.items():
-            role = db.query(Role).filter_by(code=code).first()
+            result = await db.execute(
+                select(Role)
+                .options(selectinload(Role.permissions))
+                .filter_by(code=code)
+            )
+            role = result.scalar_one_or_none()
             if role is None:
                 role = Role(code=code, name=name)
                 db.add(role)
+            # Pour un Role neuf, la collection est vide mais pas "lazy" :
+            # l'affectation est donc sûre. Pour un Role existant, selectinload
+            # a déjà chargé la relation.
             role.permissions = [permissions[p] for p in ROLE_PERMISSIONS[code]]
-        db.commit()
+
+        await db.commit()
     print("Rôles et permissions initialisés.")
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
