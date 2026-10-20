@@ -17,7 +17,7 @@ services:
       - key: REDIS_URL
         fromService:
           type: keyvalue
-          name: gateway-redis
+          name: djorssi-express-redis
           property: connectionString
       - key: CORS_ORIGINS
         value: https://ton-frontend.vercel.app,http://localhost:3000
@@ -67,9 +67,3 @@ services:
         sync: false # URL Supabase + search_path=learning
       - key: OTEL_SDK_DISABLED
         value: "true"
-
-  # 5. Redis (Key Value)
-  - type: keyvalue
-    name: gateway-redis
-    plan: free
-    ipAllowList: []
