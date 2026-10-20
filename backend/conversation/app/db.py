@@ -3,7 +3,17 @@ from sqlalchemy.orm import DeclarativeBase
 
 from . import config
 
-engine = create_async_engine(config.DATABASE_URL)
+from sqlalchemy.ext.asyncio import create_async_engine
+
+# L'URL reste propre, sans ?options=...
+engine = create_async_engine(
+    config.DATABASE_URL,
+    connect_args={
+        "server_settings": {
+            "search_path": "learning"  # <-- Remplace par "identity" ou "conversation"
+        }
+    }
+)
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
 
