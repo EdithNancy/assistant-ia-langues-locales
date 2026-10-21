@@ -16,7 +16,7 @@ import { BRAND_ASSETS } from './data/mockData';
 import { Language } from './types';
 import { soundEngine } from './utils/audio';
 import { loadPreferences, savePreferences } from './utils/preferences';
-import { loadSession, saveSession } from './utils/session';
+import { clearSession, loadSession, saveSession } from './utils/session';
 
 /** Une URL par onglet : le rafraîchissement et le bouton Retour fonctionnent. */
 const TAB_PATHS: Record<NavTabKey, string> = {
@@ -73,6 +73,13 @@ export default function App() {
         ? 'Mode Dioula (Mandé) activé'
         : 'Mode Baoulé (Akan) activé'
     );
+  };
+
+  const handleLogout = () => {
+    clearSession();
+    setIsProfileModalOpen(false);
+    setIsAuthenticated(false);
+    navigate(AUTH_PATHS.login, { replace: true });
   };
 
   const handleToggleVoiceFirst = () => {
@@ -272,6 +279,7 @@ export default function App() {
           currentLanguage={currentLanguage}
           voiceFirst={voiceFirst}
           onToggleVoiceFirst={handleToggleVoiceFirst}
+          onLogout={handleLogout}
         />
       </div>
     </div>

@@ -3,6 +3,7 @@ import { Language } from '../../types';
 import {
   AppleIcon,
   AuthHeader,
+  ComingSoonBadge,
   FormError,
   GoogleIcon,
   OrDivider,
@@ -301,17 +302,21 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
         <div className="mt-4 w-full grid grid-cols-2 gap-3">
           <button
             type="button"
-            onClick={() => onAuthenticated(language)}
-            className="h-12 rounded-full bg-white flex items-center justify-center gap-2 text-[15px] font-medium text-[#1a1c1d] shadow-sm hover:bg-[#f3f3f5] active:scale-[0.98] transition-all"
+            disabled
+            title="Bientôt disponible"
+            className="relative h-12 rounded-full bg-white flex items-center justify-center gap-2 text-[15px] font-medium text-[#1a1c1d] shadow-sm hover:bg-[#f3f3f5] active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
           >
+            <ComingSoonBadge />
             <GoogleIcon />
             Google
           </button>
           <button
             type="button"
-            onClick={() => onAuthenticated(language)}
-            className="h-12 rounded-full bg-white flex items-center justify-center gap-2 text-[15px] font-medium text-[#1a1c1d] shadow-sm hover:bg-[#f3f3f5] active:scale-[0.98] transition-all"
+            disabled
+            title="Bientôt disponible"
+            className="relative h-12 rounded-full bg-white flex items-center justify-center gap-2 text-[15px] font-medium text-[#1a1c1d] shadow-sm hover:bg-[#f3f3f5] active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
           >
+            <ComingSoonBadge />
             <AppleIcon />
             Apple
           </button>

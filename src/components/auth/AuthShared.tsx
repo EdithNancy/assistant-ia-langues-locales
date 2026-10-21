@@ -109,3 +109,10 @@ export const FormError: React.FC<{ message: string | null }> = ({ message }) =>
       {message}
     </p>
   ) : null;
+
+/** Pastille des méthodes de connexion pas encore disponibles. */
+export const ComingSoonBadge: React.FC = () => (
+  <span className="absolute -top-2 right-3 px-2 py-0.5 rounded-full bg-[#ffdbd2] text-[#9e4229] text-[11px] font-bold">
+    Bientôt
+  </span>
+);

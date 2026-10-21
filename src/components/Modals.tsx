@@ -213,6 +213,7 @@ interface ProfileModalProps {
   currentLanguage: Language;
   voiceFirst: boolean;
   onToggleVoiceFirst: () => void;
+  onLogout: () => void;
 }
 
 export const ProfileModal: React.FC<ProfileModalProps> = ({
@@ -221,6 +222,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   currentLanguage,
   voiceFirst,
   onToggleVoiceFirst,
+  onLogout,
 }) => {
   const { consent, withdraw } = useVoiceConsent();
   if (!isOpen) return null;
@@ -316,6 +318,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           className="w-full py-2.5 rounded-full bg-[#004b49] text-white text-xs font-bold active:scale-95 transition-transform"
         >
           Retour à l'application
+        </button>
+        <button
+          onClick={onLogout}
+          className="w-full py-2.5 -mt-2 rounded-full text-[#ba1a1a] text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[#ffdad6] transition-colors"
+        >
+          <span className="material-symbols-outlined text-[18px]">logout</span>
+          Se déconnecter
         </button>
       </div>
     </div>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Language } from '../../types';
 import {
   AuthHeader,
+  ComingSoonBadge,
   FormError,
   GoogleIcon,
   OrDivider,
@@ -162,7 +163,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <span className="text-[13px] font-semibold text-[#3f4948] uppercase tracking-wide">Mot de passe</span>
-              <button type="button" className="text-[13px] font-semibold text-[#9e4229] hover:underline">
+              <button
+                type="button"
+                disabled
+                title="Réinitialisation du mot de passe bientôt disponible"
+                className="text-[13px] font-semibold text-[#9e4229] hover:underline disabled:opacity-60 disabled:no-underline disabled:cursor-not-allowed"
+              >
                 Oublié ?
               </button>
             </div>
@@ -215,9 +221,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
 
           <button
             type="button"
-            onClick={() => onAuthenticated(language)}
-            className="min-h-16 rounded-2xl bg-[#e0faf6] px-4 py-3 flex items-center gap-3 text-[#004b49] hover:bg-[#cdf5ef] active:scale-[0.98] transition-all"
+            disabled
+            title="Bientôt disponible"
+            className="relative min-h-16 rounded-2xl bg-[#e0faf6] px-4 py-3 flex items-center gap-3 text-[#004b49] hover:bg-[#cdf5ef] active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
           >
+            <ComingSoonBadge />
             <span className="material-symbols-outlined text-[26px]">fingerprint</span>
             <span className="flex-1 text-center text-[15px] font-medium leading-snug">
               Connexion rapide par Empreinte / Face ID
@@ -229,9 +237,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
-              onClick={() => onAuthenticated(language)}
-              className="h-16 rounded-2xl bg-[#f3f3f5] flex items-center justify-center gap-3 text-[16px] font-medium text-[#1a1c1d] hover:bg-[#edeef0] active:scale-[0.98] transition-all"
+              disabled
+              title="Bientôt disponible"
+              className="relative h-16 rounded-2xl bg-[#f3f3f5] flex items-center justify-center gap-3 text-[16px] font-medium text-[#1a1c1d] hover:bg-[#edeef0] active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
             >
+              <ComingSoonBadge />
               <GoogleIcon className="w-6 h-6" />
               Google
             </button>
