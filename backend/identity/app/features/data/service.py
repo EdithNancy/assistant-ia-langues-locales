@@ -2,7 +2,8 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from sqlalchemy import select
-from sqlalchemy.orm import Session, aliased, joinedload
+from sqlalchemy.ext.asyncio import AsyncSession  # <-- Modifié
+from sqlalchemy.orm import aliased, joinedload
 
 from app.features.data.entity import Language, VocabularyEntry
 from app.features.data.schemas import (
@@ -15,57 +16,75 @@ from app.features.users.entity import User
 
 class DataService:
     @staticmethod
-    def create_language(db: Session, data: LanguageCreate) -> Language:
+    # <-- async def
+    async def create_language(db: AsyncSession, data: LanguageCreate) -> Language:
         code = data.code.strip().lower()
-        if db.scalar(select(Language.id).where(Language.code == code)):
-            raise HTTPException(status_code=409, detail="Cette langue existe déjà.")
+
+        # db.scalar(...) doit être awaité
+        if await db.scalar(select(Language.id).where(Language.code == code)):  # <-- await
+            raise HTTPException(
+                status_code=409, detail="Cette langue existe déjà.")
+
         language = Language(
             code=code,
             name=data.name.strip(),
             native_name=data.native_name.strip() if data.native_name else None,
         )
         db.add(language)
-        db.commit()
-        db.refresh(language)
+        await db.commit()  # <-- await
+        await db.refresh(language)  # <-- await
         return language
 
     @staticmethod
-    def list_languages(
-        db: Session, active_only: bool = True, offset: int = 0, limit: int = 100
+    async def list_languages(  # <-- async def
+        db: AsyncSession, active_only: bool = True, offset: int = 0, limit: int = 100
     ) -> list[Language]:
-        query = select(Language).order_by(Language.name).offset(offset).limit(limit)
+        query = select(Language).order_by(
+            Language.name).offset(offset).limit(limit)
         if active_only:
             query = query.where(Language.is_active.is_(True))
-        return list(db.scalars(query).all())
+
+        # Utilisation de execute au lieu de scalars
+        result = await db.execute(query)  # <-- await + execute
+        return list(result.scalars().all())
 
     @staticmethod
-    def get_language(db: Session, language_id: UUID) -> Language:
-        language = db.get(Language, language_id)
+    async def get_language(db: AsyncSession, language_id: UUID) -> Language:  # <-- async def
+        language = await db.get(Language, language_id)  # <-- await
         if language is None:
             raise HTTPException(status_code=404, detail="Langue introuvable.")
         return language
 
     @staticmethod
-    def create_entry(
-        db: Session, data: VocabularyEntryCreate, user: User
+    async def create_entry(  # <-- async def
+        db: AsyncSession, data: VocabularyEntryCreate, user: User
     ) -> VocabularyEntry:
         if data.source_language_id == data.target_language_id:
-            raise HTTPException(status_code=422, detail="Les langues doivent être différentes.")
-        languages = db.scalars(
+            raise HTTPException(
+                status_code=422, detail="Les langues doivent être différentes.")
+
+        # Correction : on ne peut pas faire await db.scalars(...) directement
+        result = await db.execute(  # <-- await + execute
             select(Language).where(
-                Language.id.in_({data.source_language_id, data.target_language_id}),
+                Language.id.in_(
+                    {data.source_language_id, data.target_language_id}),
                 Language.is_active.is_(True),
             )
-        ).all()
+        )
+        languages = result.scalars().all()
+
         if len(languages) != 2:
-            raise HTTPException(status_code=422, detail="Langue source ou cible introuvable.")
+            raise HTTPException(
+                status_code=422, detail="Langue source ou cible introuvable.")
         entry = VocabularyEntry(
             **data.model_dump(),
             created_by=user.id,
         )
         db.add(entry)
-        db.commit()
-        return db.scalar(
+        await db.commit()  # <-- await
+
+        # Retourne l'entrée avec les relations chargées
+        return await db.scalar(  # <-- await
             select(VocabularyEntry)
             .options(
                 joinedload(VocabularyEntry.source_language),
@@ -75,8 +94,8 @@ class DataService:
         )
 
     @staticmethod
-    def list_entries(
-        db: Session,
+    async def list_entries(  # <-- async def
+        db: AsyncSession,
         source_code: str | None = None,
         target_code: str | None = None,
         search: str | None = None,
@@ -114,13 +133,15 @@ class DataService:
             )
         if kind:
             query = query.where(VocabularyEntry.kind == kind)
-        return list(db.scalars(query).unique().all())
+
+        result = await db.execute(query)  # <-- await + execute
+        return list(result.scalars().unique().all())
 
     @staticmethod
-    def update_entry(
-        db: Session, entry_id: UUID, data: VocabularyEntryUpdate
+    async def update_entry(  # <-- async def
+        db: AsyncSession, entry_id: UUID, data: VocabularyEntryUpdate
     ) -> VocabularyEntry:
-        entry = db.scalar(
+        entry = await db.scalar(  # <-- await
             select(VocabularyEntry)
             .options(
                 joinedload(VocabularyEntry.source_language),
@@ -134,7 +155,8 @@ class DataService:
         source_id = updates.get("source_language_id", entry.source_language_id)
         target_id = updates.get("target_language_id", entry.target_language_id)
         if source_id is None or target_id is None or source_id == target_id:
-            raise HTTPException(status_code=422, detail="Les langues doivent être différentes.")
+            raise HTTPException(
+                status_code=422, detail="Les langues doivent être différentes.")
         example_source = updates.get("example_source", entry.example_source)
         example_target = updates.get("example_target", entry.example_target)
         if (example_source is None) != (example_target is None):
@@ -144,14 +166,14 @@ class DataService:
             )
         for field, value in updates.items():
             setattr(entry, field, value)
-        db.commit()
-        db.refresh(entry)
+        await db.commit()  # <-- await
+        await db.refresh(entry)  # <-- await
         return entry
 
     @staticmethod
-    def delete_entry(db: Session, entry_id: UUID) -> None:
-        entry = db.get(VocabularyEntry, entry_id)
+    async def delete_entry(db: AsyncSession, entry_id: UUID) -> None:  # <-- async def
+        entry = await db.get(VocabularyEntry, entry_id)  # <-- await
         if entry is None:
             raise HTTPException(status_code=404, detail="Entrée introuvable.")
-        db.delete(entry)
-        db.commit()
+        await db.delete(entry)  # <-- await
+        await db.commit()  # <-- await
