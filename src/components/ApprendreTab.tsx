@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useCelebration } from '../hooks/useCelebration';
 import { closeOnBackdrop } from '../utils/backdrop';
 import { LanguageToggle } from './LanguageToggle';
 import { useToast } from '../hooks/useToast';
@@ -33,6 +34,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
   const [quizScore, setQuizScore] = useState(0);
   const [isQuizComplete, setIsQuizComplete] = useState(false);
   const { toast, showToast } = useToast(2500);
+  const { celebrate, confetti } = useCelebration();
 
   const currentExercise =
     currentLanguage === 'dioula'
@@ -125,6 +127,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
         handlePlayQuizAudio(QUIZ_QUESTIONS[nextIdx]);
       } else {
         setIsQuizComplete(true);
+        celebrate();
       }
     }, 1500);
   };
@@ -133,6 +136,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
     <div className="grid grid-cols-1 lg:grid-cols-12 lg:items-start w-full pb-10 gap-5 lg:gap-6">
       {/* Toast Notification */}
       <Toast message={toast} icon="check_circle" />
+      {confetti}
 
       {/* Top Greeting & Streak Banner */}
       <section className="lg:col-span-12 flex flex-col space-y-3 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-6 lg:items-center">
@@ -179,7 +183,10 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
             </div>
 
             <button
-              onClick={() => showToast('Historique des 30 derniers jours consultable')}
+              onClick={() => {
+                celebrate();
+                showToast('7 jours d’affilée, bravo ! Historique bientôt disponible.');
+              }}
               aria-label="Voir statistiques"
               className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 transition-all flex items-center justify-center text-white"
             >

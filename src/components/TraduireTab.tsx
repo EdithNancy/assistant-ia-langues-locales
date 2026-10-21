@@ -114,6 +114,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
 
   const handleClear = () => {
     setSourceText('');
+    setLastTrans(null); // une nouvelle phrase ne doit pas afficher l'ancienne traduction
   };
 
   const handlePaste = async () => {
@@ -357,7 +358,8 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
 
             <button
               onClick={handleVoiceInput}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold active:scale-95 transition-transform ${
+              style={isDictating ? { boxShadow: `0 0 0 ${2 + recorder.level * 10}px rgba(186, 26, 26, 0.18)` } : undefined}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold active:scale-95 transition-[transform,box-shadow] duration-75 ${
                 isDictating
                   ? 'bg-[#ba1a1a] text-white animate-pulse'
                   : 'bg-[#ffdbd2] text-[#3c0800] hover:bg-[#ffb4a1]'
@@ -491,11 +493,15 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
             </div>
           </div>
           </>
+        ) : isTranslatingShown && !translateFailed ? (
+          <div className="relative flex flex-col gap-3 py-1" role="status">
+            <span className="sr-only">Traduction en cours…</span>
+            <span className="skeleton h-6 w-4/5 rounded-lg" />
+            <span className="skeleton h-9 w-full rounded-xl" />
+            <span className="skeleton h-14 w-full rounded-2xl" />
+          </div>
         ) : (
           <p className="relative text-sm text-[#b1eeea] py-6 flex items-center gap-2">
-            {isTranslatingShown && (
-              <span className="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
-            )}
             {translateFailed && hasText
               ? 'La traduction a échoué. Vérifiez votre connexion.'
               : isTranslatingShown
