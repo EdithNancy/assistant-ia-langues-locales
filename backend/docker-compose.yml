@@ -20,6 +20,7 @@ services:
       FORWARDED_ALLOW_IPS: ${GATEWAY_TRUSTED_PROXIES:-127.0.0.1}
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       OTEL_SERVICE_NAME: gateway
+      
     depends_on:
       identity:
         condition: service_healthy
@@ -63,6 +64,9 @@ services:
       CORS_ORIGINS: ${IDENTITY_CORS_ORIGINS:-["http://localhost:5173"]}
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       OTEL_SERVICE_NAME: identity
+      BOOTSTRAP_ADMIN_NAME: ${BOOTSTRAP_ADMIN_NAME}
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD}
     depends_on:
       identity-db:
         condition: service_healthy
