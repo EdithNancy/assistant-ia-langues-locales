@@ -10,7 +10,6 @@ from . import api, ws
 from . import config
 from .db import Base, engine
 from backend_observability import instrument_app
-from app.usage_limits import limiter  # adapte le chemin
 
 
 @asynccontextmanager
@@ -21,6 +20,7 @@ async def lifespan(app: FastAPI):
         trust_env=False,
     )
     try:
+        # dev : création auto. Plus tard : migrations Alembic.
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
         yield
@@ -35,17 +35,15 @@ observability = instrument_app(app, "conversation", engine=engine)
 
 
 @app.get("/health")
-@limiter.exempt
 async def health():
     return {"status": "ok"}
 
 
 @app.get("/ready")
-@limiter.exempt
-async def ready():
+async def readiness():
     try:
-        async with engine.connect() as conn:
-            await conn.execute(text("SELECT 1"))
+        async with engine.connect() as connection:
+            await connection.execute(text("SELECT 1"))
     except SQLAlchemyError:
         return JSONResponse({"status": "not_ready"}, status_code=503)
     return {"status": "ready"}

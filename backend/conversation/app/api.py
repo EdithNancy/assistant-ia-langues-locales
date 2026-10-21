@@ -35,7 +35,8 @@ async def create(body: ConversationCreate, user: CurrentUser = Depends(current_u
 
 @router.get("/", response_model=list[ConversationOut])
 async def list_mine(user: CurrentUser = Depends(current_user), session: AsyncSession = Depends(get_session)):
-    q = select(Conversation).where(Conversation.user_id == user.id).order_by(Conversation.created_at.desc())
+    q = select(Conversation).where(Conversation.user_id ==
+                                   user.id).order_by(Conversation.created_at.desc())
     return (await session.execute(q)).scalars().all()
 
 
@@ -86,11 +87,13 @@ async def send_text(cid: str, body: MessageIn, request: Request, response: Respo
     history.append({"role": "user", "content": body.content})
     reply = await ml.dialogue.reply(history)
     await billing.charge_reply(
-        request.app.state.identity_http, request.headers.get("authorization"), reply
+        request.app.state.identity_http, request.headers.get(
+            "authorization"), reply
     )
     await service.add_message(session, cid, "user", body.content)
     response.headers["X-Credit-Tokens-Charged"] = str(reply.total_tokens)
-    response.headers["X-Model-Token-Usage-Estimated"] = str(reply.estimated_usage).lower()
+    response.headers["X-Model-Token-Usage-Estimated"] = str(
+        reply.estimated_usage).lower()
     return await service.add_message(session, cid, "assistant", reply.content)
 
 
@@ -120,10 +123,10 @@ async def send_audio(
     await billing.require_available_token(
         request.app.state.identity_http, request.headers.get("authorization")
     )
-    if user.is_free:
-        await reserve_daily_request(
-            session, user.id, "voice", FREE_DAILY_VOICE_LIMIT
-        )
+   # if user.is_free:
+   #     await reserve_daily_request(
+   #         session, user.id, "voice", FREE_DAILY_VOICE_LIMIT
+   #    )
 
     transcript = await ml.stt.transcribe(data)
     reply = await reply_to_transcript(

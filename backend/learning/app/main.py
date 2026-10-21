@@ -10,7 +10,6 @@ from . import api
 from .db import Base, SessionLocal, engine
 from .models import Scenario
 from backend_observability import instrument_app
-from app.usage_limits import limiter  # adapte le chemin
 
 SEED = [
     dict(title="Premier échange avec un parent", level="debutant",
@@ -42,13 +41,11 @@ observability = instrument_app(app, "learning", engine=engine)
 
 
 @app.get("/health")
-@limiter.exempt
 async def health():
     return {"status": "ok"}
 
 
 @app.get("/ready")
-@limiter.exempt
 async def ready():
     try:
         # Vérifie la connexion DB directement via engine
