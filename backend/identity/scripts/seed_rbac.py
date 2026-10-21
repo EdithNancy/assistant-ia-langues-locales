@@ -1,16 +1,20 @@
 import asyncio
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.orm import selectinload
 
-from app.core.database import SessionLocal
+from app.core.database import Base, SessionLocal, engine
 
 # Charger tous les modèles SQLAlchemy avant les requêtes
+# (indispensable pour que Base.metadata soit complet)
 from app.features.users.entity import User  # noqa: F401
 from app.features.sessions.entity import UserSession  # noqa: F401
 from app.features.roles.entity import Role
 from app.features.permissions.entity import Permission
 from app.features.auth.social import FederatedIdentity  # noqa: F401
+from app.features.tokens.entity import TokenTransaction, TokenWallet  # noqa: F401
+from app.features.data.entity import Language, VocabularyEntry  # noqa: F401
+from app.features.usage.entity import UsageEvent  # noqa: F401
 
 PERMISSIONS = [
     ("users.read", "Lire les utilisateurs"), ("users.create", "Créer des utilisateurs"),
@@ -41,6 +45,12 @@ ROLE_NAMES = {"USER": "Utilisateur", "LINGUIST": "Linguiste", "MODERATOR": "Mod�
 
 
 async def main():
+    # 1. Créer le schéma et les tables s'ils n'existent pas
+    async with engine.begin() as conn:
+        await conn.execute(text("CREATE SCHEMA IF NOT EXISTS identity"))
+        await conn.run_sync(Base.metadata.create_all)
+
+    # 2. Insérer les permissions et rôles
     async with SessionLocal() as db:
         permissions = {}
         for code, name in PERMISSIONS:
@@ -62,12 +72,12 @@ async def main():
             if role is None:
                 role = Role(code=code, name=name)
                 db.add(role)
-            # Pour un Role neuf, la collection est vide mais pas "lazy" :
-            # l'affectation est donc sûre. Pour un Role existant, selectinload
-            # a déjà chargé la relation.
             role.permissions = [permissions[p] for p in ROLE_PERMISSIONS[code]]
 
         await db.commit()
+
+    # 3. Fermer proprement le moteur
+    await engine.dispose()
     print("Rôles et permissions initialisés.")
 
 

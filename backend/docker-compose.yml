@@ -55,7 +55,7 @@ services:
     environment:
       APP_NAME: IA Langues Locales CI
       DEBUG: "false"
-      DATABASE_URL: postgresql+psycopg://${IDENTITY_DB_USER:-app}:${IDENTITY_DB_PASSWORD:?Définir IDENTITY_DB_PASSWORD dans le fichier .env}@identity-db:5432/identity
+      DATABASE_URL: postgresql+asyncpg://${IDENTITY_DB_USER:-app}:${IDENTITY_DB_PASSWORD:?Définir IDENTITY_DB_PASSWORD dans le fichier .env}@identity-db:5432/identity
       REDIS_URL: redis://:${REDIS_PASSWORD:?Définir REDIS_PASSWORD dans le fichier .env}@redis:6379/0
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:?Définir JWT_SECRET_KEY dans le fichier .env}
       JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}

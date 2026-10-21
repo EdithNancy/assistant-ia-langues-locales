@@ -25,7 +25,11 @@ SEED = [
 async def lifespan(app: FastAPI):
     try:
         async with engine.begin() as conn:
+            # 1. Créer le schéma "learning" s'il n'existe pas
+            await conn.execute(text("CREATE SCHEMA IF NOT EXISTS learning"))
+            # 2. Créer les tables
             await conn.run_sync(Base.metadata.create_all)
+
         async with SessionLocal() as session:
             if (await session.execute(select(func.count()).select_from(Scenario))).scalar_one() == 0:
                 session.add_all(Scenario(**s) for s in SEED)
@@ -48,7 +52,6 @@ async def health():
 @app.get("/ready")
 async def ready():
     try:
-        # Vérifie la connexion DB directement via engine
         async with engine.connect() as conn:
             await conn.execute(text("SELECT 1"))
     except SQLAlchemyError:

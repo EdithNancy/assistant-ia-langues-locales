@@ -13,15 +13,26 @@ from redis.asyncio import Redis
 from redis.exceptions import RedisError, ResponseError
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
-# from starlette.concurrency import run_in_threadpool  <-- SUPPRIMÉ
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
 from app.config import settings
-from app.core.database import engine
+from app.core.database import Base, engine  # Base et engine importés ensemble
 from app.core.rate_limit import limiter
 from app.core.security import decode_token
+
+# --- Import explicite de tous les modèles pour peupler Base.metadata ---
+from app.features.users.entity import User  # noqa: F401
+from app.features.sessions.entity import UserSession  # noqa: F401
+from app.features.roles.entity import Role  # noqa: F401
+from app.features.permissions.entity import Permission  # noqa: F401
+from app.features.auth.social import FederatedIdentity, SocialAuthNonce  # noqa: F401
+from app.features.tokens.entity import TokenTransaction, TokenWallet  # noqa: F401
+from app.features.data.entity import Language, VocabularyEntry  # noqa: F401
+from app.features.usage.entity import UsageEvent  # noqa: F401
+# -----------------------------------------------------------------------
+
 from app.features.auth.routes import router as auth_router
 from app.features.users.routes import router as users_router
 from app.features.roles.routes import router as roles_router
@@ -42,6 +53,12 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    # 1. Création du schéma identity et des tables
+    async with engine.begin() as conn:
+        await conn.execute(text("CREATE SCHEMA IF NOT EXISTS identity"))
+        await conn.run_sync(Base.metadata.create_all)
+
+    # 2. Connexion Redis
     redis = Redis.from_url(settings.REDIS_URL, decode_responses=True)
     await redis.ping()
     try:
@@ -74,14 +91,26 @@ app = FastAPI(
     debug=settings.DEBUG,
     lifespan=lifespan,
 )
+
 observability = instrument_app(app, "identity", engine=engine)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
-app.add_middleware(CORSMiddleware, allow_origins=settings.CORS_ORIGINS,
-                   allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 for router in (
-    auth_router, users_router, roles_router, permissions_router, sessions_router, usage_router,
+    auth_router,
+    users_router,
+    roles_router,
+    permissions_router,
+    sessions_router,
+    usage_router,
     data_router,
 ):
     app.include_router(router, prefix=settings.API_V1_PREFIX)
@@ -130,7 +159,6 @@ def health():
 @app.get("/ready", tags=["Health"])
 async def readiness(request: Request):
     try:
-        # Utilisation de "async with" car engine est un AsyncEngine
         async with engine.connect() as connection:
             await connection.execute(text("SELECT 1"))
 

@@ -18,7 +18,7 @@ from app.features.auth.social import FederatedIdentity, SocialAuthNonce  # noqa:
 from app.features.tokens.entity import TokenTransaction, TokenWallet  # noqa: F401
 from app.features.data.entity import Language, VocabularyEntry  # noqa: F401
 from app.features.usage.entity import UsageEvent  # noqa: F401
-
+from sqlalchemy import text
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -61,8 +61,14 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=target_metadata)
-
+    # Crée le schéma "identity" s'il n'existe pas
+    connection.execute(text("CREATE SCHEMA IF NOT EXISTS identity"))
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        version_table_schema="identity",
+        include_schemas=True,
+    )
     with context.begin_transaction():
         context.run_migrations()
 

@@ -20,8 +20,10 @@ async def lifespan(app: FastAPI):
         trust_env=False,
     )
     try:
-        # dev : création auto. Plus tard : migrations Alembic.
         async with engine.begin() as conn:
+            # 1. Créer le schéma "conversation"
+            await conn.execute(text("CREATE SCHEMA IF NOT EXISTS conversation"))
+            # 2. Créer les tables
             await conn.run_sync(Base.metadata.create_all)
         yield
     finally:
