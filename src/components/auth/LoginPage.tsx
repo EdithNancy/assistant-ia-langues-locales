@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Flag } from '../Flag';
 import { Language } from '../../types';
 import {
   AuthHeader,
@@ -126,7 +127,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
                 </span>
               </div>
               <div className="h-14 rounded-2xl bg-[#f3f3f5] flex items-center gap-3 px-4 focus-within:ring-2 focus-within:ring-[#004b49]/30 transition-all">
-                <span className="text-xl leading-none">🇨🇮</span>
+                <Flag country="ci" className="w-6" labelled />
                 <span className="text-[17px] font-semibold text-[#1a1c1d]">+225</span>
                 <input
                   id="login-phone"

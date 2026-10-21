@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Flag } from '../Flag';
 import { Language } from '../../types';
 import {
   AppleIcon,
@@ -96,8 +97,9 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
           </div>
         </div>
 
-        <span className="mt-4 px-4 py-1.5 rounded-full bg-[#ffdbd2] text-[#7e2b14] text-[13px] font-medium">
-          🇨🇮 Rejoignez la communauté ivoirienne
+        <span className="mt-4 px-4 py-1.5 rounded-full bg-[#ffdbd2] text-[#7e2b14] text-[13px] font-medium inline-flex items-center gap-2">
+          <Flag country="ci" className="w-4" />
+          Rejoignez la communauté ivoirienne
         </span>
 
         <h1 className="mt-4 text-[34px] leading-tight font-bold text-[#003331] tracking-tight text-center">
@@ -212,7 +214,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
             ) : (
               <div className="flex gap-2">
                 <div className="h-13 shrink-0 rounded-2xl bg-[#f3f3f5] flex items-center gap-2 px-4">
-                  <span className="text-lg leading-none">🇨🇮</span>
+                  <Flag country="ci" className="w-6" labelled />
                   <span className="text-[15px] font-medium text-[#1a1c1d]">+225</span>
                   <span className="material-symbols-outlined text-[18px] text-[#3f4948]">expand_more</span>
                 </div>

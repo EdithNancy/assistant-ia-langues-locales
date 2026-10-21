@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Flag } from './Flag';
 import { closeOnBackdrop } from '../utils/backdrop';
 import { useToast } from '../hooks/useToast';
 import { Toast } from './Toast';
@@ -271,9 +272,11 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
           aria-label={`Langue source : ${sourceLabel(sourceLang)}. Changer`}
           className="flex-1 min-w-0 flex items-center justify-center gap-2 py-2.5 px-2 sm:px-3 rounded-full bg-white text-[#1a1c1d] shadow-sm transition-all active:scale-95 text-left border border-[#edeef0]"
         >
-          <span className="text-base leading-none">
-            {sourceLang === 'auto' ? '🌐' : sourceLang === 'fr' ? '🇫🇷' : '🇨🇮'}
-          </span>
+          {sourceLang === 'auto' ? (
+            <span className="material-symbols-outlined text-[20px] text-[#004b49]">language</span>
+          ) : (
+            <Flag country={sourceLang === 'fr' ? 'fr' : 'ci'} />
+          )}
           <div className="flex flex-col min-w-0">
             <span className="text-xs font-bold text-[#1a1c1d] truncate">
               {sourceLabel(sourceLang)}
@@ -308,7 +311,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
           aria-label={`Langue cible : ${LANG_LABEL[targetLang]}. Changer`}
           className="flex-1 min-w-0 flex items-center justify-center gap-2 py-2.5 px-2 sm:px-3 rounded-full bg-white text-[#1a1c1d] shadow-sm transition-all active:scale-95 text-left border border-[#edeef0]"
         >
-          <span className="text-base leading-none">{targetLang === 'fr' ? '🇫🇷' : '🇨🇮'}</span>
+          <Flag country={targetLang === 'fr' ? 'fr' : 'ci'} />
           <div className="flex flex-col min-w-0">
             <span className="text-xs font-bold text-[#004b49] truncate">
               {LANG_LABEL[targetLang]}
@@ -657,7 +660,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
                 }}
                 className="p-4 rounded-2xl bg-[#ffdbd2] text-[#3c0800] flex flex-col items-center gap-2 active:scale-95 transition-all"
               >
-                <span className="text-2xl">🇫🇷</span>
+                <Flag country="fr" className="w-8" />
                 <span className="text-xs font-bold">Interlocuteur 1</span>
                 <span className="text-[11px] text-[#7e2b14]">Français</span>
                 <div className="w-10 h-10 rounded-full bg-[#9e4229] text-white flex items-center justify-center shadow-xs">
@@ -672,7 +675,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
                 }}
                 className="p-4 rounded-2xl bg-[#b1eeea] text-[#00201f] flex flex-col items-center gap-2 active:scale-95 transition-all"
               >
-                <span className="text-2xl">🇨🇮</span>
+                <Flag country="ci" className="w-8" />
                 <span className="text-xs font-bold">Interlocuteur 2</span>
                 <span className="text-[11px] text-[#084f4d] capitalize">{targetLang}</span>
                 <div className="w-10 h-10 rounded-full bg-[#004b49] text-white flex items-center justify-center shadow-xs">

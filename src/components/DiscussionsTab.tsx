@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Flag } from './Flag';
 import { closeOnBackdrop } from '../utils/backdrop';
 import { useToast } from '../hooks/useToast';
 import { Toast } from './Toast';
@@ -235,7 +236,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
             onClick={() => setIsDialectModalOpen(true)}
             className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#edeef0] hover:bg-[#e2e2e4] transition-colors text-[#1a1c1d] active:scale-95"
           >
-            <span className="text-xs">🇨🇮</span>
+            <Flag country="ci" className="w-4" />
             <span className="text-xs font-bold text-[#003331] capitalize">
               {currentLanguage}
             </span>
@@ -679,7 +680,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">🇨🇮</span>
+                  <Flag country="ci" className="w-8" />
                   <div className="text-left">
                     <span className="text-sm font-bold text-[#00201f] block">
                       Baoulé (Akan)
@@ -709,7 +710,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">🌍</span>
+                  <Flag country="ci" className="w-8" />
                   <div className="text-left">
                     <span className="text-sm font-bold text-[#1a1c1d] block">
                       Dioula (Mandé)
@@ -728,7 +729,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
 
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#f3f3f5] opacity-75">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">🌿</span>
+                  <Flag country="ci" className="w-8 opacity-60" />
                   <div className="text-left">
                     <span className="text-sm font-bold text-[#1a1c1d] block">
                       Bété (Krou)
