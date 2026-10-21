@@ -7,6 +7,7 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 5173
+# `npm run dev` écoute déjà sur 0.0.0.0:3000 (voir package.json)
+EXPOSE 3000
 
-CMD ["npm", "run", "dev", "--", "--host"]
+CMD ["npm", "run", "dev"]

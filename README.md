@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Assistant IA Vocal et Texte en Langues Locales (Dioula & Baoulé)
 
 Projet d'assistant virtuel interactif capable de comprendre, parler et répondre en langues locales ivoiriennes (Dioula et Baoulé).
@@ -41,30 +40,34 @@ Le projet suit le modèle **Git Flow** adapté aux phases du projet :
 
 ### 1. Cloner le projet
 ```bash
-git clone [https://github.com/votre-compte/assistant-ia-langues-locales.git](https://github.com/votre-compte/assistant-ia-langues-locales.git)
+git clone https://github.com/EdithNancy/assistant-ia-langues-locales.git
 cd assistant-ia-langues-locales
-=======
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+```
 
-# Run and deploy your AI Studio app
+### 2. Lancer le frontend en local
 
-This contains everything you need to run your app locally.
+**Prérequis :** Node.js 20+
 
-View your app in AI Studio: https://ai.studio/apps/cde6511a-94a4-44dd-bb0a-1940f54ff6f9
+```bash
+npm install
+cp .env.example .env.local   # puis renseigner VITE_API_URL
+npm run dev                  # http://localhost:3000
+```
 
-## Run Locally
+### 3. Lancer avec Docker
 
-**Prerequisites:**  Node.js
+```bash
+# Développement (rechargement à chaud)
+docker compose up frontend-dev        # http://localhost:3000
 
+# Production (build statique servi par NGINX)
+docker build -t ivoirai-frontend --build-arg VITE_API_URL=https://api.exemple.ci .
+docker run -p 8080:80 ivoirai-frontend   # http://localhost:8080
+```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### 4. Vérifications
 
-
-# Comprendre l'architecture et la structure de notre projet Local_assistance_AI
->>>>>>> 11201a2 (chore: frontend initialization)
+```bash
+npm run lint    # contrôle des types TypeScript
+npm run build   # build de production dans dist/
+```
