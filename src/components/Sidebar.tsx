@@ -17,7 +17,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenProfile,
 }) => {
   return (
-    <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-64 flex-col bg-white border-r border-surface-container shadow-[4px_0_24px_rgba(0,75,73,0.04)]">
+    <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-64 flex-col bg-white border-r border-surface-container shadow-soft">
       {/* Brand */}
       <div className="h-16 px-5 flex items-center gap-3 border-b border-surface-container/60">
         <div className="relative">
@@ -37,7 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           onClick={onStartVoiceSession}
           aria-label="Lancer la session vocale en direct"
-          className="w-full h-12 rounded-2xl bg-gradient-to-tr from-primary via-primary-container to-primary-bright text-white flex items-center justify-center gap-2 font-bold text-sm shadow-[0_4px_24px_rgba(45,212,191,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all"
+          className="w-full h-12 rounded-2xl bg-gradient-to-tr from-primary via-primary-container to-primary-bright text-white flex items-center justify-center gap-2 font-bold text-sm shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all"
         >
           <span className="material-symbols-outlined text-[22px] text-tertiary-fixed">mic</span>
           Session vocale

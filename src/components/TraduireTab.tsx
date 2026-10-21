@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Modal } from './ui/Modal';
 import { categoryIcon, LANGUAGE_LABEL } from '../data/languages';
 import { Flag } from './Flag';
-import { closeOnBackdrop } from '../utils/backdrop';
 import { useToast } from '../hooks/useToast';
 import { Toast } from './Toast';
-import { useEscapeKey } from '../hooks/useEscapeKey';
 import { recorderErrorMessage, useAudioRecorder } from '../hooks/useAudioRecorder';
 import { api, TextLanguage, TranslateResult } from '../services';
 import { useVoiceConsent } from './VoiceConsent';
@@ -75,7 +74,6 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   const [savedExpressions, setSavedExpressions] = useState<VocabularyItem[]>(VOCABULARY_LIST);
   const { toast, showToast } = useToast(2200);
   const [isDualMicModalOpen, setIsDualMicModalOpen] = useState(false);
-  useEscapeKey(isDualMicModalOpen, () => setIsDualMicModalOpen(false));
 
   // Texte vidé : on n'affiche plus l'ancienne traduction
   const hasText = sourceText.trim() !== '';
@@ -253,19 +251,19 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
           <div className="w-2.5 h-2.5 rounded-full bg-tertiary-fixed-dim animate-pulse"></div>
           <span className="text-base lg:text-lg font-bold text-primary">Traducteur culturel</span>
         </div>
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed text-xs font-bold shadow-xs">
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed text-xs font-bold shadow-soft">
           <span className="material-symbols-outlined text-[14px]">psychology</span>
           IA Contextuelle
         </span>
       </div>
 
       {/* Language Direction Toggle Pill */}
-      <div className="lg:col-span-2 relative flex items-center justify-between bg-surface-container-low p-1.5 rounded-full shadow-xs border border-surface-container">
+      <div className="lg:col-span-2 relative flex items-center justify-between bg-surface-container-low p-1.5 rounded-full shadow-soft border border-surface-container">
         {/* Source Language Button */}
         <button
           onClick={handleChangeSource}
           aria-label={`Langue source : ${sourceLabel(sourceLang)}. Changer`}
-          className="flex-1 min-w-0 flex items-center justify-center gap-2 py-2.5 px-2 sm:px-3 rounded-full bg-white text-on-surface shadow-sm transition-all active:scale-95 text-left border border-surface-container"
+          className="flex-1 min-w-0 flex items-center justify-center gap-2 py-2.5 px-2 sm:px-3 rounded-full bg-white text-on-surface shadow-soft transition-all active:scale-95 text-left border border-surface-container"
         >
           {sourceLang === 'auto' ? (
             <span className="material-symbols-outlined text-[20px] text-primary-container">language</span>
@@ -294,7 +292,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
           <button
             onClick={handleSwap}
             aria-label="Permuter les langues"
-            className="w-10 h-10 rounded-full bg-secondary hover:bg-on-secondary-fixed-variant text-white flex items-center justify-center shadow-md active:scale-90 transition-transform duration-300"
+            className="w-10 h-10 rounded-full bg-secondary hover:bg-on-secondary-fixed-variant text-white flex items-center justify-center shadow-raised active:scale-90 transition-transform duration-300"
           >
             <span className="material-symbols-outlined text-[20px]">swap_horiz</span>
           </button>
@@ -304,7 +302,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
         <button
           onClick={handleChangeTarget}
           aria-label={`Langue cible : ${LANGUAGE_LABEL[targetLang]}. Changer`}
-          className="flex-1 min-w-0 flex items-center justify-center gap-2 py-2.5 px-2 sm:px-3 rounded-full bg-white text-on-surface shadow-sm transition-all active:scale-95 text-left border border-surface-container"
+          className="flex-1 min-w-0 flex items-center justify-center gap-2 py-2.5 px-2 sm:px-3 rounded-full bg-white text-on-surface shadow-soft transition-all active:scale-95 text-left border border-surface-container"
         >
           <Flag country={targetLang === 'fr' ? 'fr' : 'ci'} />
           <div className="flex flex-col min-w-0">
@@ -322,7 +320,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       </div>
 
       {/* Source Input Box */}
-      <div className="flex flex-col bg-white rounded-3xl p-4 lg:p-5 shadow-sm relative transition-all border border-surface-container focus-within:ring-2 focus-within:ring-primary-container/20">
+      <div className="flex flex-col bg-white rounded-3xl p-4 lg:p-5 shadow-soft relative transition-all border border-surface-container focus-within:ring-2 focus-within:ring-primary-container/20">
         <div className="flex justify-between items-center mb-2">
           <span className="text-xs font-bold text-outline uppercase tracking-wider">
             Texte source
@@ -382,7 +380,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       <div
         aria-live="polite"
         aria-busy={isTranslatingShown}
-        className={`bg-primary-container text-white rounded-3xl p-5 lg:p-6 shadow-md relative overflow-hidden transition-opacity ${
+        className={`bg-primary-container text-white rounded-3xl p-5 lg:p-6 shadow-raised relative overflow-hidden transition-opacity ${
           isTranslatingShown && currentTrans ? 'opacity-70' : ''
         }`}
       >
@@ -437,7 +435,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
               <button
                 onClick={handlePlayAudio}
                 aria-label="Écouter la traduction"
-                className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs shadow-sm active:scale-95 transition-all ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs shadow-soft active:scale-95 transition-all ${
                   isPlayingAudio
                     ? 'bg-secondary-container text-on-secondary-container animate-pulse'
                     : 'bg-tertiary-fixed text-on-tertiary-fixed hover:bg-tertiary-fixed-dim'
@@ -496,7 +494,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
         ) : isTranslatingShown && !translateFailed ? (
           <div className="relative flex flex-col gap-3 py-1" role="status">
             <span className="sr-only">Traduction en cours…</span>
-            <span className="skeleton h-6 w-4/5 rounded-lg" />
+            <span className="skeleton h-6 w-4/5 rounded-xl" />
             <span className="skeleton h-9 w-full rounded-xl" />
             <span className="skeleton h-14 w-full rounded-2xl" />
           </div>
@@ -542,7 +540,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
           {savedExpressions.map((item) => (
             <div
               key={item.id}
-              className="bg-white p-3.5 rounded-2xl shadow-xs flex items-center justify-between border border-surface-container hover:bg-surface transition-colors"
+              className="bg-white p-3.5 rounded-2xl shadow-soft flex items-center justify-between border border-surface-container hover:bg-surface transition-colors"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-primary-container shrink-0">
@@ -594,9 +592,9 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       </div>
 
       {/* Mode conversation immédiate Banner */}
-      <div className="lg:col-span-2 relative overflow-hidden rounded-2xl bg-surface-container p-4 lg:p-5 flex items-center justify-between gap-3 shadow-xs border border-surface-container">
+      <div className="lg:col-span-2 relative overflow-hidden rounded-2xl bg-surface-container p-4 lg:p-5 flex items-center justify-between gap-3 shadow-soft border border-surface-container">
         <div className="flex items-center gap-3 z-10 min-w-0">
-          <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-white shadow-md shrink-0">
+          <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-white shadow-raised shrink-0">
             <span className="material-symbols-outlined text-[24px]">record_voice_over</span>
           </div>
           <div>
@@ -607,7 +605,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
 
         <button
           onClick={() => setIsDualMicModalOpen(true)}
-          className="z-10 px-3.5 py-1.5 rounded-full bg-primary text-white text-xs active:scale-95 transition-transform shrink-0 font-semibold shadow-sm"
+          className="z-10 px-3.5 py-1.5 rounded-full bg-primary text-white text-xs active:scale-95 transition-transform shrink-0 font-semibold shadow-soft"
         >
           Lancer
         </button>
@@ -617,16 +615,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
 
       {/* Dual Mic Conversation Modal */}
       {isDualMicModalOpen && (
-        <div
-          onClick={closeOnBackdrop(() => setIsDualMicModalOpen(false))}
-          role="presentation"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in"
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200"
-          >
+        <Modal onClose={() => setIsDualMicModalOpen(false)} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-overlay flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-secondary">record_voice_over</span>
@@ -657,7 +646,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
                 <Flag country="fr" className="w-8" />
                 <span className="text-xs font-bold">Interlocuteur 1</span>
                 <span className="text-[11px] text-on-secondary-fixed-variant">Français</span>
-                <div className="w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center shadow-xs">
+                <div className="w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center shadow-soft">
                   <span className="material-symbols-outlined text-[20px]">mic</span>
                 </div>
               </button>
@@ -672,7 +661,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
                 <Flag country="ci" className="w-8" />
                 <span className="text-xs font-bold">Interlocuteur 2</span>
                 <span className="text-[11px] text-on-primary-fixed-variant">{LANGUAGE_LABEL[targetLang]}</span>
-                <div className="w-10 h-10 rounded-full bg-primary-container text-white flex items-center justify-center shadow-xs">
+                <div className="w-10 h-10 rounded-full bg-primary-container text-white flex items-center justify-center shadow-soft">
                   <span className="material-symbols-outlined text-[20px]">mic</span>
                 </div>
               </button>
@@ -684,8 +673,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
             >
               Fermer le mode direct
             </button>
-          </div>
-        </div>
+          </Modal>
       )}
     </div>
   );

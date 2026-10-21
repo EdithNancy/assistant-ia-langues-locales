@@ -1,3 +1,4 @@
+import { Modal } from './ui/Modal';
 import React, { createContext, useCallback, useContext, useRef, useState } from 'react';
 import {
   clearVoiceConsent,
@@ -64,13 +65,13 @@ const VoiceConsentDialog: React.FC<{ onAnswer: (consent: VoiceConsent | null) =>
   const [improveModel, setImproveModel] = useState(false);
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center sm:p-4 bg-black/50 backdrop-blur-xs animate-in fade-in">
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="consent-title"
-        className="animate-in slide-in-from-bottom sm:slide-in-from-bottom-4 sm:fade-in sm:zoom-in-95 duration-300 w-full max-w-md bg-white rounded-t-[32px] sm:rounded-3xl p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto"
-      >
+    <Modal
+      onClose={() => onAnswer(null)}
+      dismissOnBackdrop={false}
+      aria-labelledby="consent-title"
+      overlayClassName="fixed inset-0 z-[60] flex items-end sm:items-center justify-center sm:p-4 bg-black/50 backdrop-blur-xs animate-in fade-in"
+      className="animate-in slide-in-from-bottom sm:slide-in-from-bottom-4 sm:fade-in sm:zoom-in-95 duration-300 w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-5 shadow-overlay flex flex-col gap-4 max-h-[90vh] overflow-y-auto"
+    >
         <div className="flex items-center gap-3">
           <span className="w-11 h-11 rounded-2xl bg-primary-fixed text-on-primary-fixed flex items-center justify-center shrink-0">
             <span className="material-symbols-outlined text-[24px]">mic</span>
@@ -136,7 +137,6 @@ const VoiceConsentDialog: React.FC<{ onAnswer: (consent: VoiceConsent | null) =>
             Accepter
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 };

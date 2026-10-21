@@ -39,7 +39,7 @@ export const LanguageToggle: React.FC<LanguageToggleProps> = ({
           aria-checked={selected}
           onClick={() => onChange(key)}
           className={`flex-1 min-w-0 py-2 px-3 rounded-full text-xs font-bold transition-all duration-300 flex items-center justify-center gap-1.5 ${
-            selected ? 'bg-primary-container text-white shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
+            selected ? 'bg-primary-container text-white shadow-soft' : 'text-on-surface-variant hover:text-on-surface'
           }`}
         >
           <span

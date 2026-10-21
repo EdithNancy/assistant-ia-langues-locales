@@ -124,7 +124,7 @@ export default function App() {
         {/* Panneau de marque : visible uniquement sur grand écran */}
         <AuthBrandPanel />
 
-        <div className="w-full max-w-md lg:max-w-lg mx-auto min-h-screen bg-surface relative shadow-[0_0_50px_rgba(0,51,49,0.08)] lg:shadow-none">
+        <div className="w-full max-w-md lg:max-w-lg mx-auto min-h-screen bg-surface relative shadow-soft lg:shadow-none">
           {!isRegister ? (
             <LoginPage onAuthenticated={handleAuthenticated} onGoToRegister={() => goTo('register')} />
           ) : (
@@ -195,7 +195,7 @@ export default function App() {
         <Toast
           message={notificationToast}
           icon="notifications_active"
-          className="shadow-xl border border-tertiary-fixed/20"
+          className="shadow-raised border border-tertiary-fixed/20"
         />
 
         {/* Tab Content Stream */}

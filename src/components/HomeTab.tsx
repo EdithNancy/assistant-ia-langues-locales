@@ -68,7 +68,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       <Toast message={toastMessage} icon="check_circle" />
 
       {/* Top User Profile & Welcome Bar */}
-      <section className="lg:col-span-12 flex flex-wrap items-center gap-x-4 gap-y-4 bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_20px_-2px_rgba(0,75,73,0.05)] border border-surface-container/60">
+      <section className="lg:col-span-12 flex flex-wrap items-center gap-x-4 gap-y-4 bg-white p-4 lg:p-5 rounded-3xl shadow-soft border border-surface-container/60">
         <div className="flex-1 flex flex-col min-w-0">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-on-surface-variant">
             Bienvenue
@@ -113,7 +113,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       </section>
 
       {/* Hero Voice Interactive Card */}
-      <section className="lg:col-span-7 flex flex-col justify-center relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-container via-primary to-primary-deep text-white p-6 lg:p-8 shadow-[0_16px_36px_-6px_rgba(0,43,41,0.35)]">
+      <section className="lg:col-span-7 flex flex-col justify-center relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-container via-primary to-primary-deep text-white p-6 lg:p-8 shadow-raised">
         {/* Traditional Geometric Accent Watermark Pattern */}
         <svg
           className="absolute -right-8 -top-8 w-52 h-52 text-tertiary-fixed opacity-10 pointer-events-none"
@@ -131,7 +131,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         </svg>
 
         <div className="relative z-10 flex flex-col items-center text-center">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-container/80 backdrop-blur-md text-tertiary-fixed text-xs font-semibold mb-2 shadow-xs border border-tertiary-fixed/20">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-container/80 backdrop-blur-md text-tertiary-fixed text-xs font-semibold mb-2 shadow-soft border border-tertiary-fixed/20">
             <span className="material-symbols-outlined text-[14px]">graphic_eq</span>
             <span>Reconnaissance vocale ivoirienne</span>
           </div>
@@ -156,7 +156,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             <button
               onClick={onOpenVoiceSession}
               aria-label="Démarrer la discussion vocale"
-              className="relative z-20 w-20 h-20 rounded-full bg-gradient-to-tr from-tertiary-fixed-dim to-tertiary-fixed text-primary flex items-center justify-center shadow-[0_0_32px_8px_rgba(60,221,199,0.45)] hover:scale-105 active:scale-95 transition-all duration-200 group"
+              className="relative z-20 w-20 h-20 rounded-full bg-gradient-to-tr from-tertiary-fixed-dim to-tertiary-fixed text-primary flex items-center justify-center shadow-glow hover:scale-105 active:scale-95 transition-all duration-200 group"
             >
               <span className="material-symbols-outlined text-[36px] font-bold group-hover:scale-110 transition-transform">
                 mic
@@ -178,7 +178,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       </section>
 
       {/* Daily Learning Card: Mot du Jour */}
-      <section className="lg:col-span-5 flex flex-col bg-white p-5 lg:p-6 rounded-3xl shadow-[0_6px_24px_-4px_rgba(0,75,73,0.06)] relative overflow-hidden border border-surface-container/60">
+      <section className="lg:col-span-5 flex flex-col bg-white p-5 lg:p-6 rounded-3xl shadow-soft relative overflow-hidden border border-surface-container/60">
         <div className="absolute top-0 left-0 w-2 h-full bg-secondary"></div>
 
         <div className="flex items-start justify-between gap-3">
@@ -202,7 +202,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             <button
               onClick={handlePlayWord}
               aria-label="Écouter la prononciation"
-              className={`w-11 h-11 rounded-full flex items-center justify-center transition-all shadow-sm active:scale-95 ${
+              className={`w-11 h-11 rounded-full flex items-center justify-center transition-all shadow-soft active:scale-95 ${
                 isPlayingWord
                   ? 'bg-tertiary-fixed text-primary animate-pulse'
                   : 'bg-secondary-fixed text-on-secondary-fixed hover:scale-105'
@@ -292,7 +292,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           {/* Action 1: Traduire */}
           <button
             onClick={() => onNavigateTab('traduire')}
-            className="bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-surface-container/60"
+            className="bg-white p-4 lg:p-5 rounded-3xl shadow-soft hover:shadow-raised transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-surface-container/60"
           >
             <div className="w-12 h-12 rounded-2xl bg-primary-fixed text-on-primary-fixed flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <span className="material-symbols-outlined text-[26px]">translate</span>
@@ -306,7 +306,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           {/* Action 2: Tuteur IA */}
           <button
             onClick={() => onNavigateTab('discussions')}
-            className="bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-surface-container/60"
+            className="bg-white p-4 lg:p-5 rounded-3xl shadow-soft hover:shadow-raised transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-surface-container/60"
           >
             <div className="w-12 h-12 rounded-2xl bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <span className="material-symbols-outlined text-[26px]">psychology</span>
@@ -320,7 +320,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           {/* Action 3: Vocabulaire */}
           <button
             onClick={onOpenVocabularyModal}
-            className="bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-surface-container/60"
+            className="bg-white p-4 lg:p-5 rounded-3xl shadow-soft hover:shadow-raised transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-surface-container/60"
           >
             <div className="w-12 h-12 rounded-2xl bg-tertiary-container text-tertiary-fixed flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <span className="material-symbols-outlined text-[26px]">storefront</span>
@@ -334,7 +334,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           {/* Action 4: Histoires */}
           <button
             onClick={onOpenStoryModal}
-            className="bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-surface-container/60"
+            className="bg-white p-4 lg:p-5 rounded-3xl shadow-soft hover:shadow-raised transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-surface-container/60"
           >
             <div className="w-12 h-12 rounded-2xl bg-surface-container text-secondary flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <span className="material-symbols-outlined text-[26px]">auto_stories</span>
@@ -350,9 +350,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       {/* Cultural Inspiration & Visual Strip */}
       {/* <section
         onClick={onOpenStoryModal}
-        className="bg-white p-4 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] flex items-center gap-4 cursor-pointer hover:shadow-md transition-all border border-surface-container/60 group"
+        className="bg-white p-4 rounded-3xl shadow-soft flex items-center gap-4 cursor-pointer hover:shadow-raised transition-all border border-surface-container/60 group"
       >
-        <div className="relative w-20 h-20 rounded-2xl overflow-hidden shrink-0 shadow-sm">
+        <div className="relative w-20 h-20 rounded-2xl overflow-hidden shrink-0 shadow-soft">
           <img
             alt="Pagne Baoulé tissé"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -387,7 +387,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4">
           {/* Card 1 */}
           <div
-            className="relative bg-white p-3.5 rounded-3xl shadow-[0_2px_12px_rgba(0,75,73,0.03)] hover:shadow-md transition-all flex items-center justify-between gap-3 cursor-pointer border border-surface-container/60 active:scale-[0.99]"
+            className="relative bg-white p-3.5 rounded-3xl shadow-soft hover:shadow-raised transition-all flex items-center justify-between gap-3 cursor-pointer border border-surface-container/60 active:scale-[0.99]"
           >
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-12 h-12 rounded-2xl bg-secondary-container/20 text-secondary flex items-center justify-center shrink-0">
@@ -419,7 +419,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
           {/* Card 2 */}
           <div
-            className="relative bg-white p-3.5 rounded-3xl shadow-[0_2px_12px_rgba(0,75,73,0.03)] hover:shadow-md transition-all flex items-center justify-between gap-3 cursor-pointer border border-surface-container/60 active:scale-[0.99]"
+            className="relative bg-white p-3.5 rounded-3xl shadow-soft hover:shadow-raised transition-all flex items-center justify-between gap-3 cursor-pointer border border-surface-container/60 active:scale-[0.99]"
           >
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-12 h-12 rounded-2xl bg-primary-container/10 text-primary-container flex items-center justify-center shrink-0">

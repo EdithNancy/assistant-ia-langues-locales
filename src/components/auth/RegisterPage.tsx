@@ -83,7 +83,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
         {/* Hero emblem */}
         <div className="relative w-24 h-24 flex items-center justify-center">
           <div className="absolute inset-0 rounded-full bg-tertiary-fixed/20 blur-md" />
-          <div className="relative w-20 h-20 rounded-full bg-primary flex items-center justify-center shadow-[0_8px_24px_rgba(0,51,49,0.35)]">
+          <div className="relative w-20 h-20 rounded-full bg-primary flex items-center justify-center shadow-raised">
             <div className="w-12 h-12 rounded-full border border-dashed border-tertiary-fixed-dim/60 flex items-center justify-center">
               <svg viewBox="0 0 32 20" className="w-7 h-5" aria-hidden="true">
                 <rect x="0" y="6" width="3" height="8" rx="1.5" fill="#3cddc7" />
@@ -112,7 +112,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
         <form
           onSubmit={handleSubmit}
           noValidate
-          className="mt-8 w-full rounded-[28px] bg-white p-5 shadow-[0_8px_40px_rgba(0,51,49,0.06)] flex flex-col gap-5"
+          className="mt-8 w-full rounded-3xl bg-white p-5 shadow-soft flex flex-col gap-5"
         >
           {/* Priority language */}
           <div className="flex flex-col gap-3">
@@ -151,7 +151,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
                     </span>
                     <span className="mt-3 text-[20px] font-semibold text-on-surface">{choice.name}</span>
                     <span className="text-[13px] text-on-surface-variant">{choice.family}</span>
-                    <span className={`mt-1 self-start px-2 py-0.5 rounded-md text-xs font-medium ${choice.chip}`}>
+                    <span className={`mt-1 self-start px-2 py-0.5 rounded-xl text-xs font-medium ${choice.chip}`}>
                       {choice.greeting}
                     </span>
                   </button>
@@ -271,7 +271,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
               onChange={(e) => setAcceptedTerms(e.target.checked)}
               className="peer sr-only"
             />
-            <span className="mt-0.5 shrink-0 w-6 h-6 rounded-md border-2 border-primary flex items-center justify-center peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary-container/40 transition-colors">
+            <span className="mt-0.5 shrink-0 w-6 h-6 rounded-xl border-2 border-primary flex items-center justify-center peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary-container/40 transition-colors">
               {acceptedTerms && <span className="material-symbols-outlined text-[18px] text-white">check</span>}
             </span>
             <span className="text-[13px] leading-snug text-on-surface-variant">
@@ -286,7 +286,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
           <button
             type="submit"
             disabled={isLoading}
-            className="h-16 rounded-full bg-primary text-white text-[18px] font-semibold flex items-center justify-center gap-2 shadow-[0_10px_24px_rgba(0,51,49,0.3)] hover:bg-primary-container active:scale-[0.98] disabled:opacity-70 transition-all"
+            className="h-16 rounded-full bg-primary text-white text-[18px] font-semibold flex items-center justify-center gap-2 shadow-raised hover:bg-primary-container active:scale-[0.98] disabled:opacity-70 transition-all"
           >
             {isLoading ? (
               <span className="w-5 h-5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
@@ -306,7 +306,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
             type="button"
             disabled
             title="Bientôt disponible"
-            className="relative h-12 rounded-full bg-white flex items-center justify-center gap-2 text-[15px] font-medium text-on-surface shadow-sm hover:bg-surface-container-low active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
+            className="relative h-12 rounded-full bg-white flex items-center justify-center gap-2 text-[15px] font-medium text-on-surface shadow-soft hover:bg-surface-container-low active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
           >
             <ComingSoonBadge />
             <GoogleIcon />
@@ -316,7 +316,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
             type="button"
             disabled
             title="Bientôt disponible"
-            className="relative h-12 rounded-full bg-white flex items-center justify-center gap-2 text-[15px] font-medium text-on-surface shadow-sm hover:bg-surface-container-low active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
+            className="relative h-12 rounded-full bg-white flex items-center justify-center gap-2 text-[15px] font-medium text-on-surface shadow-soft hover:bg-surface-container-low active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
           >
             <ComingSoonBadge />
             <AppleIcon />

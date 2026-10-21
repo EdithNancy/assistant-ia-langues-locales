@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { Modal } from './ui/Modal';
 import { LANGUAGE_LABEL } from '../data/languages';
 import { Flag } from './Flag';
-import { closeOnBackdrop } from '../utils/backdrop';
 import { useToast } from '../hooks/useToast';
 import { Toast } from './Toast';
-import { useEscapeKey } from '../hooks/useEscapeKey';
 import { BRAND_ASSETS, INITIAL_CHAT_MESSAGES } from '../data/mockData';
 import { ChatMessage, Language } from '../types';
 import { recorderErrorMessage, useAudioRecorder } from '../hooks/useAudioRecorder';
@@ -39,7 +38,6 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
   const recorder = useAudioRecorder();
   const { ensureConsent } = useVoiceConsent();
-  useEscapeKey(isDialectModalOpen, () => setIsDialectModalOpen(false));
   const isRecording = recorder.status === 'recording';
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [isAiTyping, setIsAiTyping] = useState(false);
@@ -201,7 +199,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
           <div className="relative shrink-0">
             <img
               alt="Aya AI Avatar"
-              className="w-10 h-10 rounded-full object-cover bg-primary-fixed p-0.5 shadow-xs ring-1 ring-primary-container/20"
+              className="w-10 h-10 rounded-full object-cover bg-primary-fixed p-0.5 shadow-soft ring-1 ring-primary-container/20"
               src={BRAND_ASSETS.ayaAvatar}
             />
             <span
@@ -215,7 +213,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-1.5">
               <span className="text-sm text-on-surface font-bold truncate">Aya</span>
-              <span className="text-[11px] px-1.5 py-0.2 rounded-md bg-primary-fixed text-on-primary-fixed-variant font-bold">
+              <span className="text-[11px] px-1.5 py-0.2 rounded-xl bg-primary-fixed text-on-primary-fixed-variant font-bold">
                 Tuteur IA
               </span>
             </div>
@@ -253,7 +251,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
       <div className="flex flex-col gap-5 pt-3 pb-24">
         {/* Day Timestamp Divider */}
         <div className="flex items-center justify-center my-1">
-          <div className="px-3 py-1 rounded-full bg-surface-container-high text-on-surface-variant text-xs font-semibold shadow-xs">
+          <div className="px-3 py-1 rounded-full bg-surface-container-high text-on-surface-variant text-xs font-semibold shadow-soft">
             Aujourd'hui • Dialogue oral & écrit
           </div>
         </div>
@@ -273,7 +271,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                   <span>{msg.timestamp}</span>
                   <span className="font-bold text-primary-container">Moi</span>
                 </div>
-                <div className="bg-primary-container text-white rounded-3xl rounded-tr-sm p-4 shadow-[0_4px_20px_-2px_rgba(0,75,73,0.15)] flex flex-col gap-1.5">
+                <div className="bg-primary-container text-white rounded-3xl rounded-tr-sm p-4 shadow-raised flex flex-col gap-1.5">
                   <p className="text-sm leading-relaxed">{msg.text}</p>
                   <div className="flex items-center justify-end gap-1 text-on-primary-container text-[11px]">
                     <span>
@@ -298,7 +296,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                 <span className="text-on-surface-variant">{msg.timestamp}</span>
               </div>
 
-              <div className="bg-white rounded-3xl rounded-tl-sm p-4 shadow-[0_4px_20px_-2px_rgba(0,75,73,0.06)] flex flex-col gap-3 text-on-surface border border-surface-container">
+              <div className="bg-white rounded-3xl rounded-tl-sm p-4 shadow-soft flex flex-col gap-3 text-on-surface border border-surface-container">
                 {/* Main Text */}
                 <p className="text-sm leading-relaxed text-on-surface font-medium">
                   {msg.text}
@@ -310,7 +308,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                     <button
                       onClick={() => handlePlayMessageAudio(msg)}
                       aria-label="Écouter le message"
-                      className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-md transition-all active:scale-95 ${
+                      className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-raised transition-all active:scale-95 ${
                         isPlaying
                           ? 'bg-tertiary-fixed text-primary'
                           : 'bg-primary text-white hover:scale-105'
@@ -351,7 +349,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                           onClick={() => setPlaybackSpeed(speed)}
                           className={`px-2 py-0.5 rounded-full text-[11px] font-bold transition-all ${
                             playbackSpeed === speed
-                              ? 'bg-white text-primary shadow-xs'
+                              ? 'bg-white text-primary shadow-soft'
                               : 'text-on-surface-variant'
                           }`}
                         >
@@ -372,11 +370,11 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                 {/* Phonetics & Tone Pill if present */}
                 {msg.phonetic && (
                   <div className="flex items-center flex-wrap gap-2 pt-1">
-                    <span className="px-2 py-1 rounded-lg bg-surface-container-high text-xs text-on-surface font-mono font-medium">
+                    <span className="px-2 py-1 rounded-xl bg-surface-container-high text-xs text-on-surface font-mono font-medium">
                       {msg.phonetic}
                     </span>
                     {msg.tone && (
-                      <span className="px-2 py-0.5 rounded-md bg-secondary-fixed text-on-secondary-fixed text-[11px] font-bold flex items-center gap-1">
+                      <span className="px-2 py-0.5 rounded-xl bg-secondary-fixed text-on-secondary-fixed text-[11px] font-bold flex items-center gap-1">
                         <span className="material-symbols-outlined text-[12px]">graphic_eq</span>
                         {msg.tone}
                       </span>
@@ -536,7 +534,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
       <div className="fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] lg:bottom-0 left-0 right-0 lg:left-64 z-30 bg-gradient-to-t from-surface via-surface/95 to-transparent pt-3 pb-2 lg:pb-6 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl lg:max-w-4xl mx-auto flex flex-col gap-2">
           {/* Special African Characters Toolbar */}
-          <div className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-full bg-white shadow-[0_2px_12px_rgba(0,75,73,0.08)] border border-surface-container">
+          <div className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-full bg-white shadow-soft border border-surface-container">
             <div className="flex items-center gap-1.5 min-w-0">
               <span className="text-xs text-on-surface-variant font-bold px-1 flex items-center gap-1">
                 <span className="material-symbols-outlined text-[14px] text-primary-container">
@@ -549,7 +547,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                   <button
                     key={char}
                     onClick={() => handleCharInsert(char)}
-                    className="w-7 h-7 rounded-lg bg-surface-container hover:bg-primary-fixed hover:text-on-primary-fixed text-sm font-bold text-on-surface flex items-center justify-center active:scale-90 transition-all"
+                    className="w-7 h-7 rounded-xl bg-surface-container hover:bg-primary-fixed hover:text-on-primary-fixed text-sm font-bold text-on-surface flex items-center justify-center active:scale-90 transition-all"
                   >
                     {char}
                   </button>
@@ -567,13 +565,13 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
             <button
               onClick={() => showToast('Ajout d’image ou audio contextuel')}
               aria-label="Joindre un document"
-              className="w-12 h-12 rounded-full bg-white text-on-surface-variant hover:text-primary-container flex items-center justify-center shadow-md active:scale-95 transition-all shrink-0 border border-surface-container"
+              className="w-12 h-12 rounded-full bg-white text-on-surface-variant hover:text-primary-container flex items-center justify-center shadow-raised active:scale-95 transition-all shrink-0 border border-surface-container"
             >
               <span className="material-symbols-outlined text-[24px]">add</span>
             </button>
 
             {/* Rounded Text Input Container */}
-            <div className="flex-1 h-12 rounded-full bg-white shadow-md px-4 flex items-center justify-between gap-2 border border-surface-container focus-within:ring-2 focus-within:ring-primary-container/30">
+            <div className="flex-1 h-12 rounded-full bg-white shadow-raised px-4 flex items-center justify-between gap-2 border border-surface-container focus-within:ring-2 focus-within:ring-primary-container/30">
               <input
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
@@ -614,7 +612,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
               <button
                 onClick={handleMicToggle}
                 aria-label={isRecording ? "Arrêter l'enregistrement" : "Parler vocalement à l'IA"}
-                className={`relative w-12 h-12 rounded-full flex items-center justify-center shadow-[0_4px_16px_rgba(0,75,73,0.3)] hover:scale-105 active:scale-95 transition-all ${
+                className={`relative w-12 h-12 rounded-full flex items-center justify-center shadow-raised hover:scale-105 active:scale-95 transition-all ${
                   isRecording
                     ? 'bg-error text-white'
                     : 'bg-primary-container text-tertiary-fixed'
@@ -631,16 +629,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
 
       {/* Language / Dialect Selection Modal Drawer */}
       {isDialectModalOpen && (
-        <div
-          onClick={closeOnBackdrop(() => setIsDialectModalOpen(false))}
-          role="presentation"
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/40 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            className="w-full max-w-md bg-white rounded-t-[32px] sm:rounded-[32px] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-5 shadow-2xl flex flex-col gap-4 animate-in slide-in-from-bottom duration-300"
-          >
+        <Modal onClose={() => setIsDialectModalOpen(false)} overlayClassName="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/40 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in" className="w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-5 shadow-overlay flex flex-col gap-4 animate-in slide-in-from-bottom duration-300">
             <div className="sm:hidden w-12 h-1.5 bg-outline-variant/60 rounded-full mx-auto"></div>
 
             <div className="flex justify-between items-center">
@@ -738,8 +727,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                 </span>
               </div>
             </div>
-          </div>
-        </div>
+          </Modal>
       )}
     </div>
   );

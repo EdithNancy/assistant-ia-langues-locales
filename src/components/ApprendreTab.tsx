@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
+import { Modal } from './ui/Modal';
 import { useCelebration } from '../hooks/useCelebration';
-import { closeOnBackdrop } from '../utils/backdrop';
 import { LanguageToggle } from './LanguageToggle';
 import { useToast } from '../hooks/useToast';
 import { Toast } from './Toast';
-import { useEscapeKey } from '../hooks/useEscapeKey';
 import { LEARNING_MODULES, QUIZ_QUESTIONS } from '../data/mockData';
 import { Language, LearningModule, QuizQuestion } from '../types';
 import { soundEngine } from '../utils/audio';
@@ -26,9 +25,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
   const [userScore, setUserScore] = useState(96);
   const [hasPracticed, setHasPracticed] = useState(true);
   const [selectedModule, setSelectedModule] = useState<LearningModule | null>(null);
-  useEscapeKey(selectedModule !== null, () => setSelectedModule(null));
   const [isQuizOpen, setIsQuizOpen] = useState(false);
-  useEscapeKey(isQuizOpen, () => setIsQuizOpen(false));
   const [quizIndex, setQuizIndex] = useState(0);
   const [quizSelectedOption, setQuizSelectedOption] = useState<string | null>(null);
   const [quizScore, setQuizScore] = useState(0);
@@ -152,13 +149,13 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
               Pratiquez l'oral et enrichissez votre vocabulaire au quotidien.
             </p>
           </div>
-          <div className="p-2.5 bg-secondary-fixed text-on-secondary-fixed rounded-2xl shadow-xs flex items-center justify-center shrink-0">
+          <div className="p-2.5 bg-secondary-fixed text-on-secondary-fixed rounded-2xl shadow-soft flex items-center justify-center shrink-0">
             <span className="material-symbols-outlined text-[24px]">school</span>
           </div>
         </div>
 
         {/* Streak Card */}
-        <div className="bg-gradient-to-r from-primary-container via-primary to-on-primary-fixed-variant rounded-2xl p-4 text-white shadow-md relative overflow-hidden">
+        <div className="bg-gradient-to-r from-primary-container via-primary to-on-primary-fixed-variant rounded-2xl p-4 text-white shadow-raised relative overflow-hidden">
           <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-tertiary-fixed/10 rounded-full blur-xl pointer-events-none"></div>
 
           <div className="relative z-10 flex items-center justify-between gap-2">
@@ -229,7 +226,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
       </section>
 
       {/* Pronunciation Trainer Hero Interactive Widget */}
-      <section className="lg:col-span-7 lg:row-span-2 bg-white rounded-3xl p-5 lg:p-6 shadow-sm space-y-4 border border-surface-container">
+      <section className="lg:col-span-7 lg:row-span-2 bg-white rounded-3xl p-5 lg:p-6 shadow-soft space-y-4 border border-surface-container">
         {/* Card Header Tag & Progress */}
         <div className="flex items-center justify-between">
           <div className="inline-flex items-center space-x-1.5 px-3 py-1 bg-secondary-fixed/60 text-on-secondary-fixed-variant rounded-full">
@@ -277,7 +274,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
             <button
               onClick={handlePlayNative}
               aria-label="Écouter le locuteur natif"
-              className={`w-11 h-11 rounded-full flex items-center justify-center shadow-md active:scale-90 transition-transform ${
+              className={`w-11 h-11 rounded-full flex items-center justify-center shadow-raised active:scale-90 transition-transform ${
                 isPlayingNative ? 'bg-tertiary-fixed text-primary' : 'bg-primary text-white'
               }`}
             >
@@ -320,7 +317,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
             <button
               onClick={handleToggleRecord}
               aria-label="Enregistrer votre voix"
-              className={`w-16 h-16 rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-all duration-200 ${
+              className={`w-16 h-16 rounded-full flex items-center justify-center shadow-raised active:scale-95 transition-all duration-200 ${
                 isRecordingUser
                   ? 'bg-error text-white scale-105'
                   : 'bg-gradient-to-tr from-secondary to-secondary-container text-white'
@@ -347,7 +344,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
           <div className="bg-surface-container-low rounded-2xl p-4 space-y-3 animate-in fade-in">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <div className="w-7 h-7 rounded-lg bg-tertiary-container text-white flex items-center justify-center">
+                <div className="w-7 h-7 rounded-xl bg-tertiary-container text-white flex items-center justify-center">
                   <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
                 </div>
                 <span className="text-sm font-bold text-primary">
@@ -369,7 +366,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
 
             {/* Feedback Criteria Details */}
             <div className="grid grid-cols-3 gap-2 pt-1 text-center">
-              <div className="bg-white p-2.5 rounded-xl shadow-xs border border-surface-container">
+              <div className="bg-white p-2.5 rounded-xl shadow-soft border border-surface-container">
                 <span className="material-symbols-outlined text-tertiary-container text-[18px]">
                   graphic_eq
                 </span>
@@ -377,7 +374,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                 <p className="text-xs text-primary font-bold">Excellente</p>
               </div>
 
-              <div className="bg-white p-2.5 rounded-xl shadow-xs border border-surface-container">
+              <div className="bg-white p-2.5 rounded-xl shadow-soft border border-surface-container">
                 <span className="material-symbols-outlined text-tertiary-container text-[18px]">
                   speed
                 </span>
@@ -385,7 +382,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                 <p className="text-xs text-primary font-bold">Fluide</p>
               </div>
 
-              <div className="bg-white p-2.5 rounded-xl shadow-xs border border-surface-container">
+              <div className="bg-white p-2.5 rounded-xl shadow-soft border border-surface-container">
                 <span className="material-symbols-outlined text-secondary text-[18px]">
                   verified
                 </span>
@@ -420,7 +417,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
           {LEARNING_MODULES.map((mod) => (
             <div
               key={mod.id}
-              className="relative bg-white p-3 rounded-2xl shadow-xs flex flex-col justify-between space-y-2.5 hover:bg-surface transition-all cursor-pointer border border-surface-container group active:scale-[0.98]"
+              className="relative bg-white p-3 rounded-2xl shadow-soft flex flex-col justify-between space-y-2.5 hover:bg-surface transition-all cursor-pointer border border-surface-container group active:scale-[0.98]"
             >
               <button
                 type="button"
@@ -429,7 +426,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                 className="absolute inset-0 z-10 rounded-2xl"
               />
               <div className="space-y-2">
-                <div className="w-full h-24 rounded-xl overflow-hidden relative shadow-xs">
+                <div className="w-full h-24 rounded-xl overflow-hidden relative shadow-soft">
                   <img
                     alt={mod.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -463,7 +460,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
               </div>
 
               {mod.progress === 100 ? (
-                <div className="flex items-center space-x-1.5 py-1 px-2 rounded-lg bg-surface-container text-primary text-[11px] font-bold">
+                <div className="flex items-center space-x-1.5 py-1 px-2 rounded-xl bg-surface-container text-primary text-[11px] font-bold">
                   <span className="material-symbols-outlined text-[14px] text-tertiary-container">
                     verified
                   </span>
@@ -489,7 +486,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
       </section>
 
       {/* Daily Audio Quiz Card */}
-      <section className="lg:col-span-5 bg-gradient-to-br from-secondary-fixed via-surface-container-low to-white rounded-3xl p-5 shadow-xs relative overflow-hidden border border-surface-container">
+      <section className="lg:col-span-5 bg-gradient-to-br from-secondary-fixed via-surface-container-low to-white rounded-3xl p-5 shadow-soft relative overflow-hidden border border-surface-container">
         <div className="flex items-start justify-between gap-3 relative z-10">
           <div className="space-y-2 max-w-[70%]">
             <div className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-secondary text-white text-[11px] font-bold">
@@ -508,7 +505,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
             <div className="pt-2">
               <button
                 onClick={handleStartQuiz}
-                className="px-4 py-2.5 rounded-full bg-primary-container text-white text-xs font-bold shadow-md hover:bg-primary active:scale-95 transition-all inline-flex items-center space-x-2"
+                className="px-4 py-2.5 rounded-full bg-primary-container text-white text-xs font-bold shadow-raised hover:bg-primary active:scale-95 transition-all inline-flex items-center space-x-2"
               >
                 <span className="material-symbols-outlined text-[18px]">play_circle</span>
                 <span>Lancer le quiz audio</span>
@@ -516,7 +513,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
             </div>
           </div>
 
-          <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-2xl bg-secondary-container/30 flex items-center justify-center text-secondary shadow-xs">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-2xl bg-secondary-container/30 flex items-center justify-center text-secondary shadow-soft">
             <span className="material-symbols-outlined text-[42px]">hearing</span>
           </div>
         </div>
@@ -524,16 +521,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
 
       {/* Interactive Module Detail Modal */}
       {selectedModule && (
-        <div
-          onClick={closeOnBackdrop(() => setSelectedModule(null))}
-          role="presentation"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-in fade-in"
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            className="w-full max-w-md bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[85vh] overflow-y-auto animate-in zoom-in-95 duration-200"
-          >
+        <Modal onClose={() => setSelectedModule(null)} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-md bg-white rounded-3xl p-5 shadow-overlay flex flex-col gap-4 max-h-[85vh] overflow-y-auto animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-start">
               <div>
                 <span className="text-xs text-secondary font-bold uppercase">
@@ -593,22 +581,12 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
             >
               Pratiquer vocalement avec Aya
             </button>
-          </div>
-        </div>
+          </Modal>
       )}
 
       {/* Interactive Quiz Modal */}
       {isQuizOpen && (
-        <div
-          onClick={closeOnBackdrop(() => setIsQuizOpen(false))}
-          role="presentation"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in"
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200"
-          >
+        <Modal onClose={() => setIsQuizOpen(false)} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-overlay flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-secondary">headphones</span>
@@ -695,7 +673,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
               </>
             ) : (
               <div className="flex flex-col items-center text-center gap-3 py-3 animate-in zoom-in-90">
-                <div className="w-16 h-16 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center shadow-md">
+                <div className="w-16 h-16 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center shadow-raised">
                   <span className="material-symbols-outlined text-[36px]">celebration</span>
                 </div>
                 <h4 className="text-lg font-bold text-primary-container">Félicitations !</h4>
@@ -711,8 +689,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                 </button>
               </div>
             )}
-          </div>
-        </div>
+          </Modal>
       )}
     </div>
   );

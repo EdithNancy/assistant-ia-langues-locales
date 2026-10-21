@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
+import { Modal } from './ui/Modal';
 import { LANGUAGE_LABEL } from '../data/languages';
-import { closeOnBackdrop } from '../utils/backdrop';
-import { useEscapeKey } from '../hooks/useEscapeKey';
 import { BRAND_ASSETS, CULTURAL_STORIES, VOCABULARY_LIST } from '../data/mockData';
 import { Language } from '../types';
 import { soundEngine } from '../utils/audio';
@@ -15,7 +14,6 @@ interface StoryModalProps {
 
 export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-  useEscapeKey(isOpen, onClose);
   if (!isOpen) return null;
   const story = CULTURAL_STORIES[0];
 
@@ -33,17 +31,8 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div
-      onClick={closeOnBackdrop(onClose)}
-      role="presentation"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in"
-    >
-      <div
-        role="dialog"
-            aria-modal="true"
-        className="w-full max-w-md bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-surface-container"
-      >
-        <div className="relative w-full h-44 rounded-2xl overflow-hidden shadow-sm">
+    <Modal onClose={onClose} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-md bg-white rounded-3xl p-5 shadow-overlay flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-surface-container">
+        <div className="relative w-full h-44 rounded-2xl overflow-hidden shadow-soft">
           <img
             alt={story.title}
             src={story.image}
@@ -91,7 +80,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
             className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-90 ${
               isPlayingAudio
                 ? 'bg-secondary text-white animate-pulse'
-                : 'bg-secondary text-white shadow-sm'
+                : 'bg-secondary text-white shadow-soft'
             }`}
           >
             <span className="material-symbols-outlined text-[20px]">
@@ -106,8 +95,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
         >
           Fermer l'histoire
         </button>
-      </div>
-    </div>
+      </Modal>
   );
 };
 
@@ -118,7 +106,6 @@ interface VocabularyModalProps {
 
 export const VocabularyModal: React.FC<VocabularyModalProps> = ({ isOpen, onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  useEscapeKey(isOpen, onClose);
   if (!isOpen) return null;
 
   const filtered = VOCABULARY_LIST.filter(
@@ -128,16 +115,7 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({ isOpen, onClos
   );
 
   return (
-    <div
-      onClick={closeOnBackdrop(onClose)}
-      role="presentation"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in"
-    >
-      <div
-        role="dialog"
-            aria-modal="true"
-        className="w-full max-w-md bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-3 max-h-[85vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-surface-container"
-      >
+    <Modal onClose={onClose} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-md bg-white rounded-3xl p-5 shadow-overlay flex flex-col gap-3 max-h-[85vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-surface-container">
         <div className="flex justify-between items-center">
           <div>
             <h3 className="text-base font-bold text-on-surface">
@@ -207,8 +185,7 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({ isOpen, onClos
         >
           Fermer le lexique
         </button>
-      </div>
-    </div>
+      </Modal>
   );
 };
 
@@ -230,20 +207,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   onLogout,
 }) => {
   const { consent, withdraw } = useVoiceConsent();
-  useEscapeKey(isOpen, onClose);
   if (!isOpen) return null;
 
   return (
-    <div
-      onClick={closeOnBackdrop(onClose)}
-      role="presentation"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in"
-    >
-      <div
-        role="dialog"
-            aria-modal="true"
-        className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-surface-container"
-      >
+    <Modal onClose={onClose} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-overlay flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-surface-container">
         <div className="flex justify-between items-center">
           <h3 className="text-base font-bold text-on-surface">Mon profil IvoirAI</h3>
           <button
@@ -259,7 +226,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             <img
               src={BRAND_ASSETS.edithProfile}
               alt="Portrait Edith"
-              className="w-20 h-20 rounded-full object-cover shadow-sm ring-4 ring-primary-container/20"
+              className="w-20 h-20 rounded-full object-cover shadow-soft ring-4 ring-primary-container/20"
             />
             <span className="absolute bottom-0 right-1 w-4 h-4 bg-tertiary-fixed rounded-full ring-2 ring-white"></span>
           </div>
@@ -337,8 +304,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           <span className="material-symbols-outlined text-[18px]">logout</span>
           Se déconnecter
         </button>
-      </div>
-    </div>
+      </Modal>
   );
 };
 

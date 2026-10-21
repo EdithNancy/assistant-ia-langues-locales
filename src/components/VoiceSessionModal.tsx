@@ -166,7 +166,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
         <div className="flex items-center justify-between w-full">
           {/* Center Status: Live Timer Pill & Dialect selector */}
           <div className="flex items-center gap-2 w-full">
-            <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-highest shadow-xs flex-1 min-w-0">
+            <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-highest shadow-soft flex-1 min-w-0">
               <span className="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
               <span className="w-2 h-2 rounded-full bg-secondary -ml-3.5"></span>
               <span className="text-xs font-bold text-on-surface tracking-wide uppercase whitespace-nowrap">
@@ -180,7 +180,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
               aria-label={`Langue : ${currentDialect === 'dioula' ? 'Dioula' : 'Baoulé'}. Passer en ${
                 currentDialect === 'dioula' ? 'Baoulé' : 'Dioula'
               }`}
-              className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-white text-xs font-bold active:scale-95 transition-all shadow-sm flex-1 min-w-0"
+              className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-white text-xs font-bold active:scale-95 transition-all shadow-soft flex-1 min-w-0"
             >
               <span className="truncate">{currentDialect === 'dioula' ? 'Dioula (Mandé)' : 'Baoulé (Akan)'}</span>
               <span className="material-symbols-outlined text-[16px] shrink-0">swap_horiz</span>
@@ -192,7 +192,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
         <div className="flex items-center justify-center gap-3">
           <div className="relative">
             <img
-              className="w-11 h-11 rounded-full object-cover shadow-sm ring-2 ring-primary-container/20"
+              className="w-11 h-11 rounded-full object-cover shadow-soft ring-2 ring-primary-container/20"
               alt="Aya Tuteur"
               src={BRAND_ASSETS.ayaAvatar}
             />
@@ -266,9 +266,9 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
                 handleOrbClick();
               }
             }}
-            className={`relative z-10 w-44 h-44 rounded-full p-2 flex items-center justify-center cursor-pointer transition-all duration-300 shadow-[0_12px_40px_rgba(0,51,49,0.2)] ${
+            className={`relative z-10 w-44 h-44 rounded-full p-2 flex items-center justify-center cursor-pointer transition-all duration-300 shadow-raised ${
               speakingState === 'speaking'
-                ? 'scale-105 shadow-[0_0_50px_rgba(98,250,227,0.5)]'
+                ? 'scale-105 shadow-glow'
                 : 'hover:scale-105 active:scale-95'
             }`}
           >
@@ -295,7 +295,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
                   }`}
                 ></span>
                 <span
-                  className={`w-2 rounded-full bg-tertiary-fixed shadow-xs transition-all ${
+                  className={`w-2 rounded-full bg-tertiary-fixed shadow-soft transition-all ${
                     speakingState === 'speaking'
                       ? 'h-18 animate-[bounce_0.7s_infinite_50ms]'
                       : 'h-16'
@@ -321,7 +321,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
 
           {/* Real-time Audio EQ Indicator & Status */}
           <div className="mt-5 flex flex-col items-center gap-1.5">
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-container shadow-xs">
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-container shadow-soft">
               <div className="flex items-end gap-1 h-3.5 px-0.5">
                 <span
                   className={`w-1 bg-primary rounded-full transition-all ${
@@ -367,7 +367,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
         </div>
 
         {/* Live Transcript Glassmorphism Card */}
-        <div className="w-full bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-surface-container flex flex-col gap-2 relative">
+        <div className="w-full bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-soft border border-surface-container flex flex-col gap-2 relative">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-secondary text-[18px]">
@@ -413,7 +413,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
         </div>
 
         {/* Live Audio Feedback Snapshot Card */}
-        <div className="w-full bg-surface-container rounded-2xl p-3.5 flex items-center justify-between shadow-xs">
+        <div className="w-full bg-surface-container rounded-2xl p-3.5 flex items-center justify-between shadow-soft">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-9 h-9 rounded-xl bg-tertiary-container text-white flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-[20px]">graphic_eq</span>
@@ -437,7 +437,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
           {/* Mute Mic Button */}
           <button
             onClick={toggleMute}
-            className={`flex-1 h-13 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-all shadow-xs active:scale-95 ${
+            className={`flex-1 h-13 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-all shadow-soft active:scale-95 ${
               isMuted
                 ? 'bg-error-container text-error'
                 : 'bg-surface-container-highest text-on-surface hover:bg-surface-dim'
@@ -454,7 +454,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
           {/* Pause Session Button */}
           <button
             onClick={togglePause}
-            className={`flex-1 h-13 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-all shadow-xs active:scale-95 ${
+            className={`flex-1 h-13 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-all shadow-soft active:scale-95 ${
               isPaused
                 ? 'bg-primary-fixed text-on-primary-fixed'
                 : 'bg-surface-container-highest text-on-surface hover:bg-surface-dim'
@@ -472,7 +472,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
           <button
             onClick={handleEndCall}
             aria-label="Terminer la session vocale"
-            className="w-13 h-13 rounded-2xl bg-error hover:bg-on-error-container active:scale-90 text-white flex items-center justify-center transition-all shadow-md shrink-0"
+            className="w-13 h-13 rounded-2xl bg-error hover:bg-on-error-container active:scale-90 text-white flex items-center justify-center transition-all shadow-raised shrink-0"
           >
             <span className="material-symbols-outlined text-[26px]">call_end</span>
           </button>

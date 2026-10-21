@@ -24,7 +24,7 @@ const LoginEmblem = () => (
   <div className="relative w-40 h-40 flex items-center justify-center">
     <div className="absolute inset-0 rounded-full border border-dashed border-outline-variant" />
     <div className="absolute inset-3 rounded-full bg-primary-fixed/60" />
-    <div className="relative w-28 h-28 rounded-full p-[5px] bg-gradient-to-br from-secondary via-on-secondary-fixed-variant to-primary-container shadow-lg">
+    <div className="relative w-28 h-28 rounded-full p-[5px] bg-gradient-to-br from-secondary via-on-secondary-fixed-variant to-primary-container shadow-raised">
       <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
         <svg viewBox="0 0 64 40" className="w-16 h-10" aria-hidden="true">
           <rect x="2" y="10" width="7" height="20" rx="3.5" fill="#3cddc7" />
@@ -92,7 +92,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
         <form
           onSubmit={handleSubmit}
           noValidate
-          className="mt-8 w-full rounded-[28px] bg-white p-5 shadow-[0_8px_40px_rgba(0,51,49,0.06)] flex flex-col gap-5"
+          className="mt-8 w-full rounded-3xl bg-white p-5 shadow-soft flex flex-col gap-5"
         >
           {/* Phone / email switch */}
           <div className="grid grid-cols-2 p-1.5 rounded-full bg-surface-container">
@@ -110,7 +110,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
                   setError(null);
                 }}
                 className={`h-12 rounded-full flex items-center justify-center gap-1.5 sm:gap-2 text-[13px] min-[380px]:text-[15px] font-medium transition-all ${
-                  method === tab.key ? 'bg-white text-on-surface shadow-sm' : 'text-on-surface-variant'
+                  method === tab.key ? 'bg-white text-on-surface shadow-soft' : 'text-on-surface-variant'
                 }`}
               >
                 <span className="material-symbols-outlined text-[22px]">{tab.icon}</span>
@@ -208,7 +208,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
           <button
             type="submit"
             disabled={isLoading}
-            className="h-16 rounded-full bg-primary-container text-white text-[18px] font-semibold flex items-center justify-center gap-2 shadow-[0_10px_24px_rgba(0,75,73,0.25)] hover:bg-primary active:scale-[0.98] disabled:opacity-70 transition-all"
+            className="h-16 rounded-full bg-primary-container text-white text-[18px] font-semibold flex items-center justify-center gap-2 shadow-raised hover:bg-primary active:scale-[0.98] disabled:opacity-70 transition-all"
           >
             {isLoading ? (
               <span className="w-5 h-5 rounded-full border-2 border-white/40 border-t-white animate-spin" />

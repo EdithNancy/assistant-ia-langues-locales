@@ -55,7 +55,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   const [left, right] = [NAV_ITEMS.slice(0, 2), NAV_ITEMS.slice(2)];
 
   return (
-    <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-surface/92 backdrop-blur-xl border-t border-surface-container/80 shadow-[0_-4px_24px_rgba(0,75,73,0.06)] pb-[env(safe-area-inset-bottom)]">
+    <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-surface/92 backdrop-blur-xl border-t border-surface-container/80 shadow-soft pb-[env(safe-area-inset-bottom)]">
       <div className="relative flex justify-around items-center h-16 px-2 max-w-2xl mx-auto">
         {left.map((item) => (
           <NavButton
@@ -75,7 +75,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             <button
               onClick={onStartVoiceSession}
               aria-label="Lancer la session vocale en direct"
-              className="relative w-14 h-14 rounded-full bg-gradient-to-tr from-primary via-primary-container to-primary-bright text-white flex items-center justify-center shadow-[0_4px_24px_rgba(45,212,191,0.4)] hover:scale-105 active:scale-95 transition-all duration-300 ring-4 ring-surface"
+              className="relative w-14 h-14 rounded-full bg-gradient-to-tr from-primary via-primary-container to-primary-bright text-white flex items-center justify-center shadow-glow hover:scale-105 active:scale-95 transition-all duration-300 ring-4 ring-surface"
             >
               <span className="material-symbols-outlined text-[28px] text-tertiary-fixed">mic</span>
             </button>

@@ -44,7 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
             className="relative w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all"
           >
             <span className="material-symbols-outlined text-[22px]">notifications</span>
-            <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-secondary shadow-xs"></span>
+            <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-secondary shadow-soft"></span>
           </button>
 
           <button
