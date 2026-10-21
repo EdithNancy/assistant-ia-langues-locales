@@ -14,6 +14,7 @@ import { RegisterPage } from './components/auth/RegisterPage';
 import { BRAND_ASSETS } from './data/mockData';
 import { Language } from './types';
 import { soundEngine } from './utils/audio';
+import { loadPreferences, savePreferences } from './utils/preferences';
 import { loadSession, saveSession } from './utils/session';
 
 /** Une URL par onglet : le rafraîchissement et le bouton Retour fonctionnent. */
@@ -36,6 +37,7 @@ export default function App() {
   const [currentLanguage, setCurrentLanguage] = useState<Language>(
     () => loadSession()?.language ?? 'baoule'
   );
+  const [voiceFirst, setVoiceFirst] = useState(() => loadPreferences().voiceFirst);
   const currentTab: NavTabKey = tabFromPath(pathname) ?? 'accueil';
   const setCurrentTab = (tab: NavTabKey) => navigate(TAB_PATHS[tab]);
   const [isVoiceSessionOpen, setIsVoiceSessionOpen] = useState(false);
@@ -69,6 +71,13 @@ export default function App() {
         ? 'Mode Dioula (Mandé) activé'
         : 'Mode Baoulé (Akan) activé'
     );
+  };
+
+  const handleToggleVoiceFirst = () => {
+    const next = !voiceFirst;
+    setVoiceFirst(next);
+    savePreferences({ voiceFirst: next });
+    showNotification(next ? 'Mode voix d’abord activé' : 'Mode voix d’abord désactivé');
   };
 
   const handleStartVoiceSession = () => {
@@ -139,7 +148,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9f9fb] text-[#1a1c1d]">
+    <div className={`min-h-screen bg-[#f9f9fb] text-[#1a1c1d] ${voiceFirst ? 'voice-first' : ''}`}>
       {/* Desktop Side Navigation (lg+) */}
       <Sidebar
         currentTab={currentTab}
@@ -183,6 +192,8 @@ export default function App() {
               onOpenVocabularyModal={() => setIsVocabularyModalOpen(true)}
               onOpenProfile={() => setIsProfileModalOpen(true)}
               onSelectDiscussion={handleSelectDiscussion}
+              voiceFirst={voiceFirst}
+              onToggleVoiceFirst={handleToggleVoiceFirst}
             />
           )}
 
@@ -192,6 +203,7 @@ export default function App() {
               onLanguageChange={handleLanguageChange}
               onOpenVoiceSession={handleStartVoiceSession}
               onBackToHome={() => setCurrentTab('accueil')}
+              voiceFirst={voiceFirst}
             />
           )}
 
@@ -200,6 +212,7 @@ export default function App() {
               currentLanguage={currentLanguage}
               onLanguageChange={handleLanguageChange}
               onOpenVoiceSession={handleStartVoiceSession}
+              voiceFirst={voiceFirst}
             />
           )}
 
@@ -244,6 +257,8 @@ export default function App() {
           isOpen={isProfileModalOpen}
           onClose={() => setIsProfileModalOpen(false)}
           currentLanguage={currentLanguage}
+          voiceFirst={voiceFirst}
+          onToggleVoiceFirst={handleToggleVoiceFirst}
         />
       </div>
     </div>

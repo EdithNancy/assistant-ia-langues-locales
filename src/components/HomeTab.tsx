@@ -13,6 +13,8 @@ interface HomeTabProps {
   onOpenVocabularyModal: () => void;
   onOpenProfile: () => void;
   onSelectDiscussion: (title: string, lang: Language) => void;
+  voiceFirst: boolean;
+  onToggleVoiceFirst: () => void;
 }
 
 export const HomeTab: React.FC<HomeTabProps> = ({
@@ -24,6 +26,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
   onOpenVocabularyModal,
   onOpenProfile,
   onSelectDiscussion,
+  voiceFirst,
+  onToggleVoiceFirst,
 }) => {
   const [isPlayingWord, setIsPlayingWord] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -43,6 +47,14 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       currentLanguage,
       0.9,
       () => setIsPlayingWord(false)
+    );
+  };
+
+  const handlePlayHelp = () => {
+    voicePlayer.speak(
+      "Bienvenue sur IvoirAI. Appuyez sur le grand bouton micro pour parler à Aya en Baoulé ou en Dioula. Elle vous répondra à voix haute.",
+      'fr',
+      0.95
     );
   };
 
@@ -74,6 +86,28 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           <h2 className="text-2xl lg:text-3xl font-bold text-[#1a1c1d] truncate mt-1">
             Akwaba, Edith
           </h2>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          {voiceFirst && (
+            <button
+              onClick={handlePlayHelp}
+              aria-label="Écouter l'aide"
+              className="w-11 h-11 rounded-full bg-[#ffdbd2] text-[#3c0800] flex items-center justify-center active:scale-95 transition-transform"
+            >
+              <span className="material-symbols-outlined text-[22px]">help</span>
+            </button>
+          )}
+          <button
+            onClick={onToggleVoiceFirst}
+            aria-pressed={voiceFirst}
+            className={`h-11 px-3 rounded-full flex items-center gap-1.5 text-xs font-bold transition-colors active:scale-95 ${
+              voiceFirst ? 'bg-[#004b49] text-white' : 'bg-[#f3f3f5] text-[#3f4948] hover:bg-[#edeef0]'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[20px]">record_voice_over</span>
+            <span className="hidden min-[400px]:inline">Mode voix</span>
+          </button>
         </div>
       </section>
 

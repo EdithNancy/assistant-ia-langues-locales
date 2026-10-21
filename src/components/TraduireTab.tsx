@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { recorderErrorMessage, useAudioRecorder } from '../hooks/useAudioRecorder';
 import { api, TextLanguage, TranslateResult } from '../services';
 import { useVoiceConsent } from './VoiceConsent';
@@ -37,12 +37,15 @@ interface TraduireTabProps {
   currentLanguage: Language;
   onLanguageChange: (lang: Language) => void;
   onOpenVoiceSession: () => void;
+  /** Lit automatiquement la traduction d'une phrase dictée. */
+  voiceFirst: boolean;
 }
 
 export const TraduireTab: React.FC<TraduireTabProps> = ({
   currentLanguage,
   onLanguageChange,
   onOpenVoiceSession,
+  voiceFirst,
 }) => {
   const [sourceLang, setSourceLang] = useState<TextLanguage>('fr');
   const [targetLang, setTargetLang] = useState<TextLanguage>(
@@ -51,6 +54,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   const [currentTrans, setCurrentTrans] = useState<TranslateResult | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
   const [translateFailed, setTranslateFailed] = useState(false);
+  const speakNextResultRef = useRef(false);
   const [sourceText, setSourceText] = useState('Combien coûte le régime de bananes plantain ?');
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [audioSpeedIdx, setAudioSpeedIdx] = useState(0);
@@ -127,6 +131,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
     try {
       const hint = sourceLang === 'fr' ? undefined : sourceLang;
       const { text } = await api.transcribe(audio, hint);
+      speakNextResultRef.current = voiceFirst;
       setSourceText(text);
       showToast('Dictée vocale transcrite !');
     } catch {
@@ -156,6 +161,10 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
         if (!cancelled) {
           setCurrentTrans(result);
           setTranslateFailed(false);
+          if (speakNextResultRef.current) {
+            speakNextResultRef.current = false;
+            voicePlayer.speak(result.translation, targetLang);
+          }
         }
       } catch {
         if (!cancelled) setTranslateFailed(true);

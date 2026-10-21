@@ -12,6 +12,8 @@ interface DiscussionsTabProps {
   onLanguageChange: (lang: Language) => void;
   onOpenVoiceSession: () => void;
   onBackToHome: () => void;
+  /** Lit automatiquement chaque réponse d'Aya. */
+  voiceFirst: boolean;
 }
 
 export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
@@ -19,6 +21,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
   onLanguageChange,
   onOpenVoiceSession,
   onBackToHome,
+  voiceFirst,
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_CHAT_MESSAGES);
   const [inputText, setInputText] = useState('');
@@ -84,7 +87,8 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
         language: currentLanguage,
       };
       setMessages((prev) => [...prev, aiMsg]);
-      soundEngine.playTonePitch('Haut');
+      if (voiceFirst) handlePlayMessageAudio(aiMsg);
+      else soundEngine.playTonePitch('Haut');
     } catch {
       showToast("Aya n'a pas pu répondre. Vérifiez votre connexion.");
     }

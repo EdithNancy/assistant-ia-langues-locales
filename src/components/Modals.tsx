@@ -211,12 +211,16 @@ interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentLanguage: Language;
+  voiceFirst: boolean;
+  onToggleVoiceFirst: () => void;
 }
 
 export const ProfileModal: React.FC<ProfileModalProps> = ({
   isOpen,
   onClose,
   currentLanguage,
+  voiceFirst,
+  onToggleVoiceFirst,
 }) => {
   const { consent, withdraw } = useVoiceConsent();
   if (!isOpen) return null;
@@ -283,6 +287,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             <span className="text-xs text-[#9e4229] font-bold">7 jours consécutifs 🔥</span>
           </div>
 
+          <VoiceFirstSwitch checked={voiceFirst} onToggle={onToggleVoiceFirst} />
+
           <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-[#f3f3f5]">
             <div className="flex flex-col min-w-0">
               <span className="text-xs text-[#1a1c1d] font-semibold">Utilisation de ma voix</span>
@@ -315,3 +321,32 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     </div>
   );
 };
+
+/** Interrupteur du mode « voix d'abord », partagé par le profil et l'accueil. */
+export const VoiceFirstSwitch: React.FC<{ checked: boolean; onToggle: () => void }> = ({
+  checked,
+  onToggle,
+}) => (
+  <button
+    role="switch"
+    aria-checked={checked}
+    onClick={onToggle}
+    className="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-[#f3f3f5] text-left w-full"
+  >
+    <span className="flex flex-col min-w-0">
+      <span className="text-xs text-[#1a1c1d] font-semibold">Mode voix d’abord</span>
+      <span className="text-[11px] text-[#3f4948]">Réponses lues à voix haute, textes agrandis</span>
+    </span>
+    <span
+      className={`relative w-11 h-6 rounded-full shrink-0 transition-colors ${
+        checked ? 'bg-[#004b49]' : 'bg-[#bfc8c7]'
+      }`}
+    >
+      <span
+        className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${
+          checked ? 'left-[22px]' : 'left-0.5'
+        }`}
+      />
+    </span>
+  </button>
+);
