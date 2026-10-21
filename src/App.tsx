@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 import { Header } from './components/Header';
-import { BottomNav, TabKey } from './components/BottomNav';
+import { BottomNav, NavTabKey, TabKey } from './components/BottomNav';
 import { Sidebar } from './components/Sidebar';
 import { HomeTab } from './components/HomeTab';
 import { DiscussionsTab } from './components/DiscussionsTab';
@@ -13,13 +14,30 @@ import { RegisterPage } from './components/auth/RegisterPage';
 import { BRAND_ASSETS } from './data/mockData';
 import { Language } from './types';
 import { soundEngine } from './utils/audio';
+import { loadSession, saveSession } from './utils/session';
 
-type AuthView = 'login' | 'register' | 'authenticated';
+/** Une URL par onglet : le rafraîchissement et le bouton Retour fonctionnent. */
+const TAB_PATHS: Record<NavTabKey, string> = {
+  accueil: '/accueil',
+  discussions: '/discussions',
+  traduire: '/traduire',
+  apprendre: '/apprendre',
+};
+
+const AUTH_PATHS = { login: '/connexion', register: '/inscription' } as const;
+
+const tabFromPath = (pathname: string): NavTabKey | null =>
+  (Object.keys(TAB_PATHS) as NavTabKey[]).find((tab) => TAB_PATHS[tab] === pathname) ?? null;
 
 export default function App() {
-  const [authView, setAuthView] = useState<AuthView>('login');
-  const [currentTab, setCurrentTab] = useState<TabKey>('accueil');
-  const [currentLanguage, setCurrentLanguage] = useState<Language>('baoule');
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const [isAuthenticated, setIsAuthenticated] = useState(() => loadSession() !== null);
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(
+    () => loadSession()?.language ?? 'baoule'
+  );
+  const currentTab: NavTabKey = tabFromPath(pathname) ?? 'accueil';
+  const setCurrentTab = (tab: NavTabKey) => navigate(TAB_PATHS[tab]);
   const [isVoiceSessionOpen, setIsVoiceSessionOpen] = useState(false);
   const [isStoryModalOpen, setIsStoryModalOpen] = useState(false);
   const [isVocabularyModalOpen, setIsVocabularyModalOpen] = useState(false);
@@ -44,6 +62,7 @@ export default function App() {
 
   const handleLanguageChange = (lang: Language) => {
     setCurrentLanguage(lang);
+    saveSession({ language: lang });
     soundEngine.playTonePitch(lang === 'dioula' ? 'Moyen' : 'Haut');
     showNotification(
       lang === 'dioula'
@@ -58,20 +77,27 @@ export default function App() {
 
   const handleSelectDiscussion = (title: string, lang: Language) => {
     setCurrentLanguage(lang);
+    saveSession({ language: lang });
     setCurrentTab('discussions');
     showNotification(`Ouverture de la discussion : ${title}`);
   };
 
   const handleAuthenticated = (lang: Language) => {
     setCurrentLanguage(lang);
-    setAuthView('authenticated');
+    saveSession({ language: lang });
+    setIsAuthenticated(true);
+    navigate(TAB_PATHS.accueil, { replace: true });
     window.scrollTo({ top: 0 });
     showNotification(lang === 'dioula' ? 'I ni ce ! Bienvenue sur IvoirAI' : 'Akwaba ! Bienvenue sur IvoirAI');
   };
 
-  if (authView !== 'authenticated') {
-    const goTo = (view: AuthView) => {
-      setAuthView(view);
+  if (!isAuthenticated) {
+    const isRegister = pathname === AUTH_PATHS.register;
+    if (!isRegister && pathname !== AUTH_PATHS.login) {
+      return <Navigate to={AUTH_PATHS.login} replace />;
+    }
+    const goTo = (view: keyof typeof AUTH_PATHS) => {
+      navigate(AUTH_PATHS[view]);
       window.scrollTo({ top: 0 });
     };
     return (
@@ -80,7 +106,7 @@ export default function App() {
         <AuthBrandPanel />
 
         <div className="w-full max-w-md lg:max-w-lg mx-auto min-h-screen bg-[#f9f9fb] relative shadow-[0_0_50px_rgba(0,51,49,0.08)] lg:shadow-none">
-          {authView === 'login' ? (
+          {!isRegister ? (
             <LoginPage onAuthenticated={handleAuthenticated} onGoToRegister={() => goTo('register')} />
           ) : (
             <RegisterPage
@@ -92,6 +118,11 @@ export default function App() {
         </div>
       </div>
     );
+  }
+
+  // Connecté : les pages d'auth et les URL inconnues renvoient vers l'accueil
+  if (tabFromPath(pathname) === null) {
+    return <Navigate to={TAB_PATHS.accueil} replace />;
   }
 
   const getHeaderTitle = () => {
