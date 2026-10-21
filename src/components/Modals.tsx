@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useEscapeKey } from '../hooks/useEscapeKey';
 import { BRAND_ASSETS, CULTURAL_STORIES, VOCABULARY_LIST } from '../data/mockData';
-import { Language, VocabularyItem } from '../types';
+import { Language } from '../types';
 import { soundEngine } from '../utils/audio';
 import { voicePlayer } from '../utils/voicePlayer';
 import { useVoiceConsent } from './VoiceConsent';
@@ -111,14 +111,9 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
 interface VocabularyModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentLanguage: Language;
 }
 
-export const VocabularyModal: React.FC<VocabularyModalProps> = ({
-  isOpen,
-  onClose,
-  currentLanguage,
-}) => {
+export const VocabularyModal: React.FC<VocabularyModalProps> = ({ isOpen, onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   useEscapeKey(isOpen, onClose);
   if (!isOpen) return null;
@@ -192,7 +187,7 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({
 
               <button
                 onClick={() => {
-                  soundEngine.playTonePitch(item.tone as any);
+                  soundEngine.playTonePitch(item.tone);
                   voicePlayer.speak(item.word, item.language, 0.9);
                 }}
                 className="w-8 h-8 rounded-full bg-[#edeef0] hover:bg-[#b1eeea] text-[#004b49] flex items-center justify-center shrink-0 active:scale-90 transition-transform ml-2"

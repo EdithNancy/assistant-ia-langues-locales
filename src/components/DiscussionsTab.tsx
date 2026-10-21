@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useToast } from '../hooks/useToast';
+import { Toast } from './Toast';
 import { useEscapeKey } from '../hooks/useEscapeKey';
 import { BRAND_ASSETS, INITIAL_CHAT_MESSAGES } from '../data/mockData';
 import { ChatMessage, Language } from '../types';
@@ -48,12 +50,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
   /** Message dont on demande la raison du pouce bas. */
   const [commentingId, setCommentingId] = useState<string | null>(null);
   const [feedbackComment, setFeedbackComment] = useState('');
-  const [toast, setToast] = useState<string | null>(null);
-
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 2200);
-  };
+  const { toast, showToast } = useToast(2200);
 
   const handleCharInsert = (char: string) => {
     setInputText((prev) => prev + char);
@@ -68,7 +65,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
 
     setIsPlayingAudioId(msg.id);
     if (msg.tone) {
-      soundEngine.playTonePitch(msg.tone as any);
+      soundEngine.playTonePitch(msg.tone);
     }
     voicePlayer.speak(msg.text, msg.language ?? currentLanguage, playbackSpeed, () => {
       setIsPlayingAudioId(null);
@@ -190,12 +187,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
   return (
     <div className="flex flex-col w-full lg:max-w-4xl lg:mx-auto relative pb-28 lg:pb-32">
       {/* Toast */}
-      {toast && (
-        <div className="fixed top-20 lg:top-24 left-1/2 lg:left-[calc(50%+8rem)] -translate-x-1/2 z-50 max-w-[calc(100vw-2rem)] px-4 py-2 rounded-full bg-[#003331] text-white text-xs font-semibold shadow-lg animate-in fade-in flex items-center gap-1.5">
-          <span className="material-symbols-outlined text-[16px] text-[#62fae3]">info</span>
-          <span>{toast}</span>
-        </div>
-      )}
+      <Toast message={toast} icon="info" />
 
       {/* In-Chat Top Navigation Subheader */}
       <div className="sticky top-14 lg:top-16 z-20 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-4 py-2 bg-[#f9f9fb]/95 backdrop-blur-md flex items-center justify-between gap-2 border-b border-[#edeef0] lg:border lg:rounded-2xl lg:bg-white/95">

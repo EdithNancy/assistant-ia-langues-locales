@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useToast } from '../hooks/useToast';
+import { Toast } from './Toast';
 import { useEscapeKey } from '../hooks/useEscapeKey';
 import { recorderErrorMessage, useAudioRecorder } from '../hooks/useAudioRecorder';
 import { api, TextLanguage, TranslateResult } from '../services';
@@ -42,7 +44,6 @@ const sourceLabel = (lang: SourceLanguage) => (lang === 'auto' ? 'Détection aut
 interface TraduireTabProps {
   currentLanguage: Language;
   onLanguageChange: (lang: Language) => void;
-  onOpenVoiceSession: () => void;
   /** Lit automatiquement la traduction d'une phrase dictée. */
   voiceFirst: boolean;
 }
@@ -50,7 +51,6 @@ interface TraduireTabProps {
 export const TraduireTab: React.FC<TraduireTabProps> = ({
   currentLanguage,
   onLanguageChange,
-  onOpenVoiceSession,
   voiceFirst,
 }) => {
   const [sourceLang, setSourceLang] = useState<SourceLanguage>('fr');
@@ -71,16 +71,11 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(true);
   const [savedExpressions, setSavedExpressions] = useState<VocabularyItem[]>(VOCABULARY_LIST);
-  const [toast, setToast] = useState<string | null>(null);
+  const { toast, showToast } = useToast(2200);
   const [isDualMicModalOpen, setIsDualMicModalOpen] = useState(false);
   useEscapeKey(isDualMicModalOpen, () => setIsDualMicModalOpen(false));
 
   const speeds = ['0.8x', '1.0x', '0.5x'];
-
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 2200);
-  };
 
   const handleSwap = () => {
     // En détection auto, la langue reconnue devient la nouvelle cible
@@ -194,7 +189,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   const handlePlayAudio = () => {
     if (isPlayingAudio || !currentTrans) return;
     setIsPlayingAudio(true);
-    soundEngine.playTonePitch(currentTrans.tone as any);
+    soundEngine.playTonePitch(currentTrans.tone);
 
     const speedVal = parseFloat(speeds[audioSpeedIdx].replace('x', ''));
     voicePlayer.speak(currentTrans.translation, targetLang, speedVal, () => {
@@ -241,19 +236,14 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   };
 
   const playVocabAudio = (text: string, tone: string, language: Language) => {
-    soundEngine.playTonePitch(tone as any);
+    soundEngine.playTonePitch(tone);
     voicePlayer.speak(text, language, 1.0);
   };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 w-full pb-10 gap-4 lg:gap-6">
       {/* Toast Notification */}
-      {toast && (
-        <div className="fixed top-20 lg:top-24 left-1/2 lg:left-[calc(50%+8rem)] -translate-x-1/2 z-50 max-w-[calc(100vw-2rem)] px-4 py-2 rounded-full bg-[#003331] text-white text-xs font-semibold shadow-lg animate-in fade-in flex items-center gap-2">
-          <span className="material-symbols-outlined text-[16px] text-[#62fae3]">check_circle</span>
-          <span>{toast}</span>
-        </div>
-      )}
+      <Toast message={toast} icon="check_circle" />
 
       {/* Screen Title & Header */}
       <div className="lg:col-span-2 flex items-center justify-between gap-2 pt-1">

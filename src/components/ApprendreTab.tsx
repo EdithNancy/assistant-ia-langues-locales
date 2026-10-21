@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { LanguageToggle } from './LanguageToggle';
+import { useToast } from '../hooks/useToast';
+import { Toast } from './Toast';
 import { useEscapeKey } from '../hooks/useEscapeKey';
 import { LEARNING_MODULES, QUIZ_QUESTIONS } from '../data/mockData';
 import { Language, LearningModule, QuizQuestion } from '../types';
@@ -28,12 +31,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
   const [quizSelectedOption, setQuizSelectedOption] = useState<string | null>(null);
   const [quizScore, setQuizScore] = useState(0);
   const [isQuizComplete, setIsQuizComplete] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 2500);
-  };
+  const { toast, showToast } = useToast(2500);
 
   const currentExercise =
     currentLanguage === 'dioula'
@@ -133,12 +131,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 lg:items-start w-full pb-10 gap-5 lg:gap-6">
       {/* Toast Notification */}
-      {toast && (
-        <div className="fixed top-20 lg:top-24 left-1/2 lg:left-[calc(50%+8rem)] -translate-x-1/2 z-50 max-w-[calc(100vw-2rem)] px-4 py-2 rounded-full bg-[#003331] text-white text-xs font-semibold shadow-lg animate-in fade-in flex items-center gap-2">
-          <span className="material-symbols-outlined text-[16px] text-[#62fae3]">check_circle</span>
-          <span>{toast}</span>
-        </div>
-      )}
+      <Toast message={toast} icon="check_circle" />
 
       {/* Top Greeting & Streak Banner */}
       <section className="lg:col-span-12 flex flex-col space-y-3 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-6 lg:items-center">
@@ -215,39 +208,16 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
 
       {/* Segmented Language Control */}
       <section className="lg:col-span-12 w-full">
-        <div className="bg-[#edeef0] p-1 rounded-full flex relative shadow-inner lg:max-w-md">
-          <button
-            onClick={() => onLanguageChange('baoule')}
-            className={`flex-1 py-2 px-3 rounded-full text-xs font-bold transition-all duration-300 flex items-center justify-center space-x-1.5 ${
-              currentLanguage === 'baoule'
-                ? 'bg-[#004b49] text-white shadow-sm'
-                : 'text-[#3f4948] hover:text-[#1a1c1d]'
-            }`}
-          >
-            <span
-              className={`w-2 h-2 rounded-full ${
-                currentLanguage === 'baoule' ? 'bg-[#62fae3]' : 'bg-[#bfc8c7]'
-              }`}
-            ></span>
-            <span className="truncate">Baoulé (Centre & Sud)</span>
-          </button>
-
-          <button
-            onClick={() => onLanguageChange('dioula')}
-            className={`flex-1 py-2 px-3 rounded-full text-xs font-bold transition-all duration-300 flex items-center justify-center space-x-1.5 ${
-              currentLanguage === 'dioula'
-                ? 'bg-[#004b49] text-white shadow-sm'
-                : 'text-[#3f4948] hover:text-[#1a1c1d]'
-            }`}
-          >
-            <span
-              className={`w-2 h-2 rounded-full ${
-                currentLanguage === 'dioula' ? 'bg-[#62fae3]' : 'bg-[#bfc8c7]'
-              }`}
-            ></span>
-            <span className="truncate">Dioula (Nord & Commerce)</span>
-          </button>
-        </div>
+        <LanguageToggle
+          value={currentLanguage}
+          onChange={onLanguageChange}
+          className="lg:max-w-md"
+          inactiveDotClassName="bg-[#bfc8c7]"
+          options={[
+            { key: 'baoule', label: 'Baoulé (Centre & Sud)' },
+            { key: 'dioula', label: 'Dioula (Nord & Commerce)' },
+          ]}
+        />
       </section>
 
       {/* Pronunciation Trainer Hero Interactive Widget */}

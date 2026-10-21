@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 import { Header } from './components/Header';
 import { BottomNav, NavTabKey, TabKey } from './components/BottomNav';
 import { Sidebar } from './components/Sidebar';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
+import { useToast } from './hooks/useToast';
+import { Toast } from './components/Toast';
 import { HomeTab } from './components/HomeTab';
 import { DiscussionsTab } from './components/DiscussionsTab';
 import { TraduireTab } from './components/TraduireTab';
@@ -46,12 +48,11 @@ export default function App() {
   const [isStoryModalOpen, setIsStoryModalOpen] = useState(false);
   const [isVocabularyModalOpen, setIsVocabularyModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [notificationToast, setNotificationToast] = useState<string | null>(null);
+  const { toast: notificationToast, showToast } = useToast(3000);
 
   const showNotification = (msg: string) => {
     soundEngine.playTone(540, 0.15);
-    setNotificationToast(msg);
-    setTimeout(() => setNotificationToast(null), 3000);
+    showToast(msg);
   };
 
   const handleTabChange = (tab: TabKey) => {
@@ -191,14 +192,11 @@ export default function App() {
         )}
 
         {/* Floating Notification Toast */}
-        {notificationToast && (
-          <div className="fixed top-20 lg:top-24 left-1/2 lg:left-[calc(50%+8rem)] -translate-x-1/2 z-50 max-w-[calc(100vw-2rem)] px-4 py-2 rounded-full bg-[#003331] text-white text-xs font-semibold shadow-xl flex items-center gap-2 border border-[#62fae3]/20 animate-in fade-in slide-in-from-top-2 duration-200">
-            <span className="material-symbols-outlined text-[16px] text-[#62fae3]">
-              notifications_active
-            </span>
-            <span>{notificationToast}</span>
-          </div>
-        )}
+        <Toast
+          message={notificationToast}
+          icon="notifications_active"
+          className="shadow-xl border border-[#62fae3]/20"
+        />
 
         {/* Tab Content Stream */}
         <main className="flex-1 w-full max-w-2xl lg:max-w-6xl mx-auto pt-22 lg:pt-24 pb-28 lg:pb-10 px-4 sm:px-6 lg:px-8">
@@ -210,7 +208,6 @@ export default function App() {
               onNavigateTab={(tab) => setCurrentTab(tab)}
               onOpenStoryModal={() => setIsStoryModalOpen(true)}
               onOpenVocabularyModal={() => setIsVocabularyModalOpen(true)}
-              onOpenProfile={() => setIsProfileModalOpen(true)}
               onSelectDiscussion={handleSelectDiscussion}
               voiceFirst={voiceFirst}
               onToggleVoiceFirst={handleToggleVoiceFirst}
@@ -231,7 +228,6 @@ export default function App() {
             <TraduireTab
               currentLanguage={currentLanguage}
               onLanguageChange={handleLanguageChange}
-              onOpenVoiceSession={handleStartVoiceSession}
               voiceFirst={voiceFirst}
             />
           )}
@@ -269,7 +265,6 @@ export default function App() {
         <VocabularyModal
           isOpen={isVocabularyModalOpen}
           onClose={() => setIsVocabularyModalOpen(false)}
-          currentLanguage={currentLanguage}
         />
 
         {/* Profile Modal */}

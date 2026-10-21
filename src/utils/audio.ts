@@ -41,9 +41,17 @@ class SoundEngine {
     }
   }
 
-  // Play tonal high / mid / low melodic sequence for language training
-  playTonePitch(pitch: 'Haut' | 'Moyen' | 'Bas' | 'Ton Haut' | 'Ton Moyen' | 'Ton Bas' | 'Ton Haut-Bas') {
-    const ctx = this.getContext();
+  /**
+   * Play tonal high / mid / low melodic sequence for language training.
+   * Accepts any tone label ("Haut", "Ton Moyen-Haut", "Ton Haut-Bas"…): the keywords inside decide the melody.
+   */
+  playTonePitch(pitch: string) {
+    let ctx: AudioContext;
+    try {
+      ctx = this.getContext();
+    } catch {
+      return; // AudioContext unavailable or blocked by browser policy
+    }
     const now = ctx.currentTime;
 
     const playHarmonic = (f: number, startOffset: number, length: number) => {
@@ -74,7 +82,7 @@ class SoundEngine {
   // Play celebratory chime for quiz & exercise success
   playSuccess() {
     try {
-      const ctx = this.getContext();
+      this.getContext();
       const notes = [392.00, 523.25, 659.25, 783.99]; // G4, C5, E5, G5
       notes.forEach((freq, idx) => {
         setTimeout(() => {

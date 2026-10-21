@@ -19,7 +19,6 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
   const [currentDialect, setCurrentDialect] = useState<Language>(initialLanguage);
   const [isMuted, setIsMuted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [isSpeakerOn, setIsSpeakerOn] = useState(true);
   const [seconds, setSeconds] = useState(161); // 02:41
   const [speakingState, setSpeakingState] = useState<'listening' | 'speaking' | 'paused'>(
     'listening'
@@ -27,7 +26,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
   const [accuracyScore, setAccuracyScore] = useState(94);
 
   // Active transcription based on language
-  const [currentPhrase, setCurrentPhrase] = useState({
+  const [currentPhrase] = useState({
     dioula: {
       text: '« I ka kɛnɛ wa ? Mun lo b\'i fɛ bi ? »',
       phonetics: ['[i-ka-kɛ-nɛ]', '[wa]', '[mun-lo-bi-fɛ]'],

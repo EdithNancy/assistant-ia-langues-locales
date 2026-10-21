@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { BRAND_ASSETS } from '../data/mockData';
+import { LanguageToggle } from './LanguageToggle';
+import { useToast } from '../hooks/useToast';
+import { Toast } from './Toast';
 import { Language } from '../types';
 import { soundEngine } from '../utils/audio';
 import { voicePlayer } from '../utils/voicePlayer';
@@ -11,7 +13,6 @@ interface HomeTabProps {
   onNavigateTab: (tab: 'discussions' | 'traduire' | 'apprendre') => void;
   onOpenStoryModal: () => void;
   onOpenVocabularyModal: () => void;
-  onOpenProfile: () => void;
   onSelectDiscussion: (title: string, lang: Language) => void;
   voiceFirst: boolean;
   onToggleVoiceFirst: () => void;
@@ -24,19 +25,13 @@ export const HomeTab: React.FC<HomeTabProps> = ({
   onNavigateTab,
   onOpenStoryModal,
   onOpenVocabularyModal,
-  onOpenProfile,
   onSelectDiscussion,
   voiceFirst,
   onToggleVoiceFirst,
 }) => {
   const [isPlayingWord, setIsPlayingWord] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 2500);
-  };
+  const { toast: toastMessage, showToast } = useToast(2500);
 
   const handlePlayWord = () => {
     if (isPlayingWord) return;
@@ -70,12 +65,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 w-full gap-5 lg:gap-6 pb-10">
       {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed top-20 lg:top-24 left-1/2 lg:left-[calc(50%+8rem)] -translate-x-1/2 z-50 max-w-[calc(100vw-2rem)] px-4 py-2 rounded-full bg-[#003331] text-white text-xs font-semibold shadow-lg animate-in fade-in duration-200 flex items-center gap-2">
-          <span className="material-symbols-outlined text-[16px] text-[#62fae3]">check_circle</span>
-          <span>{toastMessage}</span>
-        </div>
-      )}
+      <Toast message={toastMessage} icon="check_circle" />
 
       {/* Top User Profile & Welcome Bar */}
       <section className="lg:col-span-7 flex items-center justify-between bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_20px_-2px_rgba(0,75,73,0.05)] border border-[#edeef0]/60">
@@ -113,39 +103,15 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
       {/* Interactive Language Toggle Pill */}
       <section className="lg:col-span-5 flex justify-center lg:justify-end items-center w-full">
-        <div className="bg-[#edeef0] p-1 rounded-full flex items-center shadow-inner w-full max-w-sm">
-          <button
-            onClick={() => onLanguageChange('baoule')}
-            className={`flex-1 py-2 px-3 rounded-full text-xs font-bold transition-all duration-300 flex items-center justify-center gap-1.5 ${
-              currentLanguage === 'baoule'
-                ? 'bg-[#004b49] text-white shadow-sm'
-                : 'text-[#3f4948] hover:text-[#1a1c1d]'
-            }`}
-          >
-            <span
-              className={`w-2 h-2 rounded-full ${
-                currentLanguage === 'baoule' ? 'bg-[#62fae3]' : 'bg-transparent'
-              }`}
-            ></span>
-            Baoulé <span className="font-normal opacity-80 text-[11px]">(Akan)</span>
-          </button>
-
-          <button
-            onClick={() => onLanguageChange('dioula')}
-            className={`flex-1 py-2 px-3 rounded-full text-xs font-bold transition-all duration-300 flex items-center justify-center gap-1.5 ${
-              currentLanguage === 'dioula'
-                ? 'bg-[#004b49] text-white shadow-sm'
-                : 'text-[#3f4948] hover:text-[#1a1c1d]'
-            }`}
-          >
-            <span
-              className={`w-2 h-2 rounded-full ${
-                currentLanguage === 'dioula' ? 'bg-[#62fae3]' : 'bg-transparent'
-              }`}
-            ></span>
-            Dioula <span className="font-normal opacity-80 text-[11px]">(Mandé)</span>
-          </button>
-        </div>
+        <LanguageToggle
+          value={currentLanguage}
+          onChange={onLanguageChange}
+          className="w-full max-w-sm"
+          options={[
+            { key: 'baoule', label: 'Baoulé', hint: '(Akan)' },
+            { key: 'dioula', label: 'Dioula', hint: '(Mandé)' },
+          ]}
+        />
       </section>
 
       {/* Hero Voice Interactive Card */}
