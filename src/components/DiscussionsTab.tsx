@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { LANGUAGE_LABEL } from '../data/languages';
 import { Flag } from './Flag';
 import { closeOnBackdrop } from '../utils/backdrop';
 import { useToast } from '../hooks/useToast';
@@ -11,13 +12,6 @@ import { api } from '../services';
 import { useVoiceConsent } from './VoiceConsent';
 import { soundEngine } from '../utils/audio';
 import { voicePlayer, VOICE_LABEL } from '../utils/voicePlayer';
-
-const DETECTED_LABEL: Record<NonNullable<ChatMessage['detectedLanguage']>, string> = {
-  fr: 'Français',
-  baoule: 'Baoulé',
-  dioula: 'Dioula',
-  bete: 'Bété',
-};
 
 /** Heure courante au format « 09:42 ». */
 const now = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -237,8 +231,8 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
             className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#edeef0] hover:bg-[#e2e2e4] transition-colors text-[#1a1c1d] active:scale-95"
           >
             <Flag country="ci" className="w-4" />
-            <span className="text-xs font-bold text-[#003331] capitalize">
-              {currentLanguage}
+            <span className="text-xs font-bold text-[#003331]">
+              {LANGUAGE_LABEL[currentLanguage]}
             </span>
             <span className="material-symbols-outlined text-[16px] text-[#3f4948]">
               expand_more
@@ -284,7 +278,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                   <div className="flex items-center justify-end gap-1 text-[#7ebab7] text-[11px]">
                     <span>
                       Envoyé
-                      {msg.detectedLanguage && ` • ${DETECTED_LABEL[msg.detectedLanguage]} reconnu`}
+                      {msg.detectedLanguage && ` • ${LANGUAGE_LABEL[msg.detectedLanguage]} reconnu`}
                     </span>
                     <span className="material-symbols-outlined text-[14px]">done_all</span>
                   </div>
@@ -562,8 +556,8 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                 ))}
               </div>
             </div>
-            <span className="text-[11px] text-[#004b49] font-bold px-1 capitalize">
-              {currentLanguage}
+            <span className="text-[11px] text-[#004b49] font-bold px-1">
+              {LANGUAGE_LABEL[currentLanguage]}
             </span>
           </div>
 

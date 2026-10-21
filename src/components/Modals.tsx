@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { LANGUAGE_LABEL } from '../data/languages';
 import { closeOnBackdrop } from '../utils/backdrop';
 import { useEscapeKey } from '../hooks/useEscapeKey';
 import { BRAND_ASSETS, CULTURAL_STORIES, VOCABULARY_LIST } from '../data/mockData';
@@ -286,8 +287,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#f3f3f5]">
             <span className="text-xs text-[#1a1c1d] font-semibold">Langue favorite</span>
-            <span className="text-xs text-[#004b49] font-bold capitalize">
-              {currentLanguage}
+            <span className="text-xs text-[#004b49] font-bold">
+              {LANGUAGE_LABEL[currentLanguage]}
             </span>
           </div>
 

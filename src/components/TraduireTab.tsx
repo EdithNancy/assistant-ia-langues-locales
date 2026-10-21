@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { LANGUAGE_LABEL } from '../data/languages';
 import { Flag } from './Flag';
 import { closeOnBackdrop } from '../utils/backdrop';
 import { useToast } from '../hooks/useToast';
@@ -11,13 +12,6 @@ import { VOCABULARY_LIST } from '../data/mockData';
 import { Language, VocabularyItem } from '../types';
 import { soundEngine } from '../utils/audio';
 import { voicePlayer } from '../utils/voicePlayer';
-
-const LANG_LABEL: Record<TextLanguage, string> = {
-  fr: 'Français',
-  baoule: 'Baoulé',
-  dioula: 'Dioula',
-  bete: 'Bété',
-};
 
 const LANG_SUBTITLE: Record<TextLanguage, string> = {
   fr: 'Standard',
@@ -41,7 +35,7 @@ const nextOption = <T extends SourceLanguage>(options: readonly T[], current: T,
   return options[i];
 };
 
-const sourceLabel = (lang: SourceLanguage) => (lang === 'auto' ? 'Détection auto' : LANG_LABEL[lang]);
+const sourceLabel = (lang: SourceLanguage) => (lang === 'auto' ? 'Détection auto' : LANGUAGE_LABEL[lang]);
 
 const playVocabAudio = (text: string, tone: string, language: Language) => {
   soundEngine.playTonePitch(tone);
@@ -285,7 +279,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
               {sourceLang !== 'auto'
                 ? LANG_SUBTITLE[sourceLang]
                 : currentTrans
-                ? `Détecté : ${LANG_LABEL[currentTrans.detectedSource]}`
+                ? `Détecté : ${LANGUAGE_LABEL[currentTrans.detectedSource]}`
                 : 'Langue reconnue seule'}
             </span>
           </div>
@@ -308,13 +302,13 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
         {/* Target Language Button */}
         <button
           onClick={handleChangeTarget}
-          aria-label={`Langue cible : ${LANG_LABEL[targetLang]}. Changer`}
+          aria-label={`Langue cible : ${LANGUAGE_LABEL[targetLang]}. Changer`}
           className="flex-1 min-w-0 flex items-center justify-center gap-2 py-2.5 px-2 sm:px-3 rounded-full bg-white text-[#1a1c1d] shadow-sm transition-all active:scale-95 text-left border border-[#edeef0]"
         >
           <Flag country={targetLang === 'fr' ? 'fr' : 'ci'} />
           <div className="flex flex-col min-w-0">
             <span className="text-xs font-bold text-[#004b49] truncate">
-              {LANG_LABEL[targetLang]}
+              {LANGUAGE_LABEL[targetLang]}
             </span>
             <span className="text-[11px] text-[#9e4229] font-semibold truncate -mt-0.5">
               {LANG_SUBTITLE[targetLang]}
@@ -396,7 +390,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#62fae3]"></span>
             <span className="text-xs text-[#62fae3] tracking-wide uppercase font-bold">
-              Traduction {LANG_LABEL[targetLang]}
+              Traduction {LANGUAGE_LABEL[targetLang]}
             </span>
           </div>
           {currentTrans?.tone && (
@@ -559,8 +553,8 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
                     <span className="text-sm font-bold text-[#1a1c1d] truncate">
                       {item.word}
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-[#edeef0] text-[11px] text-[#3f4948] font-semibold capitalize">
-                      {item.language}
+                    <span className="px-2 py-0.5 rounded-full bg-[#edeef0] text-[11px] text-[#3f4948] font-semibold">
+                      {LANGUAGE_LABEL[item.language]}
                     </span>
                   </div>
                   <span className="text-xs text-[#3f4948] truncate">
@@ -677,7 +671,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
               >
                 <Flag country="ci" className="w-8" />
                 <span className="text-xs font-bold">Interlocuteur 2</span>
-                <span className="text-[11px] text-[#084f4d] capitalize">{targetLang}</span>
+                <span className="text-[11px] text-[#084f4d]">{LANGUAGE_LABEL[targetLang]}</span>
                 <div className="w-10 h-10 rounded-full bg-[#004b49] text-white flex items-center justify-center shadow-xs">
                   <span className="material-symbols-outlined text-[20px]">mic</span>
                 </div>
