@@ -39,15 +39,23 @@ class VoicePlayer {
     this.audio = audio;
     this.objectUrl = audioUrl.startsWith('blob:') ? audioUrl : null;
 
-    audio.onended = () => {
-      this.release();
-      onEnd?.();
-    };
-    audio.onerror = () => {
+    let fellBack = false;
+    const fallBackToBrowserVoice = () => {
+      if (fellBack) return; // l'erreur audio et l'échec de play() peuvent arriver tous les deux
+      fellBack = true;
       this.release();
       soundEngine.speak(text, rate, onEnd);
     };
-    audio.play().catch(() => audio.onerror?.(new Event('error')));
+    audio.addEventListener(
+      'ended',
+      () => {
+        this.release();
+        onEnd?.();
+      },
+      { once: true }
+    );
+    audio.addEventListener('error', fallBackToBrowserVoice, { once: true });
+    audio.play().catch(fallBackToBrowserVoice);
   }
 
   stop() {

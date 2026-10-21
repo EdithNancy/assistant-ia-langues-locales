@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { closeOnBackdrop } from '../utils/backdrop';
 import { LanguageToggle } from './LanguageToggle';
 import { useToast } from '../hooks/useToast';
 import { Toast } from './Toast';
@@ -515,11 +516,11 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
       {/* Interactive Module Detail Modal */}
       {selectedModule && (
         <div
-          onClick={() => setSelectedModule(null)}
+          onClick={closeOnBackdrop(() => setSelectedModule(null))}
+          role="presentation"
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-in fade-in"
         >
           <div
-            onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
             className="w-full max-w-md bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[85vh] overflow-y-auto animate-in zoom-in-95 duration-200"
@@ -590,11 +591,11 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
       {/* Interactive Quiz Modal */}
       {isQuizOpen && (
         <div
-          onClick={() => setIsQuizOpen(false)}
+          onClick={closeOnBackdrop(() => setIsQuizOpen(false))}
+          role="presentation"
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in"
         >
           <div
-            onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
             className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200"

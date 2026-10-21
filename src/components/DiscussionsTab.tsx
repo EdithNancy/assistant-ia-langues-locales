@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { closeOnBackdrop } from '../utils/backdrop';
 import { useToast } from '../hooks/useToast';
 import { Toast } from './Toast';
 import { useEscapeKey } from '../hooks/useEscapeKey';
@@ -16,6 +17,9 @@ const DETECTED_LABEL: Record<NonNullable<ChatMessage['detectedLanguage']>, strin
   dioula: 'Dioula',
   bete: 'Bété',
 };
+
+/** Heure courante au format « 09:42 ». */
+const now = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
 interface DiscussionsTabProps {
   currentLanguage: Language;
@@ -81,7 +85,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
         ...reply,
         id: `ai-${Date.now()}`,
         sender: 'ai',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: now(),
         language: currentLanguage,
       };
       setMessages((prev) => [...prev, aiMsg]);
@@ -99,7 +103,6 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
     const userText = inputText.trim();
     setInputText('');
 
-    const now = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const userMsg: ChatMessage = {
       id: `user-${Date.now()}`,
       sender: 'user',
@@ -156,7 +159,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
   // Affiche l'erreur du micro (refus d'accès, pas de micro…) dès qu'elle survient
   useEffect(() => {
     if (recorder.error) showToast(recorderErrorMessage[recorder.error]);
-  }, [recorder.error]);
+  }, [recorder.error, showToast]);
 
   const sendFeedback = async (messageId: string, rating: 'up' | 'down', comment?: string) => {
     setRatings((prev) => ({ ...prev, [messageId]: rating }));
@@ -634,11 +637,11 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
       {/* Language / Dialect Selection Modal Drawer */}
       {isDialectModalOpen && (
         <div
-          onClick={() => setIsDialectModalOpen(false)}
+          onClick={closeOnBackdrop(() => setIsDialectModalOpen(false))}
+          role="presentation"
           className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/40 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
         >
           <div
-            onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
             className="w-full max-w-md bg-white rounded-t-[32px] sm:rounded-[32px] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-5 shadow-2xl flex flex-col gap-4 animate-in slide-in-from-bottom duration-300"

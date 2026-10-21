@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { closeOnBackdrop } from '../utils/backdrop';
 import { useToast } from '../hooks/useToast';
 import { Toast } from './Toast';
 import { useEscapeKey } from '../hooks/useEscapeKey';
@@ -41,6 +42,11 @@ const nextOption = <T extends SourceLanguage>(options: readonly T[], current: T,
 
 const sourceLabel = (lang: SourceLanguage) => (lang === 'auto' ? 'Détection auto' : LANG_LABEL[lang]);
 
+const playVocabAudio = (text: string, tone: string, language: Language) => {
+  soundEngine.playTonePitch(tone);
+  voicePlayer.speak(text, language, 1.0);
+};
+
 interface TraduireTabProps {
   currentLanguage: Language;
   onLanguageChange: (lang: Language) => void;
@@ -57,8 +63,9 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   const [targetLang, setTargetLang] = useState<TextLanguage>(
     currentLanguage === 'dioula' ? 'dioula' : 'baoule'
   );
-  const [currentTrans, setCurrentTrans] = useState<TranslateResult | null>(null);
-  const [isTranslating, setIsTranslating] = useState(false);
+  const [lastTrans, setLastTrans] = useState<TranslateResult | null>(null);
+  /** Clé de la dernière demande terminée (succès ou échec). */
+  const [settledKey, setSettledKey] = useState<string | null>(null);
   const [translateFailed, setTranslateFailed] = useState(false);
   const speakNextResultRef = useRef(false);
   const [retryCount, setRetryCount] = useState(0);
@@ -74,6 +81,13 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   const { toast, showToast } = useToast(2200);
   const [isDualMicModalOpen, setIsDualMicModalOpen] = useState(false);
   useEscapeKey(isDualMicModalOpen, () => setIsDualMicModalOpen(false));
+
+  // Texte vidé : on n'affiche plus l'ancienne traduction
+  const hasText = sourceText.trim() !== '';
+  const currentTrans = hasText ? lastTrans : null;
+  // Une traduction est en cours tant que la demande actuelle n'a pas reçu de réponse
+  const requestKey = [sourceText.trim(), sourceLang, targetLang, retryCount].join('|');
+  const isTranslatingShown = hasText && settledKey !== requestKey;
 
   const speeds = ['0.8x', '1.0x', '0.5x'];
 
@@ -151,23 +165,18 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
 
   useEffect(() => {
     if (recorder.error) showToast(recorderErrorMessage[recorder.error]);
-  }, [recorder.error]);
+  }, [recorder.error, showToast]);
 
   // Traduit à chaque modification, après une courte pause de frappe
   useEffect(() => {
     const text = sourceText.trim();
-    if (!text) {
-      setCurrentTrans(null);
-      setIsTranslating(false);
-      return;
-    }
+    if (!text) return;
     let cancelled = false;
-    setIsTranslating(true);
     const timer = setTimeout(async () => {
       try {
         const result = await api.translate({ text, source: sourceLang, target: targetLang });
         if (!cancelled) {
-          setCurrentTrans(result);
+          setLastTrans(result);
           setTranslateFailed(false);
           if (speakNextResultRef.current) {
             speakNextResultRef.current = false;
@@ -177,14 +186,16 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       } catch {
         if (!cancelled) setTranslateFailed(true);
       } finally {
-        if (!cancelled) setIsTranslating(false);
+        if (!cancelled) setSettledKey(requestKey);
       }
     }, 400);
     return () => {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [sourceText, sourceLang, targetLang, retryCount]);
+    // requestKey inclut retryCount : c'est lui qui relance la traduction après « Réessayer ».
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
+  }, [requestKey, sourceText, sourceLang, targetLang]);
 
   const handlePlayAudio = () => {
     if (isPlayingAudio || !currentTrans) return;
@@ -233,11 +244,6 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
         item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
       )
     );
-  };
-
-  const playVocabAudio = (text: string, tone: string, language: Language) => {
-    soundEngine.playTonePitch(tone);
-    voicePlayer.speak(text, language, 1.0);
   };
 
   return (
@@ -376,9 +382,9 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       {/* Translation Result Card */}
       <div
         aria-live="polite"
-        aria-busy={isTranslating}
+        aria-busy={isTranslatingShown}
         className={`bg-[#004b49] text-white rounded-3xl p-5 lg:p-6 shadow-md relative overflow-hidden transition-opacity ${
-          isTranslating && currentTrans ? 'opacity-70' : ''
+          isTranslatingShown && currentTrans ? 'opacity-70' : ''
         }`}
       >
         <div className="absolute -right-10 -bottom-10 w-36 h-36 rounded-full bg-[#00c5b1]/20 pointer-events-none blur-2xl"></div>
@@ -490,15 +496,15 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
           </>
         ) : (
           <p className="relative text-sm text-[#b1eeea] py-6 flex items-center gap-2">
-            {isTranslating && (
+            {isTranslatingShown && (
               <span className="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
             )}
-            {translateFailed
+            {translateFailed && hasText
               ? 'La traduction a échoué. Vérifiez votre connexion.'
-              : isTranslating
+              : isTranslatingShown
               ? 'Traduction en cours…'
               : 'Saisissez ou dictez une phrase pour la traduire.'}
-            {translateFailed && !isTranslating && (
+            {translateFailed && hasText && !isTranslatingShown && (
               <button
                 onClick={() => setRetryCount((n) => n + 1)}
                 className="ml-auto px-3 py-1.5 rounded-full bg-[#62fae3] text-[#00201c] text-xs font-bold active:scale-95 transition-transform"
@@ -615,11 +621,11 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       {/* Dual Mic Conversation Modal */}
       {isDualMicModalOpen && (
         <div
-          onClick={() => setIsDualMicModalOpen(false)}
+          onClick={closeOnBackdrop(() => setIsDualMicModalOpen(false))}
+          role="presentation"
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in"
         >
           <div
-            onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
             className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200"

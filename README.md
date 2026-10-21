@@ -68,6 +68,7 @@ docker run -p 8080:80 ivoirai-frontend   # http://localhost:8080
 ### 4. Vérifications
 
 ```bash
-npm run lint    # contrôle des types TypeScript
+npm run lint    # types TypeScript (strict) + oxlint (hooks React, accessibilité)
+npm test        # tests Vitest + Testing Library
 npm run build   # build de production dans dist/
 ```

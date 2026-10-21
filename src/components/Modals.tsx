@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { closeOnBackdrop } from '../utils/backdrop';
 import { useEscapeKey } from '../hooks/useEscapeKey';
 import { BRAND_ASSETS, CULTURAL_STORIES, VOCABULARY_LIST } from '../data/mockData';
 import { Language } from '../types';
@@ -32,12 +33,12 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div
-      onClick={onClose}
+      onClick={closeOnBackdrop(onClose)}
+      role="presentation"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in"
     >
       <div
-        onClick={(e) => e.stopPropagation()}
-            role="dialog"
+        role="dialog"
             aria-modal="true"
         className="w-full max-w-md bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-[#edeef0]"
       >
@@ -126,12 +127,12 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({ isOpen, onClos
 
   return (
     <div
-      onClick={onClose}
+      onClick={closeOnBackdrop(onClose)}
+      role="presentation"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in"
     >
       <div
-        onClick={(e) => e.stopPropagation()}
-            role="dialog"
+        role="dialog"
             aria-modal="true"
         className="w-full max-w-md bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-3 max-h-[85vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-[#edeef0]"
       >
@@ -232,12 +233,12 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
   return (
     <div
-      onClick={onClose}
+      onClick={closeOnBackdrop(onClose)}
+      role="presentation"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in"
     >
       <div
-        onClick={(e) => e.stopPropagation()}
-            role="dialog"
+        role="dialog"
             aria-modal="true"
         className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-[#edeef0]"
       >

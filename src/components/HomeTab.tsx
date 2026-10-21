@@ -18,6 +18,14 @@ interface HomeTabProps {
   onToggleVoiceFirst: () => void;
 }
 
+const handlePlayHelp = () => {
+  voicePlayer.speak(
+    "Bienvenue sur IvoirAI. Appuyez sur le grand bouton micro pour parler à Aya en Baoulé ou en Dioula. Elle vous répondra à voix haute.",
+    'fr',
+    0.95
+  );
+};
+
 export const HomeTab: React.FC<HomeTabProps> = ({
   currentLanguage,
   onLanguageChange,
@@ -42,14 +50,6 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       currentLanguage,
       0.9,
       () => setIsPlayingWord(false)
-    );
-  };
-
-  const handlePlayHelp = () => {
-    voicePlayer.speak(
-      "Bienvenue sur IvoirAI. Appuyez sur le grand bouton micro pour parler à Aya en Baoulé ou en Dioula. Elle vous répondra à voix haute.",
-      'fr',
-      0.95
     );
   };
 

@@ -110,12 +110,10 @@ class SoundEngine {
         utterance.voice = preferred;
       }
 
-      utterance.onend = () => {
-        if (onEnd) onEnd();
-      };
-      utterance.onerror = () => {
-        if (onEnd) onEnd();
-      };
+      if (onEnd) {
+        utterance.addEventListener('end', onEnd, { once: true });
+        utterance.addEventListener('error', onEnd, { once: true });
+      }
 
       // Play soft acoustic prelude
       this.playTone(440, 0.1, 'sine');

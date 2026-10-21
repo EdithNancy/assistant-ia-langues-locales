@@ -37,7 +37,7 @@ export const useAudioRecorder = () => {
 
   useEffect(() => cleanup, [cleanup]);
 
-  const trackLevel = (stream: MediaStream) => {
+  const trackLevel = useCallback((stream: MediaStream) => {
     try {
       const ctx = new AudioContext();
       const analyser = ctx.createAnalyser();
@@ -56,7 +56,7 @@ export const useAudioRecorder = () => {
     } catch {
       // Le niveau est décoratif : l'enregistrement continue sans
     }
-  };
+  }, []);
 
   const stop = useCallback((): Promise<Blob | null> => {
     const recorder = recorderRef.current;
@@ -102,7 +102,7 @@ export const useAudioRecorder = () => {
       setError(name === 'NotFoundError' ? 'no-microphone' : 'permission');
       return false;
     }
-  }, [cleanup, stop]);
+  }, [cleanup, stop, trackLevel]);
 
   return { status, error, level, start, stop };
 };

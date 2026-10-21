@@ -3,7 +3,9 @@ import { useEffect, useRef } from 'react';
 /** Appelle `onEscape` quand l'utilisateur appuie sur Échap, tant que `active` est vrai. */
 export const useEscapeKey = (active: boolean, onEscape: () => void) => {
   const callbackRef = useRef(onEscape);
-  callbackRef.current = onEscape;
+  useEffect(() => {
+    callbackRef.current = onEscape;
+  });
 
   useEffect(() => {
     if (!active) return;

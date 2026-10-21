@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
@@ -10,6 +11,10 @@ export default defineConfig(() => {
       alias: {
         '@': path.resolve(import.meta.dirname, './src'),
       },
+    },
+    test: {
+      environment: 'jsdom',
+      setupFiles: ['./src/test/setup.ts'],
     },
     server: {
       // Polling requis pour le rechargement à chaud dans Docker sous Windows/WSL

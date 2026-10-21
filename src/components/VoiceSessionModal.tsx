@@ -11,6 +11,12 @@ interface VoiceSessionModalProps {
   initialLanguage?: Language;
 }
 
+const formatTimer = (totalSecs: number) => {
+  const mins = Math.floor(totalSecs / 60);
+  const secs = totalSecs % 60;
+  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+};
+
 export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
   isOpen,
   onClose,
@@ -60,12 +66,6 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
   });
 
   if (!isOpen) return null;
-
-  const formatTimer = (totalSecs: number) => {
-    const mins = Math.floor(totalSecs / 60);
-    const secs = totalSecs % 60;
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-  };
 
   const handleOrbClick = () => {
     if (isPaused) return;
@@ -259,7 +259,16 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
           {/* Central Liquid Audio Orb Container */}
           <div
             id="voice-orb"
+            role="button"
+            tabIndex={0}
+            aria-label={speakingState === 'speaking' ? 'Interrompre Aya' : 'Écouter la réponse d’Aya'}
             onClick={handleOrbClick}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleOrbClick();
+              }
+            }}
             className={`relative z-10 w-44 h-44 rounded-full p-2 flex items-center justify-center cursor-pointer transition-all duration-300 shadow-[0_12px_40px_rgba(0,51,49,0.2)] ${
               speakingState === 'speaking'
                 ? 'scale-105 shadow-[0_0_50px_rgba(98,250,227,0.5)]'

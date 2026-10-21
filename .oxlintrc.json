@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "jsx-a11y", "vitest", "unicorn", "oxc"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "warn",
+    "react/react-in-jsx-scope": "off",
+    // role="dialog" / "status" / "radio" sur un div est de l'ARIA valide ;
+    // passer aux balises natives demanderait de refaire leur style.
+    "jsx-a11y/prefer-tag-over-role": "off",
+    // Les libellés sont dans des balises imbriquées (titre + description) : on regarde plus profond.
+    "jsx-a11y/control-has-associated-label": ["error", { "depth": 5 }],
+    // Style : vi.fn() sans paramètre de type suffit dans nos tests.
+    "vitest/require-mock-type-parameters": "off"
+  },
+  "ignorePatterns": ["dist", "node_modules"]
+}
