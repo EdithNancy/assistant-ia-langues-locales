@@ -4,6 +4,7 @@ import { api } from '../services';
 import { VOCABULARY_LIST } from '../data/mockData';
 import { Language, VocabularyItem } from '../types';
 import { soundEngine } from '../utils/audio';
+import { voicePlayer } from '../utils/voicePlayer';
 
 interface TraduireTabProps {
   currentLanguage: Language;
@@ -164,7 +165,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
     soundEngine.playTonePitch(currentTrans.tone as any);
 
     const speedVal = parseFloat(speeds[audioSpeedIdx].replace('x', ''));
-    soundEngine.speak(currentTrans.translation, speedVal, () => {
+    voicePlayer.speak(currentTrans.translation, targetLang, speedVal, () => {
       setIsPlayingAudio(false);
     });
   };
@@ -199,9 +200,9 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
     );
   };
 
-  const playVocabAudio = (text: string, tone: string) => {
+  const playVocabAudio = (text: string, tone: string, language: Language) => {
     soundEngine.playTonePitch(tone as any);
-    soundEngine.speak(text, 1.0);
+    voicePlayer.speak(text, language, 1.0);
   };
 
   return (
@@ -501,7 +502,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
 
               <div className="flex items-center gap-1 shrink-0">
                 <button
-                  onClick={() => playVocabAudio(item.word, item.tone)}
+                  onClick={() => playVocabAudio(item.word, item.tone, item.language)}
                   aria-label={`Prononcer ${item.word}`}
                   className="w-8 h-8 rounded-full flex items-center justify-center text-[#3f4948] hover:text-[#004b49] active:scale-90 transition-transform"
                 >

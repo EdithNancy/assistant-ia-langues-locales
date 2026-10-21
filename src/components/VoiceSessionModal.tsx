@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BRAND_ASSETS } from '../data/mockData';
 import { Language } from '../types';
 import { soundEngine } from '../utils/audio';
+import { voicePlayer } from '../utils/voicePlayer';
 
 interface VoiceSessionModalProps {
   isOpen: boolean;
@@ -72,12 +73,12 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
           ? 'I ka kɛnɛ wa ? Mun lo bi fɛ bi ? N bɛ kɔfɛ.'
           : 'Akwaba ! Nzoué o ? N kplo kɛ n wun wɔ.';
 
-      soundEngine.speak(textToSpeak, 0.95, () => {
+      voicePlayer.speak(textToSpeak, currentDialect, 0.95, () => {
         setSpeakingState('listening');
         setAccuracyScore(Math.min(99, 90 + Math.floor(Math.random() * 9)));
       });
     } else {
-      soundEngine.stopSpeech();
+      voicePlayer.stop();
       setSpeakingState('listening');
     }
   };
@@ -92,7 +93,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
     const nextPaused = !isPaused;
     setIsPaused(nextPaused);
     if (nextPaused) {
-      soundEngine.stopSpeech();
+      voicePlayer.stop();
       setSpeakingState('paused');
     } else {
       setSpeakingState('listening');
@@ -106,7 +107,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
   };
 
   const handleEndCall = () => {
-    soundEngine.stopSpeech();
+    voicePlayer.stop();
     soundEngine.playTone(280, 0.3);
     onClose();
   };

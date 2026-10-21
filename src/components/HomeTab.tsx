@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BRAND_ASSETS } from '../data/mockData';
 import { Language } from '../types';
 import { soundEngine } from '../utils/audio';
+import { voicePlayer } from '../utils/voicePlayer';
 
 interface HomeTabProps {
   currentLanguage: Language;
@@ -37,8 +38,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({
     if (isPlayingWord) return;
     setIsPlayingWord(true);
     soundEngine.playTonePitch(currentLanguage === 'dioula' ? 'Moyen' : 'Haut');
-    soundEngine.speak(
+    voicePlayer.speak(
       currentLanguage === 'dioula' ? 'An Sɔgɔma. Bonjour !' : 'Akwaba ! Bienvenue !',
+      currentLanguage,
       0.9,
       () => setIsPlayingWord(false)
     );

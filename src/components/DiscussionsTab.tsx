@@ -4,6 +4,7 @@ import { ChatMessage, Language } from '../types';
 import { recorderErrorMessage, useAudioRecorder } from '../hooks/useAudioRecorder';
 import { api } from '../services';
 import { soundEngine } from '../utils/audio';
+import { voicePlayer, VOICE_LABEL } from '../utils/voicePlayer';
 
 interface DiscussionsTabProps {
   currentLanguage: Language;
@@ -40,7 +41,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
 
   const handlePlayMessageAudio = (msg: ChatMessage) => {
     if (isPlayingAudioId === msg.id) {
-      soundEngine.stopSpeech();
+      voicePlayer.stop();
       setIsPlayingAudioId(null);
       return;
     }
@@ -49,7 +50,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
     if (msg.tone) {
       soundEngine.playTonePitch(msg.tone as any);
     }
-    soundEngine.speak(msg.text, playbackSpeed, () => {
+    voicePlayer.speak(msg.text, msg.language ?? currentLanguage, playbackSpeed, () => {
       setIsPlayingAudioId(null);
     });
   };
@@ -306,7 +307,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                       <span className="material-symbols-outlined text-[14px] text-[#004c43]">
                         record_voice_over
                       </span>
-                      Voix naturelle
+                      {VOICE_LABEL}
                     </span>
                   </div>
                 </div>

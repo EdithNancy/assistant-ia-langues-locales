@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BRAND_ASSETS, CULTURAL_STORIES, VOCABULARY_LIST } from '../data/mockData';
 import { Language, VocabularyItem } from '../types';
 import { soundEngine } from '../utils/audio';
+import { voicePlayer } from '../utils/voicePlayer';
 
 interface StoryModalProps {
   isOpen: boolean;
@@ -15,13 +16,13 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
 
   const handlePlayProverb = () => {
     if (isPlayingAudio) {
-      soundEngine.stopSpeech();
+      voicePlayer.stop();
       setIsPlayingAudio(false);
       return;
     }
     setIsPlayingAudio(true);
     soundEngine.playTonePitch('Haut');
-    soundEngine.speak(story.audioPhrase, 0.9, () => {
+    voicePlayer.speak(story.audioPhrase, 'baoule', 0.9, () => {
       setIsPlayingAudio(false);
     });
   };
@@ -184,7 +185,7 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({
               <button
                 onClick={() => {
                   soundEngine.playTonePitch(item.tone as any);
-                  soundEngine.speak(item.word, 0.9);
+                  voicePlayer.speak(item.word, item.language, 0.9);
                 }}
                 className="w-8 h-8 rounded-full bg-[#edeef0] hover:bg-[#b1eeea] text-[#004b49] flex items-center justify-center shrink-0 active:scale-90 transition-transform ml-2"
               >

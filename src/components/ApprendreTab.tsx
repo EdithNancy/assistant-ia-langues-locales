@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { LEARNING_MODULES, QUIZ_QUESTIONS } from '../data/mockData';
 import { Language, LearningModule, QuizQuestion } from '../types';
 import { soundEngine } from '../utils/audio';
+import { voicePlayer, VOICE_LABEL } from '../utils/voicePlayer';
 
 interface ApprendreTabProps {
   currentLanguage: Language;
@@ -54,14 +55,14 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
 
   const handlePlayNative = () => {
     if (isPlayingNative) {
-      soundEngine.stopSpeech();
+      voicePlayer.stop();
       setIsPlayingNative(false);
       return;
     }
 
     setIsPlayingNative(true);
     soundEngine.playTonePitch('Ton Haut');
-    soundEngine.speak(currentExercise.phrase, 0.9, () => {
+    voicePlayer.speak(currentExercise.phrase, currentLanguage, 0.9, () => {
       setIsPlayingNative(false);
     });
   };
@@ -91,13 +92,13 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
     // Play initial audio question
     setTimeout(() => {
       soundEngine.playTonePitch(QUIZ_QUESTIONS[0].correctTone);
-      soundEngine.speak(QUIZ_QUESTIONS[0].proverb, 0.9);
+      voicePlayer.speak(QUIZ_QUESTIONS[0].proverb, currentLanguage, 0.9);
     }, 400);
   };
 
   const handlePlayQuizAudio = (q: QuizQuestion) => {
     soundEngine.playTonePitch(q.correctTone);
-    soundEngine.speak(q.proverb, 0.85);
+    voicePlayer.speak(q.proverb, currentLanguage, 0.85);
   };
 
   const handleAnswerQuiz = (option: 'Haut' | 'Bas' | 'Moyen') => {
@@ -308,7 +309,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                 Locuteur natif ({currentExercise.speakerLocation})
               </p>
               <p className="text-[11px] text-[#3f4948]">
-                Voix naturelle • Accent authentique
+                {VOICE_LABEL}
               </p>
             </div>
           </div>
@@ -574,7 +575,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                     <button
                       onClick={() => {
                         soundEngine.playTonePitch('Haut');
-                        soundEngine.speak(lesson.phrase, 0.9);
+                        voicePlayer.speak(lesson.phrase, currentLanguage, 0.9);
                       }}
                       className="w-8 h-8 rounded-full bg-[#004b49] text-white flex items-center justify-center active:scale-90 transition-transform"
                     >
