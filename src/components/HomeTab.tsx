@@ -68,8 +68,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       <Toast message={toastMessage} icon="check_circle" />
 
       {/* Top User Profile & Welcome Bar */}
-      <section className="lg:col-span-7 flex items-center justify-between bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_20px_-2px_rgba(0,75,73,0.05)] border border-[#edeef0]/60">
-        <div className="flex flex-col min-w-0">
+      <section className="lg:col-span-12 flex flex-wrap items-center gap-x-4 gap-y-4 bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_20px_-2px_rgba(0,75,73,0.05)] border border-[#edeef0]/60">
+        <div className="flex-1 flex flex-col min-w-0">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#3f4948]">
             Bienvenue
           </p>
@@ -77,6 +77,17 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             Akwaba, Edith
           </h2>
         </div>
+
+        {/* Téléphone : sous la salutation ; ordinateur : entre la salutation et les boutons */}
+        <LanguageToggle
+          value={currentLanguage}
+          onChange={onLanguageChange}
+          className="order-last w-full lg:order-none lg:w-[24rem]"
+          options={[
+            { key: 'baoule', label: 'Baoulé', hint: '(Akan)' },
+            { key: 'dioula', label: 'Dioula', hint: '(Mandé)' },
+          ]}
+        />
 
         <div className="flex items-center gap-2 shrink-0">
           {voiceFirst && (
@@ -101,21 +112,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         </div>
       </section>
 
-      {/* Interactive Language Toggle Pill */}
-      <section className="lg:col-span-5 flex justify-center lg:justify-end items-center w-full">
-        <LanguageToggle
-          value={currentLanguage}
-          onChange={onLanguageChange}
-          className="w-full max-w-sm"
-          options={[
-            { key: 'baoule', label: 'Baoulé', hint: '(Akan)' },
-            { key: 'dioula', label: 'Dioula', hint: '(Mandé)' },
-          ]}
-        />
-      </section>
-
       {/* Hero Voice Interactive Card */}
-      <section className="lg:col-span-7 flex flex-col justify-center relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#004b49] via-[#003331] to-[#002422] text-white p-6 lg:p-10 shadow-[0_16px_36px_-6px_rgba(0,43,41,0.35)]">
+      <section className="lg:col-span-7 flex flex-col justify-center relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#004b49] via-[#003331] to-[#002422] text-white p-6 lg:p-8 shadow-[0_16px_36px_-6px_rgba(0,43,41,0.35)]">
         {/* Traditional Geometric Accent Watermark Pattern */}
         <svg
           className="absolute -right-8 -top-8 w-52 h-52 text-[#62fae3] opacity-10 pointer-events-none"
@@ -138,21 +136,21 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             <span>Reconnaissance vocale ivoirienne</span>
           </div>
 
-          <h3 className="text-xl lg:text-3xl font-bold text-white max-w-xs lg:max-w-md leading-snug">
+          <h3 className="text-xl lg:text-3xl font-bold text-white max-w-xs lg:max-w-md text-balance leading-snug">
             {currentLanguage === 'baoule'
               ? 'Parlez en Baoulé authentique'
               : 'Parlez en Dioula véhiculaire'}
           </h3>
 
-          <p className="text-xs lg:text-sm text-[#7ebab7] mt-1.5 max-w-xs lg:max-w-md leading-relaxed">
+          <p className="text-xs lg:text-sm text-[#7ebab7] mt-1.5 max-w-xs lg:max-w-md text-balance leading-relaxed">
             L'IA comprend vos dialectes, intonations et accents ivoiriens sans filtre.
           </p>
 
           {/* Central Floating Microphone with Animated Waves */}
-          <div className="relative my-6 flex items-center justify-center">
+          <div className="relative my-7 flex items-center justify-center">
             {/* Concentric Glow Pulse Rings */}
-            <div className="absolute w-28 h-28 rounded-full bg-[#62fae3]/20 animate-ping opacity-60 pointer-events-none"></div>
-            <div className="absolute w-24 h-24 rounded-full bg-[#3cddc7]/30 animate-pulse pointer-events-none"></div>
+            <div className="absolute w-28 h-28 rounded-full bg-[#62fae3]/15 animate-pulse-glow pointer-events-none"></div>
+            <div className="absolute w-24 h-24 rounded-full bg-[#3cddc7]/25 animate-pulse-glow [animation-delay:1.5s] pointer-events-none"></div>
 
             {/* Interactive Orb Button */}
             <button
@@ -180,7 +178,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       </section>
 
       {/* Daily Learning Card: Mot du Jour */}
-      <section className="lg:col-span-5 bg-white p-5 lg:p-6 rounded-3xl shadow-[0_6px_24px_-4px_rgba(0,75,73,0.06)] relative overflow-hidden border border-[#edeef0]/60">
+      <section className="lg:col-span-5 flex flex-col bg-white p-5 lg:p-6 rounded-3xl shadow-[0_6px_24px_-4px_rgba(0,75,73,0.06)] relative overflow-hidden border border-[#edeef0]/60">
         <div className="absolute top-0 left-0 w-2 h-full bg-[#9e4229]"></div>
 
         <div className="flex items-start justify-between gap-3">
@@ -258,7 +256,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         </div>
 
         {/* Pronunciation Micro Tip */}
-        <div className="mt-3 flex items-center gap-2 text-[#3f4948] text-xs pt-1">
+        <div className="mt-3 lg:mt-auto lg:pt-4 flex items-center gap-2 text-[#3f4948] text-xs pt-1">
           <span className="material-symbols-outlined text-[#fe8b6d] text-[18px] shrink-0">
             record_voice_over
           </span>
