@@ -42,7 +42,7 @@ const NavButton: React.FC<{
     <span className={`material-symbols-outlined text-[24px] ${isActive ? 'fill' : ''}`}>
       {item.icon}
     </span>
-    <span className="text-[10px] mt-0.5 tracking-tight font-medium">{item.label}</span>
+    <span className="text-[11px] mt-0.5 tracking-tight font-medium">{item.label}</span>
   </button>
 );
 
@@ -79,7 +79,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               <span className="material-symbols-outlined text-[28px] text-[#62fae3]">mic</span>
             </button>
           </div>
-          <span className="text-[10px] text-[#004b49] font-bold mt-1 tracking-tight">Vocal</span>
+          <span className="text-[11px] text-[#004b49] font-bold mt-1 tracking-tight">Vocal</span>
         </div>
 
         {right.map((item) => (

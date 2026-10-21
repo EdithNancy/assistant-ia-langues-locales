@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useEscapeKey } from '../hooks/useEscapeKey';
 import { BRAND_ASSETS } from '../data/mockData';
 import { Language } from '../types';
 import { soundEngine } from '../utils/audio';
@@ -53,6 +54,11 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
     }
     return () => clearInterval(timer);
   }, [isOpen, isPaused]);
+
+  useEscapeKey(isOpen, () => {
+    voicePlayer.stop();
+    onClose();
+  });
 
   if (!isOpen) return null;
 
@@ -118,7 +124,12 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
       : currentPhrase.dioula;
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#f9f9fb] flex flex-col justify-between overflow-y-auto animate-in fade-in duration-300">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Session vocale"
+      className="fixed inset-0 z-50 bg-[#f9f9fb] flex flex-col justify-between overflow-y-auto animate-in fade-in duration-300"
+    >
       {/* Top Header Bar */}
       <div className="sticky top-0 z-10 w-full bg-[#f9f9fb]/90 backdrop-blur-md px-4 sm:px-6 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-2 border-b border-[#edeef0]">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
@@ -166,7 +177,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
             <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-[#e2e2e4] shadow-xs flex-1 min-w-0">
               <span className="w-2 h-2 rounded-full bg-[#9e4229] animate-ping"></span>
               <span className="w-2 h-2 rounded-full bg-[#9e4229] -ml-3.5"></span>
-              <span className="text-[11px] font-bold text-[#1a1c1d] tracking-wide uppercase whitespace-nowrap">
+              <span className="text-xs font-bold text-[#1a1c1d] tracking-wide uppercase whitespace-nowrap">
                 En direct • {formatTimer(seconds)}
               </span>
             </div>
@@ -344,7 +355,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
                   : 'Aya écoute votre accent...'}
               </span>
             </div>
-            <p className="text-[11px] text-[#3f4948] text-center max-w-[280px]">
+            <p className="text-xs text-[#3f4948] text-center max-w-[280px]">
               Parlez naturellement. Le modèle détecte les tons hauts et bas.
             </p>
           </div>
@@ -357,12 +368,12 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
               <span className="material-symbols-outlined text-[#9e4229] text-[18px]">
                 record_voice_over
               </span>
-              <span className="text-[11px] text-[#3f4948] font-bold uppercase tracking-wider">
+              <span className="text-xs text-[#3f4948] font-bold uppercase tracking-wider">
                 Transcription en direct
               </span>
             </div>
 
-            <span className="px-2 py-0.5 rounded-full bg-[#ffdbd2] text-[#3c0800] text-[10px] font-bold">
+            <span className="px-2 py-0.5 rounded-full bg-[#ffdbd2] text-[#3c0800] text-[11px] font-bold">
               {activeContent.tone}
             </span>
           </div>
@@ -375,7 +386,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
             <div className="flex items-center gap-1.5 flex-wrap">
               {activeContent.phonetics.map((syl: string, i: number) => (
                 <React.Fragment key={i}>
-                  <span className="px-1.5 py-0.5 rounded bg-[#edeef0] text-[#3f4948] text-[11px] font-mono">
+                  <span className="px-1.5 py-0.5 rounded bg-[#edeef0] text-[#3f4948] text-xs font-mono">
                     {syl}
                   </span>
                   {i < activeContent.phonetics.length - 1 && (
@@ -406,7 +417,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
               <span className="text-xs font-bold text-[#1a1c1d] truncate">
                 Précision tonale
               </span>
-              <span className="text-[11px] text-[#3f4948] truncate">
+              <span className="text-xs text-[#3f4948] truncate">
                 {activeContent.feedback}
               </span>
             </div>
@@ -430,7 +441,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
             <span className="material-symbols-outlined text-[22px]">
               {isMuted ? 'mic_off' : 'mic'}
             </span>
-            <span className="text-[10px] font-semibold">
+            <span className="text-[11px] font-semibold">
               {isMuted ? 'Coupé' : 'Micro'}
             </span>
           </button>
@@ -447,7 +458,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
             <span className="material-symbols-outlined text-[22px]">
               {isPaused ? 'play_circle' : 'pause_circle'}
             </span>
-            <span className="text-[10px] font-semibold">
+            <span className="text-[11px] font-semibold">
               {isPaused ? 'Reprendre' : 'Pause'}
             </span>
           </button>
@@ -458,7 +469,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
             className="flex-1 h-13 rounded-2xl bg-[#e2e2e4] hover:bg-[#d9dadc] active:scale-95 text-[#1a1c1d] flex flex-col items-center justify-center gap-0.5 transition-all shadow-xs"
           >
             <span className="material-symbols-outlined text-[22px]">swap_horiz</span>
-            <span className="text-[10px] font-semibold">
+            <span className="text-[11px] font-semibold">
               {currentDialect === 'dioula' ? 'Baoulé' : 'Dioula'}
             </span>
           </button>

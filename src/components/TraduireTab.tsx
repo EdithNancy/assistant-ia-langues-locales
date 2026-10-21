@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useEscapeKey } from '../hooks/useEscapeKey';
 import { recorderErrorMessage, useAudioRecorder } from '../hooks/useAudioRecorder';
 import { api, TextLanguage, TranslateResult } from '../services';
 import { useVoiceConsent } from './VoiceConsent';
@@ -72,6 +73,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   const [savedExpressions, setSavedExpressions] = useState<VocabularyItem[]>(VOCABULARY_LIST);
   const [toast, setToast] = useState<string | null>(null);
   const [isDualMicModalOpen, setIsDualMicModalOpen] = useState(false);
+  useEscapeKey(isDualMicModalOpen, () => setIsDualMicModalOpen(false));
 
   const speeds = ['0.8x', '1.0x', '0.5x'];
 
@@ -259,7 +261,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
           <div className="w-2.5 h-2.5 rounded-full bg-[#3cddc7] animate-pulse"></div>
           <span className="text-base lg:text-lg font-bold text-[#003331]">Traducteur Culturel</span>
         </div>
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#b1eeea] text-[#00201f] text-[11px] font-bold shadow-xs">
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#b1eeea] text-[#00201f] text-xs font-bold shadow-xs">
           <span className="material-symbols-outlined text-[14px]">psychology</span>
           IA Contextuelle
         </span>
@@ -271,7 +273,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
         <button
           onClick={handleChangeSource}
           aria-label={`Langue source : ${sourceLabel(sourceLang)}. Changer`}
-          className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-full bg-white text-[#1a1c1d] shadow-sm transition-all active:scale-95 text-left border border-[#edeef0]"
+          className="flex-1 min-w-0 flex items-center justify-center gap-2 py-2.5 px-2 sm:px-3 rounded-full bg-white text-[#1a1c1d] shadow-sm transition-all active:scale-95 text-left border border-[#edeef0]"
         >
           <span className="text-base leading-none">
             {sourceLang === 'auto' ? '🌐' : sourceLang === 'fr' ? '🇫🇷' : '🇨🇮'}
@@ -280,7 +282,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
             <span className="text-xs font-bold text-[#1a1c1d] truncate">
               {sourceLabel(sourceLang)}
             </span>
-            <span className="text-[10px] text-[#3f4948] truncate -mt-0.5">
+            <span className="text-[11px] text-[#3f4948] truncate -mt-0.5">
               {sourceLang !== 'auto'
                 ? LANG_SUBTITLE[sourceLang]
                 : currentTrans
@@ -308,14 +310,14 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
         <button
           onClick={handleChangeTarget}
           aria-label={`Langue cible : ${LANG_LABEL[targetLang]}. Changer`}
-          className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-full bg-white text-[#1a1c1d] shadow-sm transition-all active:scale-95 text-left border border-[#edeef0]"
+          className="flex-1 min-w-0 flex items-center justify-center gap-2 py-2.5 px-2 sm:px-3 rounded-full bg-white text-[#1a1c1d] shadow-sm transition-all active:scale-95 text-left border border-[#edeef0]"
         >
           <span className="text-base leading-none">{targetLang === 'fr' ? '🇫🇷' : '🇨🇮'}</span>
           <div className="flex flex-col min-w-0">
             <span className="text-xs font-bold text-[#004b49] truncate">
               {LANG_LABEL[targetLang]}
             </span>
-            <span className="text-[10px] text-[#9e4229] font-semibold truncate -mt-0.5">
+            <span className="text-[11px] text-[#9e4229] font-semibold truncate -mt-0.5">
               {LANG_SUBTITLE[targetLang]}
             </span>
           </div>
@@ -328,7 +330,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       {/* Source Input Box */}
       <div className="flex flex-col bg-white rounded-3xl p-4 lg:p-5 shadow-sm relative transition-all border border-[#edeef0] focus-within:ring-2 focus-within:ring-[#004b49]/20">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-[11px] font-bold text-[#707978] uppercase tracking-wider">
+          <span className="text-xs font-bold text-[#707978] uppercase tracking-wider">
             Texte Source
           </span>
           {sourceText && (
@@ -375,7 +377,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
             </button>
           </div>
 
-          <span className="text-[11px] text-[#707978] font-medium">
+          <span className="text-xs text-[#707978] font-medium">
             {sourceText.length} car.
           </span>
         </div>
@@ -399,7 +401,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
             </span>
           </div>
           {currentTrans?.tone && (
-            <span className="text-[10px] bg-[#00332d]/60 px-2.5 py-0.5 rounded-full text-[#b1eeea] font-semibold border border-[#62fae3]/20">
+            <span className="text-[11px] bg-[#00332d]/60 px-2.5 py-0.5 rounded-full text-[#b1eeea] font-semibold border border-[#62fae3]/20">
               {currentTrans.tone}
             </span>
           )}
@@ -414,7 +416,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
           {/* Phonetics Guide */}
           {currentTrans.phonetic && (
             <div className="bg-[#00332d]/40 rounded-xl px-3 py-2 mb-3 inline-block w-full border border-white/5">
-              <span className="text-[10px] text-[#3cddc7] block font-bold mb-0.5">
+              <span className="text-[11px] text-[#3cddc7] block font-bold mb-0.5">
                 Guide Phonétique
               </span>
               <p className="text-xs text-[#edeef0] italic tracking-wide">
@@ -452,7 +454,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
 
               <button
                 onClick={handleToggleSpeed}
-                className="px-2.5 py-2 rounded-full bg-[#00332d]/50 text-[#b1eeea] text-[11px] font-bold active:scale-90 transition-transform hover:bg-[#00332d]"
+                className="px-2.5 py-2 rounded-full bg-[#00332d]/50 text-[#b1eeea] text-xs font-bold active:scale-90 transition-transform hover:bg-[#00332d]"
               >
                 {speeds[audioSpeedIdx]}
               </button>
@@ -558,7 +560,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
                     <span className="text-sm font-bold text-[#1a1c1d] truncate">
                       {item.word}
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-[#edeef0] text-[10px] text-[#3f4948] font-semibold capitalize">
+                    <span className="px-2 py-0.5 rounded-full bg-[#edeef0] text-[11px] text-[#3f4948] font-semibold capitalize">
                       {item.language}
                     </span>
                   </div>
@@ -628,6 +630,8 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
         >
           <div
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
             className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200"
           >
             <div className="flex justify-between items-center">
@@ -659,7 +663,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
               >
                 <span className="text-2xl">🇫🇷</span>
                 <span className="text-xs font-bold">Interlocuteur 1</span>
-                <span className="text-[10px] text-[#7e2b14]">Français</span>
+                <span className="text-[11px] text-[#7e2b14]">Français</span>
                 <div className="w-10 h-10 rounded-full bg-[#9e4229] text-white flex items-center justify-center shadow-xs">
                   <span className="material-symbols-outlined text-[20px]">mic</span>
                 </div>
@@ -674,7 +678,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
               >
                 <span className="text-2xl">🇨🇮</span>
                 <span className="text-xs font-bold">Interlocuteur 2</span>
-                <span className="text-[10px] text-[#084f4d] capitalize">{targetLang}</span>
+                <span className="text-[11px] text-[#084f4d] capitalize">{targetLang}</span>
                 <div className="w-10 h-10 rounded-full bg-[#004b49] text-white flex items-center justify-center shadow-xs">
                   <span className="material-symbols-outlined text-[20px]">mic</span>
                 </div>

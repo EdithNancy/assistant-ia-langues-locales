@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useEscapeKey } from '../hooks/useEscapeKey';
 import { LEARNING_MODULES, QUIZ_QUESTIONS } from '../data/mockData';
 import { Language, LearningModule, QuizQuestion } from '../types';
 import { soundEngine } from '../utils/audio';
@@ -20,7 +21,9 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
   const [userScore, setUserScore] = useState(96);
   const [hasPracticed, setHasPracticed] = useState(true);
   const [selectedModule, setSelectedModule] = useState<LearningModule | null>(null);
+  useEscapeKey(selectedModule !== null, () => setSelectedModule(null));
   const [isQuizOpen, setIsQuizOpen] = useState(false);
+  useEscapeKey(isQuizOpen, () => setIsQuizOpen(false));
   const [quizIndex, setQuizIndex] = useState(0);
   const [quizSelectedOption, setQuizSelectedOption] = useState<string | null>(null);
   const [quizScore, setQuizScore] = useState(0);
@@ -141,7 +144,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
       <section className="lg:col-span-12 flex flex-col space-y-3 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-6 lg:items-center">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-0.5">
-            <span className="text-[11px] text-[#9e4229] font-bold uppercase tracking-wider">
+            <span className="text-xs text-[#9e4229] font-bold uppercase tracking-wider">
               Tuteur Vocal & Culture
             </span>
             <h2 className="text-xl lg:text-2xl text-[#1a1c1d] font-bold leading-tight">
@@ -194,15 +197,15 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
           <div className="grid grid-cols-7 gap-1.5 mt-3 pt-3 bg-white/5 rounded-xl px-2.5 py-1.5 border border-white/5">
             {['L', 'M', 'M', 'J', 'V', 'S'].map((day, idx) => (
               <div key={idx} className="flex flex-col items-center">
-                <span className="text-[10px] text-[#62fae3] opacity-75">{day}</span>
+                <span className="text-[11px] text-[#62fae3] opacity-75">{day}</span>
                 <span className="material-symbols-outlined text-[14px] text-[#62fae3]">
                   check_circle
                 </span>
               </div>
             ))}
             <div className="flex flex-col items-center">
-              <span className="text-[10px] text-[#fe8b6d] font-bold">D</span>
-              <span className="w-3.5 h-3.5 rounded-full bg-[#fe8b6d] flex items-center justify-center text-[10px] font-bold text-[#75240e]">
+              <span className="text-[11px] text-[#fe8b6d] font-bold">D</span>
+              <span className="w-3.5 h-3.5 rounded-full bg-[#fe8b6d] flex items-center justify-center text-[11px] font-bold text-[#75240e]">
                 7
               </span>
             </div>
@@ -263,7 +266,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
         {/* Linguistic Phrase Container */}
         <div className="bg-[#f3f3f5] rounded-2xl p-4 space-y-3">
           <div>
-            <p className="text-[11px] text-[#707978] font-bold uppercase tracking-wider">
+            <p className="text-xs text-[#707978] font-bold uppercase tracking-wider">
               Français
             </p>
             <p className="text-sm text-[#1a1c1d] font-semibold mt-0.5">
@@ -273,11 +276,11 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
 
           <div className="pt-2 border-t border-[#edeef0]">
             <div className="flex items-center justify-between">
-              <p className="text-[11px] text-[#003331] font-bold uppercase tracking-wider flex items-center gap-1">
+              <p className="text-xs text-[#003331] font-bold uppercase tracking-wider flex items-center gap-1">
                 <span className="material-symbols-outlined text-[15px]">translate</span>
                 <span>{currentExercise.dialectLabel}</span>
               </p>
-              <span className="px-2 py-0.5 rounded bg-[#3cddc7]/30 text-[#005047] text-[10px] font-bold">
+              <span className="px-2 py-0.5 rounded bg-[#3cddc7]/30 text-[#005047] text-[11px] font-bold">
                 {currentExercise.tone}
               </span>
             </div>
@@ -308,7 +311,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
               <p className="text-xs font-bold text-[#1a1c1d]">
                 Locuteur natif ({currentExercise.speakerLocation})
               </p>
-              <p className="text-[11px] text-[#3f4948]">
+              <p className="text-xs text-[#3f4948]">
                 {VOICE_LABEL}
               </p>
             </div>
@@ -392,7 +395,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                 <span className="material-symbols-outlined text-[#004c43] text-[18px]">
                   graphic_eq
                 </span>
-                <p className="text-[10px] text-[#707978] mt-0.5">Intonation</p>
+                <p className="text-[11px] text-[#707978] mt-0.5">Intonation</p>
                 <p className="text-xs text-[#003331] font-bold">Excellente</p>
               </div>
 
@@ -400,7 +403,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                 <span className="material-symbols-outlined text-[#004c43] text-[18px]">
                   speed
                 </span>
-                <p className="text-[10px] text-[#707978] mt-0.5">Rythme</p>
+                <p className="text-[11px] text-[#707978] mt-0.5">Rythme</p>
                 <p className="text-xs text-[#003331] font-bold">Fluide</p>
               </div>
 
@@ -408,7 +411,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                 <span className="material-symbols-outlined text-[#9e4229] text-[18px]">
                   verified
                 </span>
-                <p className="text-[10px] text-[#707978] mt-0.5">Accent tonique</p>
+                <p className="text-[11px] text-[#707978] mt-0.5">Accent tonique</p>
                 <p className="text-xs text-[#9e4229] font-bold">Parfait</p>
               </div>
             </div>
@@ -439,9 +442,14 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
           {LEARNING_MODULES.map((mod) => (
             <div
               key={mod.id}
-              onClick={() => setSelectedModule(mod)}
-              className="bg-white p-3 rounded-2xl shadow-xs flex flex-col justify-between space-y-2.5 hover:bg-[#f9f9fb] transition-all cursor-pointer border border-[#edeef0] group active:scale-[0.98]"
+              className="relative bg-white p-3 rounded-2xl shadow-xs flex flex-col justify-between space-y-2.5 hover:bg-[#f9f9fb] transition-all cursor-pointer border border-[#edeef0] group active:scale-[0.98]"
             >
+              <button
+                type="button"
+                onClick={() => setSelectedModule(mod)}
+                aria-label={`Ouvrir le module ${mod.title}`}
+                className="absolute inset-0 z-10 rounded-2xl"
+              />
               <div className="space-y-2">
                 <div className="w-full h-24 rounded-xl overflow-hidden relative shadow-xs">
                   <img
@@ -451,7 +459,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                   />
                   {mod.tag && (
                     <span
-                      className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[11px] font-bold ${
                         mod.tag === 'Populaire'
                           ? 'bg-[#9e4229] text-white'
                           : mod.tag === 'Acquis'
@@ -468,14 +476,14 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                   <h4 className="text-xs font-bold text-[#1a1c1d] leading-tight line-clamp-1">
                     {mod.title}
                   </h4>
-                  <p className="text-[11px] text-[#707978] mt-0.5 truncate">
+                  <p className="text-xs text-[#707978] mt-0.5 truncate">
                     {mod.subtitle}
                   </p>
                 </div>
               </div>
 
               {mod.progress === 100 ? (
-                <div className="flex items-center space-x-1.5 py-1 px-2 rounded-lg bg-[#edeef0] text-[#003331] text-[10px] font-bold">
+                <div className="flex items-center space-x-1.5 py-1 px-2 rounded-lg bg-[#edeef0] text-[#003331] text-[11px] font-bold">
                   <span className="material-symbols-outlined text-[14px] text-[#004c43]">
                     verified
                   </span>
@@ -483,7 +491,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                 </div>
               ) : (
                 <div className="space-y-1 pt-1">
-                  <div className="flex justify-between text-[10px] text-[#3f4948]">
+                  <div className="flex justify-between text-[11px] text-[#3f4948]">
                     <span>Progression</span>
                     <span className="font-bold text-[#004b49]">{mod.progress}%</span>
                   </div>
@@ -504,7 +512,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
       <section className="lg:col-span-5 bg-gradient-to-br from-[#ffdbd2] via-[#f3f3f5] to-white rounded-3xl p-5 shadow-xs relative overflow-hidden border border-[#edeef0]">
         <div className="flex items-start justify-between gap-3 relative z-10">
           <div className="space-y-2 max-w-[70%]">
-            <div className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-[#9e4229] text-white text-[10px] font-bold">
+            <div className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-[#9e4229] text-white text-[11px] font-bold">
               <span className="material-symbols-outlined text-[12px]">headphones</span>
               <span>Défi d'écoute</span>
             </div>
@@ -542,6 +550,8 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
         >
           <div
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
             className="w-full max-w-md bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[85vh] overflow-y-auto animate-in zoom-in-95 duration-200"
           >
             <div className="flex justify-between items-start">
@@ -586,7 +596,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                   <p className="text-sm font-bold text-[#1a1c1d] mt-1">
                     « {lesson.phrase} »
                   </p>
-                  <span className="text-[11px] text-[#9e4229] italic">
+                  <span className="text-xs text-[#9e4229] italic">
                     {lesson.translation}
                   </span>
                 </div>
@@ -615,6 +625,8 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
         >
           <div
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
             className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200"
           >
             <div className="flex justify-between items-center">

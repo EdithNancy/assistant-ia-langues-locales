@@ -28,7 +28,7 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#62fae3] ring-1 ring-white"></span>
           </div>
           <div className="flex flex-col">
-            <span className="text-[11px] font-bold text-[#004b49] uppercase tracking-wider leading-none">
+            <span className="text-xs font-bold text-[#004b49] uppercase tracking-wider leading-none">
               IvoirAI
             </span>
             <h1 className="text-lg lg:text-xl font-bold text-[#1a1c1d] tracking-tight leading-tight">

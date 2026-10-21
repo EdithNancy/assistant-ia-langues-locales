@@ -149,7 +149,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
                     </span>
                     <span className="mt-3 text-[20px] font-semibold text-[#1a1c1d]">{choice.name}</span>
                     <span className="text-[13px] text-[#3f4948]">{choice.family}</span>
-                    <span className={`mt-1 self-start px-2 py-0.5 rounded-md text-[11px] font-medium ${choice.chip}`}>
+                    <span className={`mt-1 self-start px-2 py-0.5 rounded-md text-xs font-medium ${choice.chip}`}>
                       {choice.greeting}
                     </span>
                   </button>

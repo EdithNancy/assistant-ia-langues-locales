@@ -80,7 +80,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       {/* Top User Profile & Welcome Bar */}
       <section className="lg:col-span-7 flex items-center justify-between bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_20px_-2px_rgba(0,75,73,0.05)] border border-[#edeef0]/60">
         <div className="flex flex-col min-w-0">
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#3f4948]">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#3f4948]">
             Bienvenue
           </p>
           <h2 className="text-2xl lg:text-3xl font-bold text-[#1a1c1d] truncate mt-1">
@@ -127,7 +127,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 currentLanguage === 'baoule' ? 'bg-[#62fae3]' : 'bg-transparent'
               }`}
             ></span>
-            Baoulé <span className="font-normal opacity-80 text-[10px]">(Akan)</span>
+            Baoulé <span className="font-normal opacity-80 text-[11px]">(Akan)</span>
           </button>
 
           <button
@@ -143,7 +143,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 currentLanguage === 'dioula' ? 'bg-[#62fae3]' : 'bg-transparent'
               }`}
             ></span>
-            Dioula <span className="font-normal opacity-80 text-[10px]">(Mandé)</span>
+            Dioula <span className="font-normal opacity-80 text-[11px]">(Mandé)</span>
           </button>
         </div>
       </section>
@@ -200,7 +200,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             </button>
           </div>
 
-          <div
+          <button
+            type="button"
             onClick={onOpenVoiceSession}
             className="flex items-center gap-2 cursor-pointer hover:opacity-90 active:scale-95 transition-all"
           >
@@ -208,7 +209,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             <span className="text-xs text-white font-semibold tracking-wide">
               Appuyez pour parler en direct
             </span>
-          </div>
+          </button>
         </div>
       </section>
 
@@ -220,7 +221,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-[#9e4229] text-[18px]">lightbulb</span>
-              <span className="text-[11px] uppercase tracking-wider text-[#9e4229] font-bold">
+              <span className="text-xs uppercase tracking-wider text-[#9e4229] font-bold">
                 Mot du jour • {currentLanguage === 'dioula' ? 'Dioula' : 'Baoulé'}
               </span>
             </div>
@@ -283,7 +284,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               ? '« An sɔgɔma, i ka kɛnɛ wa ? »'
               : '« Akwaba o awlo nun, an nian amun bo »'}
           </p>
-          <span className="text-[11px] text-[#707978] block mt-0.5">
+          <span className="text-xs text-[#707978] block mt-0.5">
             {currentLanguage === 'dioula'
               ? '(Bonjour, te portes-tu bien ?)'
               : '(Bienvenue dans notre maison, installez-vous paisiblement)'}
@@ -395,7 +396,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           />
         </div>
         <div className="flex flex-col min-w-0">
-          <span className="text-[11px] text-[#9e4229] font-bold uppercase">
+          <span className="text-xs text-[#9e4229] font-bold uppercase">
             Patrimoine Oral
           </span>
           <h5 className="text-sm text-[#1a1c1d] font-bold truncate mt-0.5">
@@ -422,10 +423,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4">
           {/* Card 1 */}
           <div
-            onClick={() =>
-              onSelectDiscussion('Négociation au Marché de Treichville', 'dioula')
-            }
-            className="bg-white p-3.5 rounded-3xl shadow-[0_2px_12px_rgba(0,75,73,0.03)] hover:shadow-md transition-all flex items-center justify-between gap-3 cursor-pointer border border-[#edeef0]/60 active:scale-[0.99]"
+            className="relative bg-white p-3.5 rounded-3xl shadow-[0_2px_12px_rgba(0,75,73,0.03)] hover:shadow-md transition-all flex items-center justify-between gap-3 cursor-pointer border border-[#edeef0]/60 active:scale-[0.99]"
           >
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-12 h-12 rounded-2xl bg-[#fe8b6d]/20 text-[#9e4229] flex items-center justify-center shrink-0">
@@ -436,7 +434,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                   Négociation au Marché de Treichville
                 </h4>
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-xs text-[#707978]">
-                  <span className="px-2 py-0.5 rounded-full bg-[#edeef0] text-[10px] text-[#1a1c1d] font-bold">
+                  <span className="px-2 py-0.5 rounded-full bg-[#edeef0] text-[11px] text-[#1a1c1d] font-bold">
                     Dioula
                   </span>
                   <span>•</span>
@@ -447,8 +445,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               </div>
             </div>
             <button
-              aria-label="Continuer la discussion"
-              className="w-9 h-9 rounded-full bg-[#f3f3f5] text-[#3f4948] flex items-center justify-center shrink-0 hover:bg-[#003331] hover:text-white transition-colors"
+              onClick={() => onSelectDiscussion('Négociation au Marché de Treichville', 'dioula')}
+              aria-label="Continuer la discussion : Négociation au Marché de Treichville"
+              className="after:absolute after:inset-0 after:rounded-3xl w-9 h-9 rounded-full bg-[#f3f3f5] text-[#3f4948] flex items-center justify-center shrink-0 hover:bg-[#003331] hover:text-white transition-colors"
             >
               <span className="material-symbols-outlined text-[18px]">chevron_right</span>
             </button>
@@ -456,13 +455,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
           {/* Card 2 */}
           <div
-            onClick={() =>
-              onSelectDiscussion(
-                'Salutations traditionnelles en pays Baoulé',
-                'baoule'
-              )
-            }
-            className="bg-white p-3.5 rounded-3xl shadow-[0_2px_12px_rgba(0,75,73,0.03)] hover:shadow-md transition-all flex items-center justify-between gap-3 cursor-pointer border border-[#edeef0]/60 active:scale-[0.99]"
+            className="relative bg-white p-3.5 rounded-3xl shadow-[0_2px_12px_rgba(0,75,73,0.03)] hover:shadow-md transition-all flex items-center justify-between gap-3 cursor-pointer border border-[#edeef0]/60 active:scale-[0.99]"
           >
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-12 h-12 rounded-2xl bg-[#004b49]/10 text-[#004b49] flex items-center justify-center shrink-0">
@@ -473,7 +466,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                   Salutations traditionnelles en pays Baoulé
                 </h4>
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-xs text-[#707978]">
-                  <span className="px-2 py-0.5 rounded-full bg-[#edeef0] text-[10px] text-[#1a1c1d] font-bold">
+                  <span className="px-2 py-0.5 rounded-full bg-[#edeef0] text-[11px] text-[#1a1c1d] font-bold">
                     Baoulé
                   </span>
                   <span>•</span>
@@ -489,8 +482,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               </div>
             </div>
             <button
-              aria-label="Continuer la discussion"
-              className="w-9 h-9 rounded-full bg-[#f3f3f5] text-[#3f4948] flex items-center justify-center shrink-0 hover:bg-[#003331] hover:text-white transition-colors"
+              onClick={() => onSelectDiscussion('Salutations traditionnelles en pays Baoulé', 'baoule')}
+              aria-label="Continuer la discussion : Salutations traditionnelles en pays Baoulé"
+              className="after:absolute after:inset-0 after:rounded-3xl w-9 h-9 rounded-full bg-[#f3f3f5] text-[#3f4948] flex items-center justify-center shrink-0 hover:bg-[#003331] hover:text-white transition-colors"
             >
               <span className="material-symbols-outlined text-[18px]">chevron_right</span>
             </button>

@@ -28,7 +28,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span className="text-base font-extrabold text-[#003331] tracking-tight leading-none">
             IvoirAI
           </span>
-          <span className="text-[11px] text-[#3f4948] font-medium mt-0.5">Baoulé & Dioula</span>
+          <span className="text-xs text-[#3f4948] font-medium mt-0.5">Baoulé & Dioula</span>
         </div>
       </div>
 
@@ -46,7 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Nav items */}
       <nav className="flex-1 px-3 pt-5 flex flex-col gap-1" aria-label="Navigation principale">
-        <span className="px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-[#707978]">
+        <span className="px-3 pb-1 text-xs font-bold uppercase tracking-wider text-[#707978]">
           Menu
         </span>
         {NAV_ITEMS.map((item) => {
@@ -84,7 +84,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
         <div className="flex flex-col min-w-0">
           <span className="text-sm font-bold text-[#1a1c1d] truncate">Edith</span>
-          <span className="text-[11px] text-[#3f4948]">Voir mon profil</span>
+          <span className="text-xs text-[#3f4948]">Voir mon profil</span>
         </div>
       </button>
     </aside>

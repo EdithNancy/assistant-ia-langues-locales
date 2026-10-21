@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useEscapeKey } from '../hooks/useEscapeKey';
 import { BRAND_ASSETS, INITIAL_CHAT_MESSAGES } from '../data/mockData';
 import { ChatMessage, Language } from '../types';
 import { recorderErrorMessage, useAudioRecorder } from '../hooks/useAudioRecorder';
@@ -37,6 +38,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
   const recorder = useAudioRecorder();
   const { ensureConsent } = useVoiceConsent();
+  useEscapeKey(isDialectModalOpen, () => setIsDialectModalOpen(false));
   const isRecording = recorder.status === 'recording';
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [isAiTyping, setIsAiTyping] = useState(false);
@@ -223,7 +225,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-1.5">
               <span className="text-sm text-[#1a1c1d] font-bold truncate">Aya</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-[#b1eeea] text-[#084f4d] font-bold">
+              <span className="text-[11px] px-1.5 py-0.2 rounded-md bg-[#b1eeea] text-[#084f4d] font-bold">
                 Tuteur IA
               </span>
             </div>
@@ -277,13 +279,13 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                 key={msg.id}
                 className="flex flex-col gap-1 max-w-[90%] sm:max-w-[75%] lg:max-w-[65%] ml-auto items-end animate-in fade-in"
               >
-                <div className="flex items-center gap-1 text-[11px] text-[#3f4948]">
+                <div className="flex items-center gap-1 text-xs text-[#3f4948]">
                   <span>{msg.timestamp}</span>
                   <span className="font-bold text-[#004b49]">Moi</span>
                 </div>
                 <div className="bg-[#004b49] text-white rounded-3xl rounded-tr-sm p-4 shadow-[0_4px_20px_-2px_rgba(0,75,73,0.15)] flex flex-col gap-1.5">
                   <p className="text-sm leading-relaxed">{msg.text}</p>
-                  <div className="flex items-center justify-end gap-1 text-[#7ebab7] text-[10px]">
+                  <div className="flex items-center justify-end gap-1 text-[#7ebab7] text-[11px]">
                     <span>
                       Envoyé
                       {msg.detectedLanguage && ` • ${DETECTED_LABEL[msg.detectedLanguage]} reconnu`}
@@ -301,7 +303,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
               key={msg.id}
               className="flex flex-col gap-1 max-w-[95%] sm:max-w-[85%] lg:max-w-[75%] mr-auto animate-in fade-in"
             >
-              <div className="flex items-center gap-1.5 text-[11px]">
+              <div className="flex items-center gap-1.5 text-xs">
                 <span className="text-[#004b49] font-bold">Aya (IvoirAI)</span>
                 <span className="text-[#3f4948]">{msg.timestamp}</span>
               </div>
@@ -345,7 +347,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                         )
                       )}
                     </div>
-                    <span className="text-[11px] text-[#3f4948] font-semibold">
+                    <span className="text-xs text-[#3f4948] font-semibold">
                       {msg.audioDuration || '0:06'}
                     </span>
                   </div>
@@ -357,7 +359,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                         <button
                           key={speed}
                           onClick={() => setPlaybackSpeed(speed)}
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold transition-all ${
+                          className={`px-2 py-0.5 rounded-full text-[11px] font-bold transition-all ${
                             playbackSpeed === speed
                               ? 'bg-white text-[#003331] shadow-xs'
                               : 'text-[#3f4948]'
@@ -368,7 +370,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                       ))}
                     </div>
 
-                    <span className="text-[11px] text-[#3f4948] flex items-center gap-1 font-semibold">
+                    <span className="text-xs text-[#3f4948] flex items-center gap-1 font-semibold">
                       <span className="material-symbols-outlined text-[14px] text-[#004c43]">
                         record_voice_over
                       </span>
@@ -380,11 +382,11 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                 {/* Phonetics & Tone Pill if present */}
                 {msg.phonetic && (
                   <div className="flex items-center flex-wrap gap-2 pt-1">
-                    <span className="px-2 py-1 rounded-lg bg-[#e8e8ea] text-[11px] text-[#1a1c1d] font-mono font-medium">
+                    <span className="px-2 py-1 rounded-lg bg-[#e8e8ea] text-xs text-[#1a1c1d] font-mono font-medium">
                       {msg.phonetic}
                     </span>
                     {msg.tone && (
-                      <span className="px-2 py-0.5 rounded-md bg-[#ffdbd2] text-[#3c0800] text-[10px] font-bold flex items-center gap-1">
+                      <span className="px-2 py-0.5 rounded-md bg-[#ffdbd2] text-[#3c0800] text-[11px] font-bold flex items-center gap-1">
                         <span className="material-symbols-outlined text-[12px]">graphic_eq</span>
                         {msg.tone}
                       </span>
@@ -546,7 +548,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
           {/* Special African Characters Toolbar */}
           <div className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-full bg-white shadow-[0_2px_12px_rgba(0,75,73,0.08)] border border-[#edeef0]">
             <div className="flex items-center gap-1.5 min-w-0">
-              <span className="text-[11px] text-[#3f4948] font-bold px-1 flex items-center gap-1">
+              <span className="text-xs text-[#3f4948] font-bold px-1 flex items-center gap-1">
                 <span className="material-symbols-outlined text-[14px] text-[#004b49]">
                   keyboard_alt
                 </span>
@@ -564,7 +566,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                 ))}
               </div>
             </div>
-            <span className="text-[10px] text-[#004b49] font-bold px-1 capitalize">
+            <span className="text-[11px] text-[#004b49] font-bold px-1 capitalize">
               {currentLanguage}
             </span>
           </div>
@@ -645,6 +647,8 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
         >
           <div
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
             className="w-full max-w-md bg-white rounded-t-[32px] sm:rounded-[32px] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-5 shadow-2xl flex flex-col gap-4 animate-in slide-in-from-bottom duration-300"
           >
             <div className="sm:hidden w-12 h-1.5 bg-[#bfc8c7]/60 rounded-full mx-auto"></div>
@@ -739,7 +743,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                     </span>
                   </div>
                 </div>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#ffdbd2] text-[#3c0800] font-bold">
+                <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#ffdbd2] text-[#3c0800] font-bold">
                   Bientôt
                 </span>
               </div>

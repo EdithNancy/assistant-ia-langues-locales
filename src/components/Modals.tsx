@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useEscapeKey } from '../hooks/useEscapeKey';
 import { BRAND_ASSETS, CULTURAL_STORIES, VOCABULARY_LIST } from '../data/mockData';
 import { Language, VocabularyItem } from '../types';
 import { soundEngine } from '../utils/audio';
@@ -12,6 +13,7 @@ interface StoryModalProps {
 
 export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  useEscapeKey(isOpen, onClose);
   if (!isOpen) return null;
   const story = CULTURAL_STORIES[0];
 
@@ -35,6 +37,8 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
         className="w-full max-w-md bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-[#edeef0]"
       >
         <div className="relative w-full h-44 rounded-2xl overflow-hidden shadow-sm">
@@ -49,7 +53,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
           >
             <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
-          <span className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full bg-[#003331]/80 backdrop-blur-xs text-[#62fae3] text-[10px] font-bold">
+          <span className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full bg-[#003331]/80 backdrop-blur-xs text-[#62fae3] text-[11px] font-bold">
             {story.category}
           </span>
         </div>
@@ -68,13 +72,13 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
         {/* Audio Proverb Player Card */}
         <div className="p-3.5 rounded-2xl bg-[#ffdbd2]/40 border border-[#ffdbd2] flex items-center justify-between gap-3">
           <div className="flex flex-col min-w-0">
-            <span className="text-[10px] text-[#9e4229] font-bold uppercase tracking-wider">
+            <span className="text-[11px] text-[#9e4229] font-bold uppercase tracking-wider">
               Proverbe en Baoulé
             </span>
             <p className="text-xs font-bold text-[#3c0800] truncate mt-0.5">
               « {story.audioPhrase} »
             </p>
-            <span className="text-[10px] text-[#7e2b14] truncate">
+            <span className="text-[11px] text-[#7e2b14] truncate">
               {story.audioTranslation}
             </span>
           </div>
@@ -116,6 +120,7 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({
   currentLanguage,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  useEscapeKey(isOpen, onClose);
   if (!isOpen) return null;
 
   const filtered = VOCABULARY_LIST.filter(
@@ -131,6 +136,8 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
         className="w-full max-w-md bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-3 max-h-[85vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-[#edeef0]"
       >
         <div className="flex justify-between items-center">
@@ -170,7 +177,7 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({
               <div className="flex flex-col min-w-0">
                 <div className="flex items-center gap-1.5">
                   <span className="text-xs font-bold text-[#004b49]">{item.word}</span>
-                  <span className="text-[10px] text-[#707978]">{item.phonetic}</span>
+                  <span className="text-[11px] text-[#707978]">{item.phonetic}</span>
                   <span className="px-1.5 py-0.2 rounded bg-[#edeef0] text-[9px] font-bold uppercase text-[#3f4948]">
                     {item.language}
                   </span>
@@ -178,7 +185,7 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({
                 <span className="text-xs text-[#1a1c1d] font-medium mt-0.5">
                   {item.meaning}
                 </span>
-                <span className="text-[11px] text-[#707978] italic mt-0.5">
+                <span className="text-xs text-[#707978] italic mt-0.5">
                   « {item.example} » ({item.exampleMeaning})
                 </span>
               </div>
@@ -225,6 +232,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   onLogout,
 }) => {
   const { consent, withdraw } = useVoiceConsent();
+  useEscapeKey(isOpen, onClose);
   if (!isOpen) return null;
 
   return (
@@ -234,6 +242,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
         className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-[#edeef0]"
       >
         <div className="flex justify-between items-center">
@@ -294,7 +304,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-[#f3f3f5]">
             <div className="flex flex-col min-w-0">
               <span className="text-xs text-[#1a1c1d] font-semibold">Utilisation de ma voix</span>
-              <span className="text-[11px] text-[#3f4948]">
+              <span className="text-xs text-[#3f4948]">
                 {consent
                   ? `Acceptée le ${new Date(consent.acceptedAt).toLocaleDateString('fr-FR')}${
                       consent.improveModel ? ' • aide à l’amélioration' : ''
@@ -344,7 +354,7 @@ export const VoiceFirstSwitch: React.FC<{ checked: boolean; onToggle: () => void
   >
     <span className="flex flex-col min-w-0">
       <span className="text-xs text-[#1a1c1d] font-semibold">Mode voix d’abord</span>
-      <span className="text-[11px] text-[#3f4948]">Réponses lues à voix haute, textes agrandis</span>
+      <span className="text-xs text-[#3f4948]">Réponses lues à voix haute, textes agrandis</span>
     </span>
     <span
       className={`relative w-11 h-6 rounded-full shrink-0 transition-colors ${

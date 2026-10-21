@@ -93,7 +93,7 @@
 }
 
 /* Mode « voix d'abord » : aucun texte sous 14 px pour les publics peu à l'aise avec la lecture */
-.voice-first :is(.text-\[10px\], .text-\[11px\], .text-\[12px\], .text-xs) {
+.voice-first :is(.text-\[11px\], .text-xs) {
   font-size: 0.875rem;
   line-height: 1.35;
 }
