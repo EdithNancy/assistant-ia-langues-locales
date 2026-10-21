@@ -1,32 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
 import { loadPreferences, savePreferences, ThemePreference } from '../utils/preferences';
 
-const DARK_QUERY = '(prefers-color-scheme: dark)';
 /** Couleur de la barre du navigateur mobile, selon le thème. */
-const THEME_COLOR = { light: '#004b49', dark: '#0e1415' } as const;
+const THEME_COLOR: Record<ThemePreference, string> = { light: '#004b49', dark: '#0e1415' };
 
-const resolve = (preference: ThemePreference): 'light' | 'dark' => {
-  if (preference !== 'system') return preference;
-  return window.matchMedia?.(DARK_QUERY).matches ? 'dark' : 'light';
-};
-
-const apply = (preference: ThemePreference) => {
-  const theme = resolve(preference);
-  document.documentElement.dataset.theme = theme;
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_COLOR[theme]);
-};
-
-/** Apparence de l'app : suit le téléphone (« system ») ou forcée en clair / sombre. */
+/** Apparence de l'app : clair par défaut, sombre si l'utilisateur le choisit (mémorisé). */
 export const useTheme = () => {
   const [theme, setThemeState] = useState<ThemePreference>(() => loadPreferences().theme);
 
   useEffect(() => {
-    apply(theme);
-    if (theme !== 'system' || !window.matchMedia) return;
-    const media = window.matchMedia(DARK_QUERY);
-    const follow = () => apply('system');
-    media.addEventListener('change', follow);
-    return () => media.removeEventListener('change', follow);
+    document.documentElement.dataset.theme = theme;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_COLOR[theme]);
   }, [theme]);
 
   const setTheme = useCallback((next: ThemePreference) => {
@@ -34,5 +18,9 @@ export const useTheme = () => {
     savePreferences({ theme: next });
   }, []);
 
-  return { theme, setTheme };
+  const toggleTheme = useCallback(() => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  }, [setTheme, theme]);
+
+  return { theme, setTheme, toggleTheme };
 };

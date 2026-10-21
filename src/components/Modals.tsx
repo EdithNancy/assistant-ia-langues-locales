@@ -175,7 +175,6 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({ isOpen, onClos
 };
 
 const THEME_OPTIONS: readonly { key: ThemePreference; label: string; icon: string }[] = [
-  { key: 'system', label: 'Auto', icon: 'brightness_auto' },
   { key: 'light', label: 'Clair', icon: 'light_mode' },
   { key: 'dark', label: 'Sombre', icon: 'dark_mode' },
 ];

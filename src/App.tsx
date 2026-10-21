@@ -43,7 +43,7 @@ export default function App() {
   );
   const [voiceFirst, setVoiceFirst] = useState(() => loadPreferences().voiceFirst);
   const isOnline = useOnlineStatus();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, toggleTheme } = useTheme();
   const currentTab: NavTabKey = tabFromPath(pathname) ?? 'accueil';
   const setCurrentTab = (tab: NavTabKey) => navigate(TAB_PATHS[tab], { viewTransition: true });
   const [isVoiceSessionOpen, setIsVoiceSessionOpen] = useState(false);
@@ -180,6 +180,8 @@ export default function App() {
             )
           }
           onOpenProfile={() => setIsProfileModalOpen(true)}
+          isDark={theme === 'dark'}
+          onToggleTheme={toggleTheme}
         />
 
         {/* Bandeau hors connexion */}

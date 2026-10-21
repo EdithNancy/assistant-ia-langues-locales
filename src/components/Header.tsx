@@ -1,10 +1,13 @@
 import React from 'react';
 import { BRAND_ASSETS } from '../data/mockData';
+import { IconButton } from './ui/IconButton';
 
 interface HeaderProps {
   title: string;
   onOpenNotifications: () => void;
   onOpenProfile: () => void;
+  isDark: boolean;
+  onToggleTheme: () => void;
   currentTime?: string;
 }
 
@@ -12,6 +15,8 @@ export const Header: React.FC<HeaderProps> = ({
   title,
   onOpenNotifications,
   onOpenProfile,
+  isDark,
+  onToggleTheme,
 }) => {
   return (
     <header className="fixed top-0 inset-x-0 lg:left-64 z-30 bg-surface/90 backdrop-blur-xl border-b border-surface-container/60 transition-all pt-[env(safe-area-inset-top)]">
@@ -38,6 +43,17 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         <div className="flex items-center gap-1">
+          <IconButton
+            onClick={onToggleTheme}
+            aria-label={isDark ? 'Activer le mode clair' : 'Activer le mode sombre'}
+            aria-pressed={isDark}
+            title={isDark ? 'Mode clair' : 'Mode sombre'}
+            icon={isDark ? 'light_mode' : 'dark_mode'}
+            size="lg"
+            iconClassName="text-[22px]"
+            className="text-on-surface-variant hover:bg-surface-container active:scale-95"
+          />
+
           <button
             onClick={onOpenNotifications}
             aria-label="Notifications"

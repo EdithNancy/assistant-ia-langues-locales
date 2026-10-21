@@ -1,16 +1,16 @@
 /** Préférences d'affichage propres à cet appareil. */
-export type ThemePreference = 'system' | 'light' | 'dark';
+export type ThemePreference = 'light' | 'dark';
 
 export interface Preferences {
   /** Mode « voix d'abord » : lecture automatique des réponses et textes agrandis. */
   voiceFirst: boolean;
-  /** Apparence : suit le téléphone, ou forcée en clair / sombre. */
+  /** Apparence : clair par défaut, sombre au choix de l'utilisateur. */
   theme: ThemePreference;
 }
 
 const STORAGE_KEY = 'ivoirai.preferences';
-const DEFAULTS: Preferences = { voiceFirst: false, theme: 'system' };
-const THEMES: readonly ThemePreference[] = ['system', 'light', 'dark'];
+const DEFAULTS: Preferences = { voiceFirst: false, theme: 'light' };
+const THEMES: readonly ThemePreference[] = ['light', 'dark'];
 
 export const loadPreferences = (): Preferences => {
   try {
