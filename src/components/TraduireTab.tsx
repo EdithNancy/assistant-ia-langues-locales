@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { LANGUAGE_LABEL } from '../data/languages';
+import { categoryIcon, LANGUAGE_LABEL } from '../data/languages';
 import { Flag } from './Flag';
 import { closeOnBackdrop } from '../utils/backdrop';
 import { useToast } from '../hooks/useToast';
@@ -540,13 +540,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-10 h-10 rounded-xl bg-[#edeef0] flex items-center justify-center text-[#004b49] shrink-0">
-                  <span className="material-symbols-outlined text-[20px]">
-                    {item.word === "N'zue"
-                      ? 'water_drop'
-                      : item.word === 'I ni ce'
-                      ? 'handshake'
-                      : 'fitness_center'}
-                  </span>
+                  <span className="material-symbols-outlined text-[20px]">{categoryIcon(item.category)}</span>
                 </div>
                 <div className="flex flex-col min-w-0">
                   <div className="flex items-center gap-2">

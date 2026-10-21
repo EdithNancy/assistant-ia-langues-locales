@@ -75,8 +75,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
       <main className="flex-1 px-5 pt-6 pb-8 flex flex-col items-center">
         <LoginEmblem />
 
-        <span className="-mt-2 px-4 py-1.5 rounded-full bg-[#ffdbd2] text-[#9e4229] text-[15px] font-medium">
-          ✨ Akwaba nimbâ ! • Bon retour
+        <span className="-mt-2 px-4 py-1.5 rounded-full bg-[#ffdbd2] text-[#9e4229] text-[15px] font-medium inline-flex items-center gap-1.5">
+          <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
+          Akwaba nimbâ ! • Bon retour
         </span>
 
         <h1 className="mt-4 text-[24px] min-[380px]:text-[28px] font-bold text-[#003331] tracking-tight text-center">

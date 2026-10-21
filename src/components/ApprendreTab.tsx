@@ -348,7 +348,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                 </span>
               </div>
               <span className="text-xs px-2.5 py-1 rounded-full bg-[#b1eeea] text-[#084f4d] font-bold">
-                🌟 Magistral
+                <span className="material-symbols-outlined fill text-[14px] align-[-2px]">star</span> Magistral
               </span>
             </div>
 
@@ -460,7 +460,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                   <span className="material-symbols-outlined text-[14px] text-[#004c43]">
                     verified
                   </span>
-                  <span>Terminé à 100% ✅</span>
+                  <span>Terminé à 100 %</span>
                 </div>
               ) : (
                 <div className="space-y-1 pt-1">

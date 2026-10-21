@@ -22,7 +22,7 @@ const sourceFiles = (dir: string): string[] =>
     return /\.tsx?$/.test(name) && !name.includes('.test.') ? [path] : [];
   });
 
-/** Noms d'icônes repérables dans le code : contenu des <span class="material-symbols-outlined">, props `icon`. */
+/** Noms d'icônes repérables dans le code : contenu des <span class="material-symbols-outlined">, props `icon`, tables *_ICON. */
 const usedIcons = () => {
   const found = new Map<string, string>();
   for (const file of sourceFiles(join(root, 'src'))) {
@@ -37,6 +37,11 @@ const usedIcons = () => {
     for (const [, name] of code.matchAll(/\bicon(?:=|: )['"]([a-z][a-z0-9_]*)['"]/g)) {
       found.set(name, file);
     }
+    // Tables d'icônes (ex. CATEGORY_ICON) et leur valeur de repli (`?? 'translate'`)
+    for (const [, table] of code.matchAll(/_ICON[^=]*=\s*\{([\s\S]*?)\};/g)) {
+      for (const [, name] of table.matchAll(/:\s*'([a-z][a-z0-9_]*)'/g)) found.set(name, file);
+    }
+    for (const [, name] of code.matchAll(/Icon = [^\n]*\?\?\s*'([a-z][a-z0-9_]*)'/g)) found.set(name, file);
   }
   return found;
 };

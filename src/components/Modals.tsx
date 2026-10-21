@@ -294,7 +294,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#f3f3f5]">
             <span className="text-xs text-[#1a1c1d] font-semibold">Série de connexion</span>
-            <span className="text-xs text-[#9e4229] font-bold">7 jours consécutifs 🔥</span>
+            <span className="text-xs text-[#9e4229] font-bold inline-flex items-center gap-1">
+              7 jours consécutifs
+              <span className="material-symbols-outlined fill text-[16px]">local_fire_department</span>
+            </span>
           </div>
 
           <VoiceFirstSwitch checked={voiceFirst} onToggle={onToggleVoiceFirst} />
