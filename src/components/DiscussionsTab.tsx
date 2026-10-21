@@ -35,7 +35,10 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
   const [isAiTyping, setIsAiTyping] = useState(false);
   /** Dernier message resté sans réponse, pour proposer « Réessayer ». */
   const [failedText, setFailedText] = useState<string | null>(null);
-  const [likedMap, setLikedMap] = useState<Record<string, boolean>>({});
+  const [ratings, setRatings] = useState<Record<string, 'up' | 'down'>>({});
+  /** Message dont on demande la raison du pouce bas. */
+  const [commentingId, setCommentingId] = useState<string | null>(null);
+  const [feedbackComment, setFeedbackComment] = useState('');
   const [toast, setToast] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -137,6 +140,27 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
   useEffect(() => {
     if (recorder.error) showToast(recorderErrorMessage[recorder.error]);
   }, [recorder.error]);
+
+  const sendFeedback = async (messageId: string, rating: 'up' | 'down', comment?: string) => {
+    setRatings((prev) => ({ ...prev, [messageId]: rating }));
+    try {
+      await api.sendFeedback({ messageId, rating, comment });
+      showToast(rating === 'up' ? 'Merci pour votre retour !' : 'Merci, Aya va s’améliorer.');
+    } catch {
+      showToast("Votre avis n'a pas pu être envoyé.");
+    }
+  };
+
+  const handleThumbDown = (messageId: string) => {
+    setRatings((prev) => ({ ...prev, [messageId]: 'down' }));
+    setFeedbackComment('');
+    setCommentingId(messageId);
+  };
+
+  const submitComment = (messageId: string) => {
+    setCommentingId(null);
+    void sendFeedback(messageId, 'down', feedbackComment.trim() || undefined);
+  };
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -398,30 +422,71 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
 
                   <div className="flex items-center gap-1">
                     <button
-                      onClick={() => {
-                        setLikedMap((prev) => ({ ...prev, [msg.id]: true }));
-                        showToast('Merci pour votre retour !');
-                      }}
+                      onClick={() => void sendFeedback(msg.id, 'up')}
+                      aria-pressed={ratings[msg.id] === 'up'}
+                      aria-label="Réponse utile"
                       className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                        likedMap[msg.id]
+                        ratings[msg.id] === 'up'
                           ? 'text-[#004b49] bg-[#b1eeea]'
                           : 'hover:bg-[#edeef0]'
                       }`}
                       title="Utile"
                     >
-                      <span className="material-symbols-outlined text-[18px]">thumb_up</span>
+                      <span className={`material-symbols-outlined text-[18px] ${ratings[msg.id] === 'up' ? 'fill' : ''}`}>thumb_up</span>
                     </button>
                     <button
-                      onClick={() => showToast('Remarque notée pour améliorer Aya.')}
-                      className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#edeef0] transition-colors"
+                      onClick={() => handleThumbDown(msg.id)}
+                      aria-pressed={ratings[msg.id] === 'down'}
+                      aria-label="Réponse à améliorer"
+                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                        ratings[msg.id] === 'down'
+                          ? 'text-[#9e4229] bg-[#ffdbd2]'
+                          : 'hover:bg-[#edeef0]'
+                      }`}
                       title="À améliorer"
                     >
-                      <span className="material-symbols-outlined text-[18px]">
+                      <span className={`material-symbols-outlined text-[18px] ${ratings[msg.id] === 'down' ? 'fill' : ''}`}>
                         thumb_down
                       </span>
                     </button>
                   </div>
                 </div>
+
+                {commentingId === msg.id && (
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      submitComment(msg.id);
+                    }}
+                    className="flex flex-col gap-2 p-3 rounded-2xl bg-[#f9f9fb] border border-[#edeef0]"
+                  >
+                    <label htmlFor={`feedback-${msg.id}`} className="text-xs font-bold text-[#1a1c1d]">
+                      Qu'est-ce qui n'allait pas ? (facultatif)
+                    </label>
+                    <input
+                      id={`feedback-${msg.id}`}
+                      value={feedbackComment}
+                      onChange={(e) => setFeedbackComment(e.target.value)}
+                      placeholder="Ex. : mauvaise traduction, mauvais ton…"
+                      className="h-10 px-3 rounded-xl bg-white border border-[#edeef0] text-sm focus:outline-none focus:ring-2 focus:ring-[#004b49]/30"
+                    />
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => submitComment(msg.id)}
+                        className="px-3 py-1.5 rounded-full text-xs font-bold text-[#3f4948]"
+                      >
+                        Passer
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-3 py-1.5 rounded-full bg-[#004b49] text-white text-xs font-bold"
+                      >
+                        Envoyer
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
             </div>
           );
