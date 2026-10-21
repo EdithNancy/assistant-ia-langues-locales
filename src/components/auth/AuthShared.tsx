@@ -7,25 +7,22 @@ interface AuthHeaderProps {
 }
 
 export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, onBack }) => (
-  <header className="sticky top-0 z-40 w-full bg-[#f9f9fb]/90 backdrop-blur-xl shadow-[0_1px_12px_rgba(0,51,49,0.04)]">
+  <header className="sticky top-0 z-40 w-full bg-[#f9f9fb]/90 backdrop-blur-xl">
     <div className="h-16 px-4 flex items-center justify-between">
       <div className="flex items-center gap-3">
-        <button
-          onClick={onBack}
-          aria-label="Retour"
-          className="w-9 h-9 flex items-center justify-center rounded-full text-[#1a1c1d] hover:bg-[#edeef0] active:scale-95 transition-all"
-        >
-          <span className="material-symbols-outlined text-[24px]">arrow_back</span>
-        </button>
-        <img src={BRAND_ASSETS.logo} alt="Logo IvoirAI" className="h-9 w-9 rounded-xl object-contain" />
-        <span className="hidden min-[360px]:inline text-xl font-semibold text-[#1a1c1d] tracking-tight">IvoirAI</span>
+        {onBack && (
+          <button
+            onClick={onBack}
+            aria-label="Retour"
+            className="w-9 h-9 flex items-center justify-center rounded-full text-[#1a1c1d] hover:bg-[#edeef0] active:scale-95 transition-all"
+          >
+            <span className="material-symbols-outlined text-[24px]">arrow_back</span>
+          </button>
+        )}
+        <img src={BRAND_ASSETS.logo} alt="" className="h-9 w-9 rounded-xl object-contain" />
+        <span className="text-xl font-semibold text-[#1a1c1d] tracking-tight">IvoirAI</span>
       </div>
-
-      <span className="text-[15px] sm:text-[17px] font-medium text-[#3f4948]">{title}</span>
-
-      <div className="w-10 h-10 rounded-full bg-[#003331] flex items-center justify-center text-white">
-        <span className="material-symbols-outlined text-[20px]">person</span>
-      </div>
+      <span className="text-[15px] font-medium text-[#3f4948]">{title}</span>
     </div>
   </header>
 );

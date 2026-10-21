@@ -6,7 +6,6 @@ import {
   ComingSoonBadge,
   FormError,
   GoogleIcon,
-  OrDivider,
   PasswordField,
   formatIvorianPhone,
   phoneDigits,
@@ -73,17 +72,20 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
       <AuthHeader title="Connexion" onBack={onBack} />
 
       <main className="flex-1 px-5 pt-6 pb-8 flex flex-col items-center">
-        <LoginEmblem />
+        {/* Sur ordinateur, le panneau de marque à gauche joue déjà ce rôle */}
+        <div className="lg:hidden">
+          <LoginEmblem />
+        </div>
 
-        <span className="-mt-2 px-4 py-1.5 rounded-full bg-[#ffdbd2] text-[#9e4229] text-[15px] font-medium inline-flex items-center gap-1.5">
+        <span className="mt-2 lg:mt-6 text-[15px] font-semibold text-[#9e4229] inline-flex items-center gap-1.5">
           <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
           Akwaba nimbâ ! • Bon retour
         </span>
 
-        <h1 className="mt-4 text-[24px] min-[380px]:text-[28px] font-bold text-[#003331] tracking-tight text-center">
+        <h1 className="mt-2 text-[24px] min-[380px]:text-[28px] font-bold text-[#003331] tracking-tight text-center">
           Connexion à votre espace
         </h1>
-        <p className="mt-2 text-[17px] leading-relaxed text-[#3f4948] text-center">
+        <p className="mt-2 text-[15px] leading-relaxed text-[#3f4948] text-center text-balance">
           Reprenez vos conversations orales enrichies en Baoulé et Dioula.
         </p>
 
@@ -119,14 +121,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
 
           {method === 'phone' ? (
             <div className="flex flex-col gap-2">
-              <div className="flex items-start justify-between gap-3">
-                <label htmlFor="login-phone" className="text-[13px] font-semibold text-[#3f4948] uppercase tracking-wide">
-                  Numéro mobile Côte d’Ivoire
-                </label>
-                <span className="text-[12px] font-medium text-[#004b49] tracking-wide text-right">
-                  Orange • MTN • Moov • Wave
-                </span>
-              </div>
+              <label htmlFor="login-phone" className="text-[13px] font-semibold text-[#3f4948] uppercase tracking-wide">
+                Numéro mobile
+              </label>
               <div className="h-14 rounded-2xl bg-[#f3f3f5] flex items-center gap-3 px-4 focus-within:ring-2 focus-within:ring-[#004b49]/30 transition-all">
                 <Flag country="ci" className="w-6" labelled />
                 <span className="text-[17px] font-semibold text-[#1a1c1d]">+225</span>
@@ -181,7 +178,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
           <div className="rounded-2xl bg-[#f3f3f5] p-3 pl-4 flex items-center justify-between gap-2">
             <span className="flex items-center gap-2 text-[14px] font-medium text-[#3f4948]">
               <span className="material-symbols-outlined text-[22px]">record_voice_over</span>
-              Langue de session
+              <span className="whitespace-nowrap">
+                Langue<span className="hidden min-[420px]:inline"> de session</span>
+              </span>
             </span>
             <div className="flex p-1 rounded-full bg-white">
               {(
@@ -223,42 +222,46 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
 
           <button
             type="button"
-            disabled
-            title="Bientôt disponible"
-            className="relative min-h-16 rounded-2xl bg-[#e0faf6] px-4 py-3 flex items-center gap-3 text-[#004b49] hover:bg-[#cdf5ef] active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
+            onClick={() => onAuthenticated(language)}
+            className="h-12 -mt-1 rounded-full text-[15px] font-semibold text-[#004b49] hover:bg-[#e0faf6] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
-            <ComingSoonBadge />
-            <span className="material-symbols-outlined text-[26px]">fingerprint</span>
-            <span className="flex-1 text-center text-[15px] font-medium leading-snug">
-              Connexion rapide par empreinte / Face ID
-            </span>
+            <span className="material-symbols-outlined text-[20px]">account_circle</span>
+            Essayer sans compte (démo)
           </button>
 
-          <OrDivider label="ou continuer avec" className="mt-1" />
-
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              disabled
-              title="Bientôt disponible"
-              className="relative h-16 rounded-2xl bg-[#f3f3f5] flex items-center justify-center gap-3 text-[16px] font-medium text-[#1a1c1d] hover:bg-[#edeef0] active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
-            >
-              <ComingSoonBadge />
-              <GoogleIcon className="w-6 h-6" />
-              Google
-            </button>
-            <button
-              type="button"
-              onClick={() => onAuthenticated(language)}
-              className="h-16 rounded-2xl bg-[#f3f3f5] flex items-center justify-center gap-3 text-[16px] font-medium text-[#1a1c1d] hover:bg-[#edeef0] active:scale-[0.98] transition-all"
-            >
-              <span className="material-symbols-outlined text-[24px]">account_circle</span>
-              Invité démo
-            </button>
-          </div>
+          <details className="group rounded-2xl border border-[#edeef0]">
+            <summary className="list-none cursor-pointer select-none px-4 h-12 flex items-center justify-between text-[14px] font-medium text-[#3f4948] [&::-webkit-details-marker]:hidden">
+              Autres méthodes de connexion
+              <span className="material-symbols-outlined text-[20px] transition-transform group-open:rotate-180">
+                expand_more
+              </span>
+            </summary>
+            <div className="grid grid-cols-2 gap-3 px-3 pb-3 pt-2">
+              <button
+                type="button"
+                disabled
+                title="Bientôt disponible"
+                className="relative h-14 rounded-2xl bg-[#f3f3f5] flex items-center justify-center gap-2 text-[14px] font-medium text-[#1a1c1d] disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <ComingSoonBadge />
+                <span className="material-symbols-outlined text-[22px] text-[#004b49]">fingerprint</span>
+                Empreinte
+              </button>
+              <button
+                type="button"
+                disabled
+                title="Bientôt disponible"
+                className="relative h-14 rounded-2xl bg-[#f3f3f5] flex items-center justify-center gap-2 text-[14px] font-medium text-[#1a1c1d] disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <ComingSoonBadge />
+                <GoogleIcon className="w-5 h-5" />
+                Google
+              </button>
+            </div>
+          </details>
         </form>
 
-        <p className="mt-8 text-[17px] text-[#3f4948] text-center leading-relaxed">
+        <p className="mt-6 text-[15px] text-[#3f4948] text-center leading-relaxed">
           Vous n’avez pas encore de compte ?{' '}
           <button
             type="button"
