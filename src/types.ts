@@ -6,6 +6,8 @@ export interface ChatMessage {
   timestamp: string;
   text: string;
   language?: Language;
+  /** Langue reconnue automatiquement dans le message de l'utilisateur. */
+  detectedLanguage?: 'fr' | Language;
   audioDuration?: string;
   phonetic?: string;
   tone?: string;

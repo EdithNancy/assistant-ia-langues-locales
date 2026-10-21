@@ -21,17 +21,22 @@ const LANG_SUBTITLE: Record<TextLanguage, string> = {
   bete: 'Krou',
 };
 
-/** Langues proposées dans les sélecteurs (le Bété est hors périmètre V1). */
-const SELECTABLE: readonly TextLanguage[] = ['fr', 'baoule', 'dioula'];
+type SourceLanguage = TextLanguage | 'auto';
 
-/** Langue suivante dans la liste, en sautant celle déjà prise de l'autre côté. */
-const nextLanguage = (current: TextLanguage, other: TextLanguage): TextLanguage => {
-  let i = SELECTABLE.indexOf(current);
+/** Langues proposées dans les sélecteurs (le Bété est hors périmètre V1). */
+const TARGET_OPTIONS: readonly TextLanguage[] = ['fr', 'baoule', 'dioula'];
+const SOURCE_OPTIONS: readonly SourceLanguage[] = ['auto', ...TARGET_OPTIONS];
+
+/** Option suivante dans la liste, en sautant celle déjà prise de l'autre côté. */
+const nextOption = <T extends SourceLanguage>(options: readonly T[], current: T, other: SourceLanguage): T => {
+  let i = options.indexOf(current);
   do {
-    i = (i + 1) % SELECTABLE.length;
-  } while (SELECTABLE[i] === other);
-  return SELECTABLE[i];
+    i = (i + 1) % options.length;
+  } while (options[i] === other);
+  return options[i];
 };
+
+const sourceLabel = (lang: SourceLanguage) => (lang === 'auto' ? 'Détection auto' : LANG_LABEL[lang]);
 
 interface TraduireTabProps {
   currentLanguage: Language;
@@ -47,7 +52,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   onOpenVoiceSession,
   voiceFirst,
 }) => {
-  const [sourceLang, setSourceLang] = useState<TextLanguage>('fr');
+  const [sourceLang, setSourceLang] = useState<SourceLanguage>('fr');
   const [targetLang, setTargetLang] = useState<TextLanguage>(
     currentLanguage === 'dioula' ? 'dioula' : 'baoule'
   );
@@ -76,21 +81,26 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   };
 
   const handleSwap = () => {
+    // En détection auto, la langue reconnue devient la nouvelle cible
+    const resolvedSource =
+      sourceLang === 'auto' ? currentTrans?.detectedSource ?? 'fr' : sourceLang;
+    const newTarget =
+      resolvedSource === targetLang ? nextOption(TARGET_OPTIONS, targetLang, targetLang) : resolvedSource;
     setSourceLang(targetLang);
-    setTargetLang(sourceLang);
+    setTargetLang(newTarget);
     if (currentTrans?.translation) setSourceText(currentTrans.translation);
-    if (sourceLang !== 'fr') onLanguageChange(sourceLang);
+    if (newTarget !== 'fr') onLanguageChange(newTarget);
     soundEngine.playTone(520, 0.15);
   };
 
   const handleChangeSource = () => {
-    const next = nextLanguage(sourceLang, targetLang);
+    const next = nextOption(SOURCE_OPTIONS, sourceLang, targetLang);
     setSourceLang(next);
-    showToast(`Langue source : ${LANG_LABEL[next]}`);
+    showToast(`Langue source : ${sourceLabel(next)}`);
   };
 
   const handleChangeTarget = () => {
-    const next = nextLanguage(targetLang, sourceLang);
+    const next = nextOption(TARGET_OPTIONS, targetLang, sourceLang);
     setTargetLang(next);
     if (next !== 'fr') onLanguageChange(next);
     else showToast('Langue cible : Français');
@@ -130,7 +140,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
     if (!audio) return;
     setIsTranscribing(true);
     try {
-      const hint = sourceLang === 'fr' ? undefined : sourceLang;
+      const hint = sourceLang === 'fr' || sourceLang === 'auto' ? undefined : sourceLang;
       const { text } = await api.transcribe(audio, hint);
       speakNextResultRef.current = voiceFirst;
       setSourceText(text);
@@ -260,18 +270,22 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
         {/* Source Language Button */}
         <button
           onClick={handleChangeSource}
-          aria-label={`Langue source : ${LANG_LABEL[sourceLang]}. Changer`}
+          aria-label={`Langue source : ${sourceLabel(sourceLang)}. Changer`}
           className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-full bg-white text-[#1a1c1d] shadow-sm transition-all active:scale-95 text-left border border-[#edeef0]"
         >
           <span className="text-base leading-none">
-            {sourceLang === 'fr' ? '🇫🇷' : '🇨🇮'}
+            {sourceLang === 'auto' ? '🌐' : sourceLang === 'fr' ? '🇫🇷' : '🇨🇮'}
           </span>
           <div className="flex flex-col min-w-0">
             <span className="text-xs font-bold text-[#1a1c1d] truncate">
-              {LANG_LABEL[sourceLang]}
+              {sourceLabel(sourceLang)}
             </span>
             <span className="text-[10px] text-[#3f4948] truncate -mt-0.5">
-              {LANG_SUBTITLE[sourceLang]}
+              {sourceLang !== 'auto'
+                ? LANG_SUBTITLE[sourceLang]
+                : currentTrans
+                ? `Détecté : ${LANG_LABEL[currentTrans.detectedSource]}`
+                : 'Langue reconnue seule'}
             </span>
           </div>
           <span className="material-symbols-outlined text-[16px] text-[#707978] ml-auto">

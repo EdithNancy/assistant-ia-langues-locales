@@ -7,6 +7,13 @@ import { useVoiceConsent } from './VoiceConsent';
 import { soundEngine } from '../utils/audio';
 import { voicePlayer, VOICE_LABEL } from '../utils/voicePlayer';
 
+const DETECTED_LABEL: Record<NonNullable<ChatMessage['detectedLanguage']>, string> = {
+  fr: 'Français',
+  baoule: 'Baoulé',
+  dioula: 'Dioula',
+  bete: 'Bété',
+};
+
 interface DiscussionsTabProps {
   currentLanguage: Language;
   onLanguageChange: (lang: Language) => void;
@@ -104,6 +111,17 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
 
     setMessages((prev) => [...prev, userMsg]);
     soundEngine.playTone(480, 0.1);
+
+    // Indication non bloquante : la langue reconnue s'affiche sous le message
+    api
+      .detectLanguage(userText)
+      .then(({ language }) =>
+        setMessages((prev) =>
+          prev.map((m) => (m.id === userMsg.id ? { ...m, detectedLanguage: language } : m))
+        )
+      )
+      .catch(() => undefined);
+
     await requestReply(userText);
   };
 
@@ -266,7 +284,10 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                 <div className="bg-[#004b49] text-white rounded-3xl rounded-tr-sm p-4 shadow-[0_4px_20px_-2px_rgba(0,75,73,0.15)] flex flex-col gap-1.5">
                   <p className="text-sm leading-relaxed">{msg.text}</p>
                   <div className="flex items-center justify-end gap-1 text-[#7ebab7] text-[10px]">
-                    <span>Envoyé</span>
+                    <span>
+                      Envoyé
+                      {msg.detectedLanguage && ` • ${DETECTED_LABEL[msg.detectedLanguage]} reconnu`}
+                    </span>
                     <span className="material-symbols-outlined text-[14px]">done_all</span>
                   </div>
                 </div>
