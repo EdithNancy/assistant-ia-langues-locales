@@ -1,10 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { recorderErrorMessage, useAudioRecorder } from '../hooks/useAudioRecorder';
-import { api } from '../services';
+import { api, TextLanguage, TranslateResult } from '../services';
 import { VOCABULARY_LIST } from '../data/mockData';
 import { Language, VocabularyItem } from '../types';
 import { soundEngine } from '../utils/audio';
 import { voicePlayer } from '../utils/voicePlayer';
+
+const LANG_LABEL: Record<TextLanguage, string> = {
+  fr: 'Français',
+  baoule: 'Baoulé',
+  dioula: 'Dioula',
+  bete: 'Bété',
+};
+
+const LANG_SUBTITLE: Record<TextLanguage, string> = {
+  fr: 'Standard',
+  baoule: 'Akan Authentique',
+  dioula: 'Marché / Véhiculaire',
+  bete: 'Krou',
+};
+
+/** Langues proposées dans les sélecteurs (le Bété est hors périmètre V1). */
+const SELECTABLE: readonly TextLanguage[] = ['fr', 'baoule', 'dioula'];
+
+/** Langue suivante dans la liste, en sautant celle déjà prise de l'autre côté. */
+const nextLanguage = (current: TextLanguage, other: TextLanguage): TextLanguage => {
+  let i = SELECTABLE.indexOf(current);
+  do {
+    i = (i + 1) % SELECTABLE.length;
+  } while (SELECTABLE[i] === other);
+  return SELECTABLE[i];
+};
 
 interface TraduireTabProps {
   currentLanguage: Language;
@@ -17,10 +43,13 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   onLanguageChange,
   onOpenVoiceSession,
 }) => {
-  const [sourceLang, setSourceLang] = useState<'fr' | Language>('fr');
-  const [targetLang, setTargetLang] = useState<Language>(
+  const [sourceLang, setSourceLang] = useState<TextLanguage>('fr');
+  const [targetLang, setTargetLang] = useState<TextLanguage>(
     currentLanguage === 'dioula' ? 'dioula' : 'baoule'
   );
+  const [currentTrans, setCurrentTrans] = useState<TranslateResult | null>(null);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [translateFailed, setTranslateFailed] = useState(false);
   const [sourceText, setSourceText] = useState('Combien coûte le régime de bananes plantain ?');
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [audioSpeedIdx, setAudioSpeedIdx] = useState(0);
@@ -40,19 +69,24 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   };
 
   const handleSwap = () => {
-    if (sourceLang === 'fr') {
-      setSourceLang(targetLang);
-      setTargetLang(currentLanguage);
-      setSourceText(
-        targetLang === 'dioula'
-          ? 'Barana yiriwari nin bɛ sɔngɔ jolibɔ ?'
-          : 'Alokô kpɛkun nga ɔ to nzen ?'
-      );
-    } else {
-      setSourceLang('fr');
-      setSourceText('Combien coûte le régime de bananes plantain ?');
-    }
+    setSourceLang(targetLang);
+    setTargetLang(sourceLang);
+    if (currentTrans?.translation) setSourceText(currentTrans.translation);
+    if (sourceLang !== 'fr') onLanguageChange(sourceLang);
     soundEngine.playTone(520, 0.15);
+  };
+
+  const handleChangeSource = () => {
+    const next = nextLanguage(sourceLang, targetLang);
+    setSourceLang(next);
+    showToast(`Langue source : ${LANG_LABEL[next]}`);
+  };
+
+  const handleChangeTarget = () => {
+    const next = nextLanguage(targetLang, sourceLang);
+    setTargetLang(next);
+    if (next !== 'fr') onLanguageChange(next);
+    else showToast('Langue cible : Français');
   };
 
   const handleClear = () => {
@@ -100,67 +134,37 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
     if (recorder.error) showToast(recorderErrorMessage[recorder.error]);
   }, [recorder.error]);
 
-  const getTranslationData = () => {
-    const isDioula = targetLang === 'dioula';
-    const textLower = sourceText.toLowerCase();
-
-    if (textLower.includes('banane') || textLower.includes('combien')) {
-      if (isDioula) {
-        return {
-          translation: 'Barana yiriwari nin bɛ sɔngɔ jolibɔ ?',
-          phonetic: '[Bah-rah-nah yee-ree-wah-ree neen bɛh sɔn-gɔ joh-lee-bɔ]',
-          tone: 'Ton Haut-Bas',
-          tip: 'Au marché d\'Abidjan, dites simplement « Barana nin joli ? » pour un échange naturel et direct avec le commerçant.',
-        };
-      } else {
-        return {
-          translation: 'Alokô kpɛkun nga ɔ to nzen ?',
-          phonetic: '[Ah-loh-koh kpeh-koon ngah oh toh n-zen ?]',
-          tone: 'Ton Moyen',
-          tip: 'Pour le plantain mûr au marché baoulé, précisez « alokô » pour le plantain doux à frire.',
-        };
+  // Traduit à chaque modification, après une courte pause de frappe
+  useEffect(() => {
+    const text = sourceText.trim();
+    if (!text) {
+      setCurrentTrans(null);
+      setIsTranslating(false);
+      return;
+    }
+    let cancelled = false;
+    setIsTranslating(true);
+    const timer = setTimeout(async () => {
+      try {
+        const result = await api.translate({ text, source: sourceLang, target: targetLang });
+        if (!cancelled) {
+          setCurrentTrans(result);
+          setTranslateFailed(false);
+        }
+      } catch {
+        if (!cancelled) setTranslateFailed(true);
+      } finally {
+        if (!cancelled) setIsTranslating(false);
       }
-    }
-
-    if (textLower.includes('taxi') || textLower.includes('plateau')) {
-      if (isDioula) {
-        return {
-          translation: 'N bɛ se ka wotoro sɔrɔ ka taa Plató yɔrɔ juman ?',
-          phonetic: '[N beh seh kah woh-toh-roh soh-roh kah tah Plah-toh ?]',
-          tone: 'Ton Montant',
-          tip: 'À Abidjan, les wôro-wôro ou taxis compteurs ont des codes de négociation simples : donnez la destination et demandez « c’est combien ? »',
-        };
-      } else {
-        return {
-          translation: 'N wun loto kpa kɔ Plató nuan nun ?',
-          phonetic: '[N woon loh-toh kpah koh Plah-toh nwan noon]',
-          tone: 'Ton Moyen-Haut',
-          tip: 'En Baoulé, le voyage se bénit en souhaitant « Atin kpa » (bonne route).',
-        };
-      }
-    }
-
-    if (isDioula) {
-      return {
-        translation: 'Aw ni ce kosɛbɛ, an bɛ kɔfɛ !',
-        phonetic: '[Ow nee tché koh-seh-beh, an beh koh-feh]',
-        tone: 'Ton Haut',
-        tip: 'Une salutation chaleureuse ouvre toujours les meilleures opportunités en pays mandé.',
-      };
-    } else {
-      return {
-        translation: 'Mo kpa kpa ! Akwaba awlo nun.',
-        phonetic: '[Moh kpah kpah ! Ah-kwah-bah ow-loh noon]',
-        tone: 'Ton Haut',
-        tip: 'Le mot « Akwaba » est le trésor d’accueil de toute la Côte d’Ivoire.',
-      };
-    }
-  };
-
-  const currentTrans = getTranslationData();
+    }, 400);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [sourceText, sourceLang, targetLang]);
 
   const handlePlayAudio = () => {
-    if (isPlayingAudio) return;
+    if (isPlayingAudio || !currentTrans) return;
     setIsPlayingAudio(true);
     soundEngine.playTonePitch(currentTrans.tone as any);
 
@@ -176,19 +180,27 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
     soundEngine.playTone(400, 0.1);
   };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(currentTrans.translation);
-    showToast('Traduction copiée dans le presse-papiers !');
+  const handleCopy = async () => {
+    if (!currentTrans) return;
+    try {
+      await navigator.clipboard.writeText(currentTrans.translation);
+      showToast('Traduction copiée dans le presse-papiers !');
+    } catch {
+      showToast('Copie impossible sur cet appareil.');
+    }
   };
 
   const handleShare = () => {
+    if (!currentTrans) return;
     if (navigator.share) {
-      navigator.share({
-        title: 'Traduction IvoirAI',
-        text: `${currentTrans.translation} (${currentTrans.phonetic})`,
-      });
+      navigator
+        .share({
+          title: 'Traduction IvoirAI',
+          text: [currentTrans.translation, currentTrans.phonetic].filter(Boolean).join(' '),
+        })
+        .catch(() => undefined); // partage annulé par l'utilisateur
     } else {
-      handleCopy();
+      void handleCopy();
     }
   };
 
@@ -231,9 +243,8 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       <div className="lg:col-span-2 relative flex items-center justify-between bg-[#f3f3f5] p-1.5 rounded-full shadow-xs border border-[#edeef0]">
         {/* Source Language Button */}
         <button
-          onClick={() => {
-            showToast('Langue source : Français Standard');
-          }}
+          onClick={handleChangeSource}
+          aria-label={`Langue source : ${LANG_LABEL[sourceLang]}. Changer`}
           className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-full bg-white text-[#1a1c1d] shadow-sm transition-all active:scale-95 text-left border border-[#edeef0]"
         >
           <span className="text-base leading-none">
@@ -241,13 +252,11 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
           </span>
           <div className="flex flex-col min-w-0">
             <span className="text-xs font-bold text-[#1a1c1d] truncate">
-              {sourceLang === 'fr'
-                ? 'Français'
-                : sourceLang === 'dioula'
-                ? 'Dioula'
-                : 'Baoulé'}
+              {LANG_LABEL[sourceLang]}
             </span>
-            <span className="text-[10px] text-[#3f4948] truncate -mt-0.5">Standard</span>
+            <span className="text-[10px] text-[#3f4948] truncate -mt-0.5">
+              {LANG_SUBTITLE[sourceLang]}
+            </span>
           </div>
           <span className="material-symbols-outlined text-[16px] text-[#707978] ml-auto">
             expand_more
@@ -267,21 +276,17 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
 
         {/* Target Language Button */}
         <button
-          onClick={() => {
-            const next = targetLang === 'dioula' ? 'baoule' : 'dioula';
-            setTargetLang(next);
-            onLanguageChange(next);
-            showToast(`Langue cible : ${next === 'dioula' ? 'Dioula' : 'Baoulé'}`);
-          }}
+          onClick={handleChangeTarget}
+          aria-label={`Langue cible : ${LANG_LABEL[targetLang]}. Changer`}
           className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-full bg-white text-[#1a1c1d] shadow-sm transition-all active:scale-95 text-left border border-[#edeef0]"
         >
-          <span className="text-base leading-none">🇨🇮</span>
+          <span className="text-base leading-none">{targetLang === 'fr' ? '🇫🇷' : '🇨🇮'}</span>
           <div className="flex flex-col min-w-0">
-            <span className="text-xs font-bold text-[#004b49] truncate capitalize">
-              {targetLang}
+            <span className="text-xs font-bold text-[#004b49] truncate">
+              {LANG_LABEL[targetLang]}
             </span>
             <span className="text-[10px] text-[#9e4229] font-semibold truncate -mt-0.5">
-              {targetLang === 'dioula' ? 'Marché / Véhiculaire' : 'Akan Authentique'}
+              {LANG_SUBTITLE[targetLang]}
             </span>
           </div>
           <span className="material-symbols-outlined text-[16px] text-[#707978] ml-auto">
@@ -347,107 +352,132 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       </div>
 
       {/* Translation Result Card */}
-      <div className="bg-[#004b49] text-white rounded-3xl p-5 lg:p-6 shadow-md relative overflow-hidden">
+      <div
+        aria-live="polite"
+        aria-busy={isTranslating}
+        className={`bg-[#004b49] text-white rounded-3xl p-5 lg:p-6 shadow-md relative overflow-hidden transition-opacity ${
+          isTranslating && currentTrans ? 'opacity-70' : ''
+        }`}
+      >
         <div className="absolute -right-10 -bottom-10 w-36 h-36 rounded-full bg-[#00c5b1]/20 pointer-events-none blur-2xl"></div>
 
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#62fae3]"></span>
             <span className="text-xs text-[#62fae3] tracking-wide uppercase font-bold">
-              Traduction {targetLang === 'dioula' ? 'Dioula' : 'Baoulé'}
+              Traduction {LANG_LABEL[targetLang]}
             </span>
           </div>
-          <span className="text-[10px] bg-[#00332d]/60 px-2.5 py-0.5 rounded-full text-[#b1eeea] font-semibold border border-[#62fae3]/20">
-            {currentTrans.tone}
-          </span>
+          {currentTrans?.tone && (
+            <span className="text-[10px] bg-[#00332d]/60 px-2.5 py-0.5 rounded-full text-[#b1eeea] font-semibold border border-[#62fae3]/20">
+              {currentTrans.tone}
+            </span>
+          )}
         </div>
 
-        <p className="text-lg text-white font-bold leading-snug mb-2">
-          {currentTrans.translation}
-        </p>
-
-        {/* Phonetics Guide */}
-        <div className="bg-[#00332d]/40 rounded-xl px-3 py-2 mb-3 inline-block w-full border border-white/5">
-          <span className="text-[10px] text-[#3cddc7] block font-bold mb-0.5">
-            Guide Phonétique
-          </span>
-          <p className="text-xs text-[#edeef0] italic tracking-wide">
-            {currentTrans.phonetic}
+        {currentTrans ? (
+          <>
+          <p className="text-lg text-white font-bold leading-snug mb-2">
+            {currentTrans.translation}
           </p>
-        </div>
 
-        {/* Merchant Tip */}
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 mb-4 flex items-start gap-2.5 border border-white/10">
-          <span className="material-symbols-outlined text-[#ffdbd2] text-[20px] shrink-0 mt-0.5">
-            lightbulb
-          </span>
-          <p className="text-xs text-white leading-relaxed">
-            <span className="font-bold text-[#ffdbd2]">Astuce marchande : </span>
-            {currentTrans.tip}
-          </p>
-        </div>
-
-        {/* Action Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handlePlayAudio}
-              aria-label="Écouter la traduction"
-              className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs shadow-sm active:scale-95 transition-all ${
-                isPlayingAudio
-                  ? 'bg-[#fe8b6d] text-[#75240e] animate-pulse'
-                  : 'bg-[#62fae3] text-[#00201c] hover:bg-[#3cddc7]'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[18px] fill">volume_up</span>
-              <span>{isPlayingAudio ? 'Lecture...' : 'Écouter'}</span>
-            </button>
-
-            <button
-              onClick={handleToggleSpeed}
-              className="px-2.5 py-2 rounded-full bg-[#00332d]/50 text-[#b1eeea] text-[11px] font-bold active:scale-90 transition-transform hover:bg-[#00332d]"
-            >
-              {speeds[audioSpeedIdx]}
-            </button>
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={handleCopy}
-              aria-label="Copier la traduction"
-              className="w-9 h-9 rounded-full bg-[#00332d]/50 text-white flex items-center justify-center active:scale-90 transition-transform hover:bg-[#00332d]"
-            >
-              <span className="material-symbols-outlined text-[18px]">content_copy</span>
-            </button>
-
-            <button
-              onClick={handleShare}
-              aria-label="Partager la traduction"
-              className="w-9 h-9 rounded-full bg-[#00332d]/50 text-white flex items-center justify-center active:scale-90 transition-transform hover:bg-[#00332d]"
-            >
-              <span className="material-symbols-outlined text-[18px]">share</span>
-            </button>
-
-            <button
-              onClick={() => {
-                setIsBookmarked(!isBookmarked);
-                showToast(
-                  !isBookmarked
-                    ? 'Ajouté aux favoris !'
-                    : 'Retiré des favoris'
-                );
-              }}
-              aria-label="Sauvegarder l'expression"
-              className={`w-9 h-9 rounded-full flex items-center justify-center active:scale-90 transition-transform ${
-                isBookmarked ? 'bg-[#9e4229] text-white' : 'bg-[#00332d]/50 text-white'
-              }`}
-            >
-              <span className={`material-symbols-outlined text-[18px] ${isBookmarked ? 'fill' : ''}`}>
-                star
+          {/* Phonetics Guide */}
+          {currentTrans.phonetic && (
+            <div className="bg-[#00332d]/40 rounded-xl px-3 py-2 mb-3 inline-block w-full border border-white/5">
+              <span className="text-[10px] text-[#3cddc7] block font-bold mb-0.5">
+                Guide Phonétique
               </span>
-            </button>
+              <p className="text-xs text-[#edeef0] italic tracking-wide">
+                {currentTrans.phonetic}
+              </p>
+            </div>
+          )}
+
+          {/* Merchant Tip */}
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 mb-4 flex items-start gap-2.5 border border-white/10">
+            <span className="material-symbols-outlined text-[#ffdbd2] text-[20px] shrink-0 mt-0.5">
+              lightbulb
+            </span>
+            <p className="text-xs text-white leading-relaxed">
+              <span className="font-bold text-[#ffdbd2]">Astuce marchande : </span>
+              {currentTrans.tip}
+            </p>
           </div>
-        </div>
+
+          {/* Action Controls */}
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handlePlayAudio}
+                aria-label="Écouter la traduction"
+                className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs shadow-sm active:scale-95 transition-all ${
+                  isPlayingAudio
+                    ? 'bg-[#fe8b6d] text-[#75240e] animate-pulse'
+                    : 'bg-[#62fae3] text-[#00201c] hover:bg-[#3cddc7]'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[18px] fill">volume_up</span>
+                <span>{isPlayingAudio ? 'Lecture...' : 'Écouter'}</span>
+              </button>
+
+              <button
+                onClick={handleToggleSpeed}
+                className="px-2.5 py-2 rounded-full bg-[#00332d]/50 text-[#b1eeea] text-[11px] font-bold active:scale-90 transition-transform hover:bg-[#00332d]"
+              >
+                {speeds[audioSpeedIdx]}
+              </button>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={handleCopy}
+                aria-label="Copier la traduction"
+                className="w-9 h-9 rounded-full bg-[#00332d]/50 text-white flex items-center justify-center active:scale-90 transition-transform hover:bg-[#00332d]"
+              >
+                <span className="material-symbols-outlined text-[18px]">content_copy</span>
+              </button>
+
+              <button
+                onClick={handleShare}
+                aria-label="Partager la traduction"
+                className="w-9 h-9 rounded-full bg-[#00332d]/50 text-white flex items-center justify-center active:scale-90 transition-transform hover:bg-[#00332d]"
+              >
+                <span className="material-symbols-outlined text-[18px]">share</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsBookmarked(!isBookmarked);
+                  showToast(
+                    !isBookmarked
+                      ? 'Ajouté aux favoris !'
+                      : 'Retiré des favoris'
+                  );
+                }}
+                aria-label="Sauvegarder l'expression"
+                className={`w-9 h-9 rounded-full flex items-center justify-center active:scale-90 transition-transform ${
+                  isBookmarked ? 'bg-[#9e4229] text-white' : 'bg-[#00332d]/50 text-white'
+                }`}
+              >
+                <span className={`material-symbols-outlined text-[18px] ${isBookmarked ? 'fill' : ''}`}>
+                  star
+                </span>
+              </button>
+            </div>
+          </div>
+          </>
+        ) : (
+          <p className="relative text-sm text-[#b1eeea] py-6 flex items-center gap-2">
+            {isTranslating && (
+              <span className="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
+            )}
+            {translateFailed
+              ? 'La traduction a échoué. Vérifiez votre connexion et réessayez.'
+              : isTranslating
+              ? 'Traduction en cours…'
+              : 'Saisissez ou dictez une phrase pour la traduire.'}
+          </p>
+        )}
       </div>
 
       {/* Key Expressions & Memorized List */}
