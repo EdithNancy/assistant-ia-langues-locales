@@ -17,8 +17,8 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, onBack }) => (
         >
           <span className="material-symbols-outlined text-[24px]">arrow_back</span>
         </button>
-        <img src={BRAND_ASSETS.logo} alt="Logo N'Zassa" className="h-9 w-9 rounded-xl object-contain" />
-        <span className="hidden min-[360px]:inline text-xl font-semibold text-[#1a1c1d] tracking-tight">N’Zassa</span>
+        <img src={BRAND_ASSETS.logo} alt="Logo IvoirAI" className="h-9 w-9 rounded-xl object-contain" />
+        <span className="hidden min-[360px]:inline text-xl font-semibold text-[#1a1c1d] tracking-tight">IvoirAI</span>
       </div>
 
       <span className="text-[15px] sm:text-[17px] font-medium text-[#3f4948]">{title}</span>
