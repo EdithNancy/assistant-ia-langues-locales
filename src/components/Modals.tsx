@@ -3,6 +3,7 @@ import { BRAND_ASSETS, CULTURAL_STORIES, VOCABULARY_LIST } from '../data/mockDat
 import { Language, VocabularyItem } from '../types';
 import { soundEngine } from '../utils/audio';
 import { voicePlayer } from '../utils/voicePlayer';
+import { useVoiceConsent } from './VoiceConsent';
 
 interface StoryModalProps {
   isOpen: boolean;
@@ -217,6 +218,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   onClose,
   currentLanguage,
 }) => {
+  const { consent, withdraw } = useVoiceConsent();
   if (!isOpen) return null;
 
   return (
@@ -279,6 +281,27 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#f3f3f5]">
             <span className="text-xs text-[#1a1c1d] font-semibold">Série de connexion</span>
             <span className="text-xs text-[#9e4229] font-bold">7 jours consécutifs 🔥</span>
+          </div>
+
+          <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-[#f3f3f5]">
+            <div className="flex flex-col min-w-0">
+              <span className="text-xs text-[#1a1c1d] font-semibold">Utilisation de ma voix</span>
+              <span className="text-[11px] text-[#3f4948]">
+                {consent
+                  ? `Acceptée le ${new Date(consent.acceptedAt).toLocaleDateString('fr-FR')}${
+                      consent.improveModel ? ' • aide à l’amélioration' : ''
+                    }`
+                  : 'Non accordée : demandée au premier enregistrement'}
+              </span>
+            </div>
+            {consent && (
+              <button
+                onClick={withdraw}
+                className="shrink-0 px-3 py-1.5 rounded-full bg-white text-[#ba1a1a] text-xs font-bold border border-[#edeef0] active:scale-95 transition-transform"
+              >
+                Retirer
+              </button>
+            )}
           </div>
         </div>
 

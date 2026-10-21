@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { recorderErrorMessage, useAudioRecorder } from '../hooks/useAudioRecorder';
 import { api, TextLanguage, TranslateResult } from '../services';
+import { useVoiceConsent } from './VoiceConsent';
 import { VOCABULARY_LIST } from '../data/mockData';
 import { Language, VocabularyItem } from '../types';
 import { soundEngine } from '../utils/audio';
@@ -54,6 +55,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [audioSpeedIdx, setAudioSpeedIdx] = useState(0);
   const recorder = useAudioRecorder();
+  const { ensureConsent } = useVoiceConsent();
   const isDictating = recorder.status === 'recording';
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(true);
@@ -109,6 +111,10 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   const handleVoiceInput = async () => {
     if (isTranscribing) return;
     if (!isDictating) {
+      if (!(await ensureConsent())) {
+        showToast('Sans votre accord, vous pouvez taper votre phrase.');
+        return;
+      }
       if (await recorder.start()) {
         soundEngine.playTone(600, 0.15);
         showToast('Je vous écoute… appuyez sur Stop pour terminer.');

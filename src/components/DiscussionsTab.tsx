@@ -3,6 +3,7 @@ import { BRAND_ASSETS, INITIAL_CHAT_MESSAGES } from '../data/mockData';
 import { ChatMessage, Language } from '../types';
 import { recorderErrorMessage, useAudioRecorder } from '../hooks/useAudioRecorder';
 import { api } from '../services';
+import { useVoiceConsent } from './VoiceConsent';
 import { soundEngine } from '../utils/audio';
 import { voicePlayer, VOICE_LABEL } from '../utils/voicePlayer';
 
@@ -25,6 +26,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
   const [isPlayingAudioId, setIsPlayingAudioId] = useState<string | null>(null);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
   const recorder = useAudioRecorder();
+  const { ensureConsent } = useVoiceConsent();
   const isRecording = recorder.status === 'recording';
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [likedMap, setLikedMap] = useState<Record<string, boolean>>({});
@@ -91,6 +93,10 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
   const handleMicToggle = async () => {
     if (isTranscribing) return;
     if (!isRecording) {
+      if (!(await ensureConsent())) {
+        showToast('Sans votre accord, vous pouvez écrire votre message.');
+        return;
+      }
       const started = await recorder.start();
       if (started) {
         soundEngine.playTone(660, 0.15);
