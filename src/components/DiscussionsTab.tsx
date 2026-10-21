@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BRAND_ASSETS, INITIAL_CHAT_MESSAGES } from '../data/mockData';
 import { ChatMessage, Language } from '../types';
+import { recorderErrorMessage, useAudioRecorder } from '../hooks/useAudioRecorder';
 import { api } from '../services';
 import { soundEngine } from '../utils/audio';
 
@@ -22,7 +23,9 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
   const [isDialectModalOpen, setIsDialectModalOpen] = useState(false);
   const [isPlayingAudioId, setIsPlayingAudioId] = useState<string | null>(null);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
-  const [isRecording, setIsRecording] = useState(false);
+  const recorder = useAudioRecorder();
+  const isRecording = recorder.status === 'recording';
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const [likedMap, setLikedMap] = useState<Record<string, boolean>>({});
   const [toast, setToast] = useState<string | null>(null);
 
@@ -84,23 +87,35 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
     }
   };
 
-  const handleMicToggle = () => {
-    setIsRecording(!isRecording);
+  const handleMicToggle = async () => {
+    if (isTranscribing) return;
     if (!isRecording) {
-      soundEngine.playTone(660, 0.15);
-      showToast('Écoute de votre voix ivoirienne...');
-      setTimeout(() => {
-        setIsRecording(false);
-        setInputText(
-          currentLanguage === 'dioula'
-            ? 'I ni ce, n bɛ fɛ ka kalan kɛ'
-            : "Mo n'dri, n kplo kɛ n suan ndɛ"
-        );
-      }, 2500);
-    } else {
-      soundEngine.playTone(330, 0.15);
+      const started = await recorder.start();
+      if (started) {
+        soundEngine.playTone(660, 0.15);
+        showToast('Je vous écoute… appuyez à nouveau pour terminer.');
+      }
+      return;
+    }
+
+    soundEngine.playTone(330, 0.15);
+    const audio = await recorder.stop();
+    if (!audio) return;
+    setIsTranscribing(true);
+    try {
+      const { text } = await api.transcribe(audio, currentLanguage);
+      setInputText(text);
+    } catch {
+      showToast("La transcription a échoué. Réessayez ou écrivez votre message.");
+    } finally {
+      setIsTranscribing(false);
     }
   };
+
+  // Affiche l'erreur du micro (refus d'accès, pas de micro…) dès qu'elle survient
+  useEffect(() => {
+    if (recorder.error) showToast(recorderErrorMessage[recorder.error]);
+  }, [recorder.error]);
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -466,19 +481,22 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
             {/* Animated Microphone / Trigger */}
             <div className="relative shrink-0">
               {isRecording && (
-                <div className="absolute -inset-1.5 rounded-full bg-[#62fae3] opacity-60 blur-xs animate-ping pointer-events-none"></div>
+                <div
+                  style={{ transform: `scale(${1 + recorder.level * 0.6})` }}
+                  className="absolute -inset-1.5 rounded-full bg-[#62fae3] opacity-60 blur-xs transition-transform duration-75 pointer-events-none"
+                ></div>
               )}
               <button
                 onClick={handleMicToggle}
-                aria-label="Parler vocalement à l'IA"
+                aria-label={isRecording ? "Arrêter l'enregistrement" : "Parler vocalement à l'IA"}
                 className={`relative w-12 h-12 rounded-full flex items-center justify-center shadow-[0_4px_16px_rgba(0,75,73,0.3)] hover:scale-105 active:scale-95 transition-all ${
                   isRecording
                     ? 'bg-[#ba1a1a] text-white'
                     : 'bg-[#004b49] text-[#62fae3]'
                 }`}
               >
-                <span className="material-symbols-outlined text-[24px]">
-                  {isRecording ? 'mic_off' : 'mic'}
+                <span className={`material-symbols-outlined text-[24px] ${isTranscribing ? 'animate-spin' : ''}`}>
+                  {isTranscribing ? 'progress_activity' : isRecording ? 'stop' : 'mic'}
                 </span>
               </button>
             </div>

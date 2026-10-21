@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { recorderErrorMessage, useAudioRecorder } from '../hooks/useAudioRecorder';
+import { api } from '../services';
 import { VOCABULARY_LIST } from '../data/mockData';
 import { Language, VocabularyItem } from '../types';
 import { soundEngine } from '../utils/audio';
@@ -21,7 +23,9 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   const [sourceText, setSourceText] = useState('Combien coûte le régime de bananes plantain ?');
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [audioSpeedIdx, setAudioSpeedIdx] = useState(0);
-  const [isDictating, setIsDictating] = useState(false);
+  const recorder = useAudioRecorder();
+  const isDictating = recorder.status === 'recording';
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(true);
   const [savedExpressions, setSavedExpressions] = useState<VocabularyItem[]>(VOCABULARY_LIST);
   const [toast, setToast] = useState<string | null>(null);
@@ -67,16 +71,33 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
     }
   };
 
-  const handleVoiceInput = () => {
-    setIsDictating(true);
-    soundEngine.playTone(600, 0.15);
-    showToast('Écoute de votre voix...');
-    setTimeout(() => {
-      setIsDictating(false);
-      setSourceText('Où puis-je trouver un bon taxi pour aller au Plateau ?');
-      showToast('Dictée vocale transcrite avec succès !');
-    }, 2400);
+  const handleVoiceInput = async () => {
+    if (isTranscribing) return;
+    if (!isDictating) {
+      if (await recorder.start()) {
+        soundEngine.playTone(600, 0.15);
+        showToast('Je vous écoute… appuyez sur Stop pour terminer.');
+      }
+      return;
+    }
+    const audio = await recorder.stop();
+    if (!audio) return;
+    setIsTranscribing(true);
+    try {
+      const hint = sourceLang === 'fr' ? undefined : sourceLang;
+      const { text } = await api.transcribe(audio, hint);
+      setSourceText(text);
+      showToast('Dictée vocale transcrite !');
+    } catch {
+      showToast('La transcription a échoué. Réessayez.');
+    } finally {
+      setIsTranscribing(false);
+    }
   };
+
+  useEffect(() => {
+    if (recorder.error) showToast(recorderErrorMessage[recorder.error]);
+  }, [recorder.error]);
 
   const getTranslationData = () => {
     const isDioula = targetLang === 'dioula';
@@ -311,10 +332,10 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
                   : 'bg-[#ffdbd2] text-[#3c0800] hover:bg-[#ffb4a1]'
               }`}
             >
-              <span className="material-symbols-outlined text-[16px] text-[#9e4229]">
-                {isDictating ? 'sync' : 'mic'}
+              <span className={`material-symbols-outlined text-[16px] ${isDictating ? '' : 'text-[#9e4229]'} ${isTranscribing ? 'animate-spin' : ''}`}>
+                {isTranscribing ? 'progress_activity' : isDictating ? 'stop' : 'mic'}
               </span>
-              {isDictating ? 'Écoute...' : 'Parler'}
+              {isTranscribing ? 'Transcription…' : isDictating ? 'Stop' : 'Parler'}
             </button>
           </div>
 
