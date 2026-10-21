@@ -46,7 +46,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
     setIsPlayingWord(true);
     soundEngine.playTonePitch(currentLanguage === 'dioula' ? 'Moyen' : 'Haut');
     voicePlayer.speak(
-      currentLanguage === 'dioula' ? 'An Sɔgɔma. Bonjour !' : 'Akwaba ! Bienvenue !',
+      currentLanguage === 'dioula' ? 'An Sɔgɔma. Bonjour !' : 'Akwaba ! Bienvenue !',
       currentLanguage,
       0.9,
       () => setIsPlayingWord(false)
@@ -57,7 +57,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
     setIsBookmarked(!isBookmarked);
     showToast(
       !isBookmarked
-        ? 'Expression enregistrée dans votre lexique personnel !'
+        ? 'Expression enregistrée dans votre lexique personnel !'
         : 'Expression retirée des favoris.'
     );
   };
@@ -191,7 +191,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             </div>
 
             <h4 className="text-xl text-[#1a1c1d] font-extrabold mt-1">
-              {currentLanguage === 'dioula' ? 'An Sɔgɔma' : 'Akwaba !'}
+              {currentLanguage === 'dioula' ? 'An Sɔgɔma' : 'Akwaba !'}
             </h4>
             <span className="text-xs text-[#707978] font-medium tracking-tight mt-0.5">
               {currentLanguage === 'dioula' ? '[ An Sɔ-gɔ-ma ]' : '[ Ah-kwah-bah ]'}
@@ -236,21 +236,21 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         {/* Meaning & Cultural Context */}
         <div className="mt-4 p-3.5 rounded-2xl bg-[#f3f3f5]">
           <div className="flex flex-wrap items-baseline justify-between gap-x-2 mb-1">
-            <span className="text-xs text-[#1a1c1d] font-bold">Traduction :</span>
+            <span className="text-xs text-[#1a1c1d] font-bold">Traduction :</span>
             <span className="text-xs text-[#9e4229] font-bold">
               {currentLanguage === 'dioula'
-                ? '« Bonjour / Bonne matinée »'
-                : '« Bienvenue / Sois le bienvenu »'}
+                ? '« Bonjour / Bonne matinée »'
+                : '« Bienvenue / Sois le bienvenu »'}
             </span>
           </div>
           <p className="text-xs text-[#3f4948] italic">
             {currentLanguage === 'dioula'
-              ? '« An sɔgɔma, i ka kɛnɛ wa ? »'
-              : '« Akwaba o awlo nun, an nian amun bo »'}
+              ? '« An sɔgɔma, i ka kɛnɛ wa ? »'
+              : '« Akwaba o awlo nun, an nian amun bo »'}
           </p>
           <span className="text-xs text-[#707978] block mt-0.5">
             {currentLanguage === 'dioula'
-              ? '(Bonjour, te portes-tu bien ?)'
+              ? '(Bonjour, te portes-tu bien ?)'
               : '(Bienvenue dans notre maison, installez-vous paisiblement)'}
           </span>
         </div>
@@ -263,12 +263,12 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           <span>
             {currentLanguage === 'dioula' ? (
               <>
-                Le <strong>« ɔ »</strong> s'ouvre légèrement comme dans « port » en français
+                Le <strong>« ɔ »</strong> s'ouvre légèrement comme dans « port » en français
                 d'Abidjan.
               </>
             ) : (
               <>
-                Le <strong>« kwa »</strong> se prononce avec une douce glissade tonale montante.
+                Le <strong>« kwa »</strong> se prononce avec une douce glissade tonale montante.
               </>
             )}
           </span>
@@ -278,7 +278,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       {/* Quick Actions Grid */}
       <section className="lg:col-span-12 flex flex-col gap-2">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-sm lg:text-base font-bold text-[#1a1c1d]">Pratique Rapide</h3>
+          <h3 className="text-sm lg:text-base font-bold text-[#1a1c1d]">Pratique rapide</h3>
           <button
             disabled
             onClick={() => onNavigateTab('apprendre')}
@@ -299,7 +299,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             </div>
             <div>
               <h4 className="text-sm font-bold text-[#1a1c1d] leading-tight">Traduire</h4>
-              <p className="text-xs text-[#3f4948] mt-1">Instant voice & texte</p>
+              <p className="text-xs text-[#3f4948] mt-1">Voix et texte instantanés</p>
             </div>
           </button>
 
@@ -327,7 +327,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             </div>
             <div>
               <h4 className="text-sm font-bold text-[#1a1c1d] leading-tight">Vocabulaire</h4>
-              <p className="text-xs text-[#3f4948] mt-1">Marché & Salutations</p>
+              <p className="text-xs text-[#3f4948] mt-1">Marché & salutations</p>
             </div>
           </button>
 
@@ -375,7 +375,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       {/* Recent Discussions Section */}
       <section className="lg:col-span-12 flex flex-col gap-2">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-sm lg:text-base font-bold text-[#1a1c1d]">Discussions Récentes</h3>
+          <h3 className="text-sm lg:text-base font-bold text-[#1a1c1d]">Discussions récentes</h3>
           <button
             onClick={() => onNavigateTab('discussions')}
             className="text-xs text-[#9e4229] font-bold hover:underline"
@@ -395,7 +395,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               </div>
               <div className="flex flex-col min-w-0">
                 <h4 className="text-sm text-[#1a1c1d] font-bold truncate">
-                  Négociation au Marché de Treichville
+                  Négociation au marché de Treichville
                 </h4>
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-xs text-[#707978]">
                   <span className="px-2 py-0.5 rounded-full bg-[#edeef0] text-[11px] text-[#1a1c1d] font-bold">
@@ -409,8 +409,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               </div>
             </div>
             <button
-              onClick={() => onSelectDiscussion('Négociation au Marché de Treichville', 'dioula')}
-              aria-label="Continuer la discussion : Négociation au Marché de Treichville"
+              onClick={() => onSelectDiscussion('Négociation au marché de Treichville', 'dioula')}
+              aria-label="Continuer la discussion : Négociation au marché de Treichville"
               className="after:absolute after:inset-0 after:rounded-3xl w-9 h-9 rounded-full bg-[#f3f3f5] text-[#3f4948] flex items-center justify-center shrink-0 hover:bg-[#003331] hover:text-white transition-colors"
             >
               <span className="material-symbols-outlined text-[18px]">chevron_right</span>
@@ -447,7 +447,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             </div>
             <button
               onClick={() => onSelectDiscussion('Salutations traditionnelles en pays Baoulé', 'baoule')}
-              aria-label="Continuer la discussion : Salutations traditionnelles en pays Baoulé"
+              aria-label="Continuer la discussion : Salutations traditionnelles en pays Baoulé"
               className="after:absolute after:inset-0 after:rounded-3xl w-9 h-9 rounded-full bg-[#f3f3f5] text-[#3f4948] flex items-center justify-center shrink-0 hover:bg-[#003331] hover:text-white transition-colors"
             >
               <span className="material-symbols-outlined text-[18px]">chevron_right</span>

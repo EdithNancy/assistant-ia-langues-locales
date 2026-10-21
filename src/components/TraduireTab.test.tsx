@@ -29,7 +29,7 @@ describe('TraduireTab', () => {
 
     await user.click(screen.getByRole('button', { name: /permuter les langues/i }));
 
-    expect(screen.getByRole('textbox')).toHaveValue('Alokô kpɛkun nga ɔ to nzen ?');
+    expect(screen.getByRole('textbox')).toHaveValue('Alokô kpɛkun nga ɔ to nzen ?');
     expect(
       await within(resultCard()).findByText(
         'Combien coûte le régime de bananes plantain ?',

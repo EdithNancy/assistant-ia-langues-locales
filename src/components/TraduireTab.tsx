@@ -15,8 +15,8 @@ import { voicePlayer } from '../utils/voicePlayer';
 
 const LANG_SUBTITLE: Record<TextLanguage, string> = {
   fr: 'Standard',
-  baoule: 'Akan Authentique',
-  dioula: 'Marché / Véhiculaire',
+  baoule: 'Akan authentique',
+  dioula: 'Marché / véhiculaire',
   bete: 'Krou',
 };
 
@@ -64,7 +64,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   const [translateFailed, setTranslateFailed] = useState(false);
   const speakNextResultRef = useRef(false);
   const [retryCount, setRetryCount] = useState(0);
-  const [sourceText, setSourceText] = useState('Combien coûte le régime de bananes plantain ?');
+  const [sourceText, setSourceText] = useState('Combien coûte le régime de bananes plantain ?');
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [audioSpeedIdx, setAudioSpeedIdx] = useState(0);
   const recorder = useAudioRecorder();
@@ -102,14 +102,14 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   const handleChangeSource = () => {
     const next = nextOption(SOURCE_OPTIONS, sourceLang, targetLang);
     setSourceLang(next);
-    showToast(`Langue source : ${sourceLabel(next)}`);
+    showToast(`Langue source : ${sourceLabel(next)}`);
   };
 
   const handleChangeTarget = () => {
     const next = nextOption(TARGET_OPTIONS, targetLang, sourceLang);
     setTargetLang(next);
     if (next !== 'fr') onLanguageChange(next);
-    else showToast('Langue cible : Français');
+    else showToast('Langue cible : Français');
   };
 
   const handleClear = () => {
@@ -121,11 +121,11 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       const text = await navigator.clipboard.readText();
       if (text) {
         setSourceText(text);
-        showToast('Texte collé !');
+        showToast('Texte collé !');
       }
     } catch {
-      setSourceText('An bɛ taa yɔrɔ juman ?');
-      showToast('Exemple de phrase inséré !');
+      setSourceText('An bɛ taa yɔrɔ juman ?');
+      showToast('Exemple de phrase inséré !');
     }
   };
 
@@ -150,7 +150,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       const { text } = await api.transcribe(audio, hint);
       speakNextResultRef.current = voiceFirst;
       setSourceText(text);
-      showToast('Dictée vocale transcrite !');
+      showToast('Dictée vocale transcrite !');
     } catch {
       showToast('La transcription a échoué. Réessayez.');
     } finally {
@@ -213,7 +213,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
     if (!currentTrans) return;
     try {
       await navigator.clipboard.writeText(currentTrans.translation);
-      showToast('Traduction copiée dans le presse-papiers !');
+      showToast('Traduction copiée dans le presse-papiers !');
     } catch {
       showToast('Copie impossible sur cet appareil.');
     }
@@ -250,7 +250,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       <div className="lg:col-span-2 flex items-center justify-between gap-2 pt-1">
         <div className="flex items-center gap-2">
           <div className="w-2.5 h-2.5 rounded-full bg-[#3cddc7] animate-pulse"></div>
-          <span className="text-base lg:text-lg font-bold text-[#003331]">Traducteur Culturel</span>
+          <span className="text-base lg:text-lg font-bold text-[#003331]">Traducteur culturel</span>
         </div>
         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#b1eeea] text-[#00201f] text-xs font-bold shadow-xs">
           <span className="material-symbols-outlined text-[14px]">psychology</span>
@@ -263,7 +263,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
         {/* Source Language Button */}
         <button
           onClick={handleChangeSource}
-          aria-label={`Langue source : ${sourceLabel(sourceLang)}. Changer`}
+          aria-label={`Langue source : ${sourceLabel(sourceLang)}. Changer`}
           className="flex-1 min-w-0 flex items-center justify-center gap-2 py-2.5 px-2 sm:px-3 rounded-full bg-white text-[#1a1c1d] shadow-sm transition-all active:scale-95 text-left border border-[#edeef0]"
         >
           {sourceLang === 'auto' ? (
@@ -279,7 +279,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
               {sourceLang !== 'auto'
                 ? LANG_SUBTITLE[sourceLang]
                 : currentTrans
-                ? `Détecté : ${LANGUAGE_LABEL[currentTrans.detectedSource]}`
+                ? `Détecté : ${LANGUAGE_LABEL[currentTrans.detectedSource]}`
                 : 'Langue reconnue seule'}
             </span>
           </div>
@@ -302,7 +302,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
         {/* Target Language Button */}
         <button
           onClick={handleChangeTarget}
-          aria-label={`Langue cible : ${LANGUAGE_LABEL[targetLang]}. Changer`}
+          aria-label={`Langue cible : ${LANGUAGE_LABEL[targetLang]}. Changer`}
           className="flex-1 min-w-0 flex items-center justify-center gap-2 py-2.5 px-2 sm:px-3 rounded-full bg-white text-[#1a1c1d] shadow-sm transition-all active:scale-95 text-left border border-[#edeef0]"
         >
           <Flag country={targetLang === 'fr' ? 'fr' : 'ci'} />
@@ -324,7 +324,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       <div className="flex flex-col bg-white rounded-3xl p-4 lg:p-5 shadow-sm relative transition-all border border-[#edeef0] focus-within:ring-2 focus-within:ring-[#004b49]/20">
         <div className="flex justify-between items-center mb-2">
           <span className="text-xs font-bold text-[#707978] uppercase tracking-wider">
-            Texte Source
+            Texte source
           </span>
           {sourceText && (
             <button
@@ -410,7 +410,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
           {currentTrans.phonetic && (
             <div className="bg-[#00332d]/40 rounded-xl px-3 py-2 mb-3 inline-block w-full border border-white/5">
               <span className="text-[11px] text-[#3cddc7] block font-bold mb-0.5">
-                Guide Phonétique
+                Guide phonétique
               </span>
               <p className="text-xs text-[#edeef0] italic tracking-wide">
                 {currentTrans.phonetic}
@@ -424,7 +424,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
               lightbulb
             </span>
             <p className="text-xs text-white leading-relaxed">
-              <span className="font-bold text-[#ffdbd2]">Astuce marchande : </span>
+              <span className="font-bold text-[#ffdbd2]">Astuce marchande : </span>
               {currentTrans.tip}
             </p>
           </div>
@@ -475,7 +475,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
                   setIsBookmarked(!isBookmarked);
                   showToast(
                     !isBookmarked
-                      ? 'Ajouté aux favoris !'
+                      ? 'Ajouté aux favoris !'
                       : 'Retiré des favoris'
                   );
                 }}
@@ -521,7 +521,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
               auto_stories
             </span>
             <span className="text-sm font-bold text-[#1a1c1d]">
-              Expressions Clés & Mémorisées
+              Expressions clés & mémorisées
             </span>
           </div>
           <button
@@ -587,14 +587,14 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
         </div>
       </div>
 
-      {/* Mode Conversation Immédiate Banner */}
+      {/* Mode conversation immédiate Banner */}
       <div className="lg:col-span-2 relative overflow-hidden rounded-2xl bg-[#edeef0] p-4 lg:p-5 flex items-center justify-between gap-3 shadow-xs border border-[#edeef0]">
         <div className="flex items-center gap-3 z-10 min-w-0">
           <div className="w-12 h-12 rounded-full bg-[#9e4229] flex items-center justify-center text-white shadow-md shrink-0">
             <span className="material-symbols-outlined text-[24px]">record_voice_over</span>
           </div>
           <div>
-            <p className="text-sm font-bold text-[#1a1c1d]">Mode Conversation Immédiate</p>
+            <p className="text-sm font-bold text-[#1a1c1d]">Mode conversation immédiate</p>
             <p className="text-xs text-[#3f4948]">Traduction simultanée à deux micros</p>
           </div>
         </div>
@@ -625,7 +625,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-[#9e4229]">record_voice_over</span>
                 <h3 className="text-base font-bold text-[#1a1c1d]">
-                  Traduction Instantanée à 2
+                  Traduction instantanée à deux
                 </h3>
               </div>
               <button
@@ -644,7 +644,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
               <button
                 onClick={() => {
                   soundEngine.playTone(440, 0.2);
-                  showToast('Micro 1 (Français) activé !');
+                  showToast('Micro 1 (Français) activé !');
                 }}
                 className="p-4 rounded-2xl bg-[#ffdbd2] text-[#3c0800] flex flex-col items-center gap-2 active:scale-95 transition-all"
               >
@@ -659,7 +659,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
               <button
                 onClick={() => {
                   soundEngine.playTone(520, 0.2);
-                  showToast('Micro 2 (Dioula/Baoulé) activé !');
+                  showToast('Micro 2 (Dioula/Baoulé) activé !');
                 }}
                 className="p-4 rounded-2xl bg-[#b1eeea] text-[#00201f] flex flex-col items-center gap-2 active:scale-95 transition-all"
               >

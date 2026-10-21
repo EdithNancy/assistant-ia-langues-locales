@@ -25,49 +25,49 @@ interface Phrase {
 const PHRASES: Phrase[] = [
   {
     keywords: ['banane', 'combien', 'plantain', 'alokô', 'barana'],
-    fr: 'Combien coûte le régime de bananes plantain ?',
+    fr: 'Combien coûte le régime de bananes plantain ?',
     baoule: {
-      text: 'Alokô kpɛkun nga ɔ to nzen ?',
-      phonetic: '[Ah-loh-koh kpeh-koon ngah oh toh n-zen ?]',
+      text: 'Alokô kpɛkun nga ɔ to nzen ?',
+      phonetic: '[Ah-loh-koh kpeh-koon ngah oh toh n-zen ?]',
       tone: 'Ton Moyen',
-      tip: 'Pour le plantain mûr au marché baoulé, précisez « alokô » pour le plantain doux à frire.',
+      tip: 'Pour le plantain mûr au marché baoulé, précisez « alokô » pour le plantain doux à frire.',
     },
     dioula: {
-      text: 'Barana yiriwari nin bɛ sɔngɔ jolibɔ ?',
+      text: 'Barana yiriwari nin bɛ sɔngɔ jolibɔ ?',
       phonetic: '[Bah-rah-nah yee-ree-wah-ree neen bɛh sɔn-gɔ joh-lee-bɔ]',
       tone: 'Ton Haut-Bas',
-      tip: "Au marché d'Abidjan, dites simplement « Barana nin joli ? » pour un échange naturel et direct avec le commerçant.",
+      tip: "Au marché d'Abidjan, dites simplement « Barana nin joli ? » pour un échange naturel et direct avec le commerçant.",
     },
   },
   {
     keywords: ['taxi', 'plateau', 'plató', 'wotoro', 'loto'],
-    fr: 'Où puis-je trouver un bon taxi pour aller au Plateau ?',
+    fr: 'Où puis-je trouver un bon taxi pour aller au Plateau ?',
     baoule: {
-      text: 'N wun loto kpa kɔ Plató nuan nun ?',
+      text: 'N wun loto kpa kɔ Plató nuan nun ?',
       phonetic: '[N woon loh-toh kpah koh Plah-toh nwan noon]',
       tone: 'Ton Moyen-Haut',
-      tip: 'En Baoulé, le voyage se bénit en souhaitant « Atin kpa » (bonne route).',
+      tip: 'En Baoulé, le voyage se bénit en souhaitant « Atin kpa » (bonne route).',
     },
     dioula: {
-      text: 'N bɛ se ka wotoro sɔrɔ ka taa Plató yɔrɔ juman ?',
-      phonetic: '[N beh seh kah woh-toh-roh soh-roh kah tah Plah-toh ?]',
+      text: 'N bɛ se ka wotoro sɔrɔ ka taa Plató yɔrɔ juman ?',
+      phonetic: '[N beh seh kah woh-toh-roh soh-roh kah tah Plah-toh ?]',
       tone: 'Ton Montant',
-      tip: 'À Abidjan, les wôro-wôro ou taxis compteurs ont des codes de négociation simples : donnez la destination et demandez « c’est combien ? »',
+      tip: 'À Abidjan, les wôro-wôro ou taxis compteurs ont des codes de négociation simples : donnez la destination et demandez « c’est combien ? »',
     },
   },
 ];
 
 const FALLBACK_PHRASE: Phrase = {
   keywords: [],
-  fr: 'Merci beaucoup, bienvenue à la maison !',
+  fr: 'Merci beaucoup, bienvenue à la maison !',
   baoule: {
-    text: 'Mo kpa kpa ! Akwaba awlo nun.',
-    phonetic: '[Moh kpah kpah ! Ah-kwah-bah ow-loh noon]',
+    text: 'Mo kpa kpa ! Akwaba awlo nun.',
+    phonetic: '[Moh kpah kpah ! Ah-kwah-bah ow-loh noon]',
     tone: 'Ton Haut',
-    tip: 'Le mot « Akwaba » est le trésor d’accueil de toute la Côte d’Ivoire.',
+    tip: 'Le mot « Akwaba » est le trésor d’accueil de toute la Côte d’Ivoire.',
   },
   dioula: {
-    text: 'Aw ni ce kosɛbɛ, an bɛ kɔfɛ !',
+    text: 'Aw ni ce kosɛbɛ, an bɛ kɔfɛ !',
     phonetic: '[Ow nee tché koh-seh-beh, an beh koh-feh]',
     tone: 'Ton Haut',
     tip: 'Une salutation chaleureuse ouvre toujours les meilleures opportunités en pays mandé.',
@@ -102,23 +102,23 @@ const chatReply = (message: string, language: Language): ChatReply => {
   if (lower.includes('bonjour') || lower.includes('salut')) {
     return dioula
       ? {
-          text: '« An sɔgɔma ! I ka kɛnɛ wa ? »',
-          phonetic: '[An Sɔ-gɔ-ma ! Ee kah keh-neh wah]',
-          translation: 'Bonjour ! Te portes-tu bien ce matin ?',
+          text: '« An sɔgɔma ! I ka kɛnɛ wa ? »',
+          phonetic: '[An Sɔ-gɔ-ma ! Ee kah keh-neh wah]',
+          translation: 'Bonjour ! Te portes-tu bien ce matin ?',
           tone: 'Ton Moyen-Haut',
           linguisticBreakdown: [
             { term: 'An sɔgɔma', meaning: 'Bonjour / Bonne matinée' },
-            { term: 'I ka kɛnɛ wa', meaning: 'Es-tu en bonne santé / Comment vas-tu ?' },
+            { term: 'I ka kɛnɛ wa', meaning: 'Es-tu en bonne santé / Comment vas-tu ?' },
           ],
         }
       : {
-          text: '« Akwaba ! Nzoué o ? »',
-          phonetic: '[Ah-kwah-bah ! N-zoo-eh oh]',
-          translation: 'Bienvenue ! Comment vas-tu ?',
+          text: '« Akwaba ! Nzoué o ? »',
+          phonetic: '[Ah-kwah-bah ! N-zoo-eh oh]',
+          translation: 'Bienvenue ! Comment vas-tu ?',
           tone: 'Ton Moyen-Haut',
           linguisticBreakdown: [
             { term: 'Akwaba', meaning: 'Bienvenue / Salutation d’accueil' },
-            { term: 'Nzoué o', meaning: 'Comment vas-tu ? (Lit. Comment est l’eau ?)' },
+            { term: 'Nzoué o', meaning: 'Comment vas-tu ? (Lit. Comment est l’eau ?)' },
           ],
         };
   }
@@ -126,9 +126,9 @@ const chatReply = (message: string, language: Language): ChatReply => {
   if (lower.includes('merci')) {
     return dioula
       ? {
-          text: '« I ni ce kosɛbɛ ! »',
+          text: '« I ni ce kosɛbɛ ! »',
           phonetic: '[Ee nee tché koh-seh-beh]',
-          translation: 'Merci beaucoup de tout coeur !',
+          translation: 'Merci beaucoup de tout coeur !',
           tone: 'Ton Moyen-Haut',
           linguisticBreakdown: [
             { term: 'I ni ce', meaning: 'Merci' },
@@ -136,9 +136,9 @@ const chatReply = (message: string, language: Language): ChatReply => {
           ],
         }
       : {
-          text: '« Mo n’dri kpa kpa ! »',
+          text: '« Mo n’dri kpa kpa ! »',
           phonetic: '[Moh n-dree kpah kpah]',
-          translation: 'Grand merci chaleureux à toi !',
+          translation: 'Grand merci chaleureux à toi !',
           tone: 'Ton Moyen-Haut',
           linguisticBreakdown: [
             { term: 'Mo n’dri', meaning: 'Merci beaucoup' },
@@ -150,9 +150,9 @@ const chatReply = (message: string, language: Language): ChatReply => {
   if (lower.includes('prix') || lower.includes('marché') || lower.includes('combien')) {
     return dioula
       ? {
-          text: '« Sɔngɔ jolibɔ ? Dɔ bɔ a la n ma. »',
-          phonetic: '[Son-goh joh-lee-boh ? Doh boh ah lah n mah]',
-          translation: 'Quel est le prix ? Diminue un peu pour moi.',
+          text: '« Sɔngɔ jolibɔ ? Dɔ bɔ a la n ma. »',
+          phonetic: '[Son-goh joh-lee-boh ? Doh boh ah lah n mah]',
+          translation: 'Quel est le prix ? Diminue un peu pour moi.',
           tone: 'Ton Moyen-Haut',
           linguisticBreakdown: [
             { term: 'Sɔngɔ', meaning: 'Le prix / la valeur' },
@@ -161,7 +161,7 @@ const chatReply = (message: string, language: Language): ChatReply => {
           ],
         }
       : {
-          text: '« N kplo kɛ n to bo afwé nun. »',
+          text: '« N kplo kɛ n to bo afwé nun. »',
           phonetic: '[N-kplo keh n-toh boh ah-fweh noon]',
           translation: 'Je souhaite faire mes achats au marché.',
           tone: 'Ton Moyen-Haut',
@@ -174,9 +174,9 @@ const chatReply = (message: string, language: Language): ChatReply => {
 
   return dioula
     ? {
-        text: `« N b’a mɛn ! "${message}" bɛ fɔ ko : Aw bɛ kɛnɛ. »`,
-        phonetic: '[N beh ah men ! Aw beh keh-neh]',
-        translation: `Bien compris ! "${message}" trouve son écho dans la tradition d'Abidjan.`,
+        text: `« N b’a mɛn ! "${message}" bɛ fɔ ko : Aw bɛ kɛnɛ. »`,
+        phonetic: '[N beh ah men ! Aw beh keh-neh]',
+        translation: `Bien compris ! "${message}" trouve son écho dans la tradition d'Abidjan.`,
         tone: 'Ton Moyen-Haut',
         linguisticBreakdown: [
           { term: 'N b’a mɛn', meaning: 'Je comprends / j’entends bien' },
@@ -184,7 +184,7 @@ const chatReply = (message: string, language: Language): ChatReply => {
         ],
       }
     : {
-        text: `« N ti ndɛ nun kpa. "${message}" o ti ndɛ kpa. »`,
+        text: `« N ti ndɛ nun kpa. "${message}" o ti ndɛ kpa. »`,
         phonetic: '[N tee n-deh noon kpah]',
         translation: `Je saisis parfaitement. "${message}" s'exprime avec respect chez les Baoulés.`,
         tone: 'Ton Moyen-Haut',
@@ -203,7 +203,7 @@ export const mockApi: IvoirAIApi = {
     await delay(900);
     if (hint === 'dioula') return { text: 'I ni ce, n bɛ fɛ ka kalan kɛ', language: 'dioula' };
     if (hint === 'baoule') return { text: "Mo n'dri, n kplo kɛ n suan ndɛ", language: 'baoule' };
-    return { text: 'Où puis-je trouver un bon taxi pour aller au Plateau ?', language: 'fr' };
+    return { text: 'Où puis-je trouver un bon taxi pour aller au Plateau ?', language: 'fr' };
   },
 
   async translate({ text, source, target }) {

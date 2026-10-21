@@ -160,7 +160,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
     setRatings((prev) => ({ ...prev, [messageId]: rating }));
     try {
       await api.sendFeedback({ messageId, rating, comment });
-      showToast(rating === 'up' ? 'Merci pour votre retour !' : 'Merci, Aya va s’améliorer.');
+      showToast(rating === 'up' ? 'Merci pour votre retour !' : 'Merci, Aya va s’améliorer.');
     } catch {
       showToast("Votre avis n'a pas pu être envoyé.");
     }
@@ -179,7 +179,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
-    showToast('Texte copié !');
+    showToast('Texte copié !');
   };
 
   return (
@@ -474,13 +474,13 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                     className="flex flex-col gap-2 p-3 rounded-2xl bg-[#f9f9fb] border border-[#edeef0]"
                   >
                     <label htmlFor={`feedback-${msg.id}`} className="text-xs font-bold text-[#1a1c1d]">
-                      Qu'est-ce qui n'allait pas ? (facultatif)
+                      Qu'est-ce qui n'allait pas ? (facultatif)
                     </label>
                     <input
                       id={`feedback-${msg.id}`}
                       value={feedbackComment}
                       onChange={(e) => setFeedbackComment(e.target.value)}
-                      placeholder="Ex. : mauvaise traduction, mauvais ton…"
+                      placeholder="Ex. : mauvaise traduction, mauvais ton…"
                       className="h-10 px-3 rounded-xl bg-white border border-[#edeef0] text-sm focus:outline-none focus:ring-2 focus:ring-[#004b49]/30"
                     />
                     <div className="flex justify-end gap-2">
@@ -542,7 +542,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                 <span className="material-symbols-outlined text-[14px] text-[#004b49]">
                   keyboard_alt
                 </span>
-                <span className="hidden min-[400px]:inline">Touches :</span>
+                <span className="hidden min-[400px]:inline">Touches :</span>
               </span>
               <div className="flex items-center gap-1">
                 {['ɛ', 'ɔ', 'ɲ', 'ŋ', 'ʼ'].map((char) => (
@@ -665,7 +665,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                 onClick={() => {
                   onLanguageChange('baoule');
                   setIsDialectModalOpen(false);
-                  showToast('Langue changée : Baoulé (Akan)');
+                  showToast('Langue changée : Baoulé (Akan)');
                 }}
                 className={`flex items-center justify-between p-3.5 rounded-2xl transition-all ${
                   currentLanguage === 'baoule'
@@ -695,7 +695,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                 onClick={() => {
                   onLanguageChange('dioula');
                   setIsDialectModalOpen(false);
-                  showToast('Langue changée : Dioula (Mandé)');
+                  showToast('Langue changée : Dioula (Mandé)');
                 }}
                 className={`flex items-center justify-between p-3.5 rounded-2xl transition-all ${
                   currentLanguage === 'dioula'

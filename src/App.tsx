@@ -98,7 +98,7 @@ export default function App() {
     setCurrentLanguage(lang);
     saveSession({ language: lang });
     setCurrentTab('discussions');
-    showNotification(`Ouverture de la discussion : ${title}`);
+    showNotification(`Ouverture de la discussion : ${title}`);
   };
 
   const handleAuthenticated = (lang: Language) => {
@@ -107,7 +107,7 @@ export default function App() {
     setIsAuthenticated(true);
     navigate(TAB_PATHS.accueil, { replace: true, viewTransition: true });
     window.scrollTo({ top: 0 });
-    showNotification(lang === 'dioula' ? 'I ni ce ! Bienvenue sur IvoirAI' : 'Akwaba ! Bienvenue sur IvoirAI');
+    showNotification(lang === 'dioula' ? 'I ni ce ! Bienvenue sur IvoirAI' : 'Akwaba ! Bienvenue sur IvoirAI');
   };
 
   if (!isAuthenticated) {
@@ -174,7 +174,7 @@ export default function App() {
           title={getHeaderTitle()}
           onOpenNotifications={() =>
             showNotification(
-              'Aya : Nouveau proverbe du jour disponible en audio !'
+              'Aya : Nouveau proverbe du jour disponible en audio !'
             )
           }
           onOpenProfile={() => setIsProfileModalOpen(true)}
@@ -187,7 +187,7 @@ export default function App() {
             className="fixed top-[calc(3.5rem+env(safe-area-inset-top))] lg:top-16 inset-x-0 lg:left-64 z-30 px-4 py-2 bg-[#9e4229] text-white text-xs font-semibold flex items-center justify-center gap-2"
           >
             <span className="material-symbols-outlined text-[16px]">wifi_off</span>
-            Hors connexion : Aya, la traduction et la voix sont indisponibles.
+            Hors connexion : Aya, la traduction et la voix sont indisponibles.
           </div>
         )}
 

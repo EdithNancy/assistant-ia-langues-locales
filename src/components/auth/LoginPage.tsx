@@ -77,7 +77,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
 
         <span className="-mt-2 px-4 py-1.5 rounded-full bg-[#ffdbd2] text-[#9e4229] text-[15px] font-medium inline-flex items-center gap-1.5">
           <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
-          Akwaba nimbâ ! • Bon retour
+          Akwaba nimbâ ! • Bon retour
         </span>
 
         <h1 className="mt-4 text-[24px] min-[380px]:text-[28px] font-bold text-[#003331] tracking-tight text-center">
@@ -171,7 +171,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
                 title="Réinitialisation du mot de passe bientôt disponible"
                 className="text-[13px] font-semibold text-[#9e4229] hover:underline disabled:opacity-60 disabled:no-underline disabled:cursor-not-allowed"
               >
-                Oublié ?
+                Oublié ?
               </button>
             </div>
             <PasswordField value={password} onChange={setPassword} />
@@ -230,11 +230,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
             <ComingSoonBadge />
             <span className="material-symbols-outlined text-[26px]">fingerprint</span>
             <span className="flex-1 text-center text-[15px] font-medium leading-snug">
-              Connexion rapide par Empreinte / Face ID
+              Connexion rapide par empreinte / Face ID
             </span>
           </button>
 
-          <OrDivider label="OU CONTINUER AVEC" className="mt-1" />
+          <OrDivider label="ou continuer avec" className="mt-1" />
 
           <div className="grid grid-cols-2 gap-3">
             <button
@@ -253,13 +253,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
               className="h-16 rounded-2xl bg-[#f3f3f5] flex items-center justify-center gap-3 text-[16px] font-medium text-[#1a1c1d] hover:bg-[#edeef0] active:scale-[0.98] transition-all"
             >
               <span className="material-symbols-outlined text-[24px]">account_circle</span>
-              Invité Démo
+              Invité démo
             </button>
           </div>
         </form>
 
         <p className="mt-8 text-[17px] text-[#3f4948] text-center leading-relaxed">
-          Vous n’avez pas encore de compte ?{' '}
+          Vous n’avez pas encore de compte ?{' '}
           <button
             type="button"
             onClick={onGoToRegister}

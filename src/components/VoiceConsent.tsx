@@ -116,7 +116,7 @@ const VoiceConsentDialog: React.FC<{ onAnswer: (consent: VoiceConsent | null) =>
             className="mt-0.5 w-5 h-5 accent-[#004b49] shrink-0"
           />
           <span className="text-sm text-[#3f4948]">
-            Facultatif : mes enregistrements anonymisés peuvent servir à améliorer la reconnaissance
+            Facultatif : mes enregistrements anonymisés peuvent servir à améliorer la reconnaissance
             du Baoulé et du Dioula.
           </span>
         </label>

@@ -34,18 +34,18 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
   // Active transcription based on language
   const [currentPhrase] = useState({
     dioula: {
-      text: '« I ka kɛnɛ wa ? Mun lo b\'i fɛ bi ? »',
+      text: '« I ka kɛnɛ wa ? Mun lo b\'i fɛ bi ? »',
       phonetics: ['[i-ka-kɛ-nɛ]', '[wa]', '[mun-lo-bi-fɛ]'],
-      tone: 'Ton : Interrogatif monté',
-      translation: '« Comment vas-tu ? Qu\'aimerais-tu explorer ou faire aujourd\'hui ? »',
-      feedback: 'Voyelle nasale « ɛ » bien articulée',
+      tone: 'Ton : Interrogatif monté',
+      translation: '« Comment vas-tu ? Qu\'aimerais-tu explorer ou faire aujourd\'hui ? »',
+      feedback: 'Voyelle nasale « ɛ » bien articulée',
     },
     baoule: {
-      text: '« Akwaba ! Nzoué o ? N kplo kɛ n wun wɔ. »',
+      text: '« Akwaba ! Nzoué o ? N kplo kɛ n wun wɔ. »',
       phonetics: ['[ah-kwah-bah]', '[n-zoo-eh]', '[n-kplo-keh]'],
-      tone: 'Ton : Accueil & Salutation haute',
-      translation: '« Bienvenue ! Comment te portes-tu ? Je suis ravie de converser avec toi. »',
-      feedback: 'Élévation tonale sur « Nzoué » excellente',
+      tone: 'Ton : Accueil & Salutation haute',
+      translation: '« Bienvenue ! Comment te portes-tu ? Je suis ravie de converser avec toi. »',
+      feedback: 'Élévation tonale sur « Nzoué » excellente',
     },
   });
 
@@ -75,8 +75,8 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
       soundEngine.playTonePitch(currentDialect === 'dioula' ? 'Ton Haut-Bas' : 'Ton Haut');
       const textToSpeak =
         currentDialect === 'dioula'
-          ? 'I ka kɛnɛ wa ? Mun lo bi fɛ bi ? N bɛ kɔfɛ.'
-          : 'Akwaba ! Nzoué o ? N kplo kɛ n wun wɔ.';
+          ? 'I ka kɛnɛ wa ? Mun lo bi fɛ bi ? N bɛ kɔfɛ.'
+          : 'Akwaba ! Nzoué o ? N kplo kɛ n wun wɔ.';
 
       voicePlayer.speak(textToSpeak, currentDialect, 0.95, () => {
         setSpeakingState('listening');
@@ -146,7 +146,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
               className="h-7 w-7 object-contain"
             />
             <h1 className="text-base font-bold text-[#1a1c1d] tracking-tight">
-              Session Vocale
+              Session vocale
             </h1>
           </div>
 

@@ -65,7 +65,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
           <h3 className="text-lg font-bold text-[#1a1c1d] leading-snug">
             {story.title}
           </h3>
-          <span className="text-xs text-[#707978]">Lecture : {story.readTime}</span>
+          <span className="text-xs text-[#707978]">Lecture : {story.readTime}</span>
         </div>
 
         <p className="text-xs text-[#3f4948] leading-relaxed whitespace-pre-line">
@@ -141,7 +141,7 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({ isOpen, onClos
         <div className="flex justify-between items-center">
           <div>
             <h3 className="text-base font-bold text-[#1a1c1d]">
-              Lexique & Expressions Essentielles
+              Lexique & expressions essentielles
             </h3>
             <p className="text-xs text-[#3f4948]">Vocabulaire pratique Baoulé & Dioula</p>
           </div>
@@ -245,7 +245,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-[#edeef0]"
       >
         <div className="flex justify-between items-center">
-          <h3 className="text-base font-bold text-[#1a1c1d]">Mon Profil IvoirAI</h3>
+          <h3 className="text-base font-bold text-[#1a1c1d]">Mon profil IvoirAI</h3>
           <button
             onClick={onClose}
             className="w-8 h-8 rounded-full bg-[#edeef0] flex items-center justify-center text-[#3f4948]"
@@ -310,7 +310,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   ? `Acceptée le ${new Date(consent.acceptedAt).toLocaleDateString('fr-FR')}${
                       consent.improveModel ? ' • aide à l’amélioration' : ''
                     }`
-                  : 'Non accordée : demandée au premier enregistrement'}
+                  : 'Non accordée : demandée au premier enregistrement'}
               </span>
             </div>
             {consent && (

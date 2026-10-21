@@ -8,7 +8,7 @@ describe('mockApi.translate', () => {
       source: 'fr',
       target: 'baoule',
     });
-    expect(result.translation).toBe('Alokô kpɛkun nga ɔ to nzen ?');
+    expect(result.translation).toBe('Alokô kpɛkun nga ɔ to nzen ?');
     expect(result.detectedSource).toBe('fr');
   });
 
@@ -18,7 +18,7 @@ describe('mockApi.translate', () => {
       source: 'dioula',
       target: 'fr',
     });
-    expect(result.translation).toBe('Combien coûte le régime de bananes plantain ?');
+    expect(result.translation).toBe('Combien coûte le régime de bananes plantain ?');
     expect(result.phonetic).toBe('');
   });
 

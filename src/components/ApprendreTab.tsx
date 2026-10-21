@@ -37,21 +37,21 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
   const currentExercise =
     currentLanguage === 'dioula'
       ? {
-          title: 'Exercice du Jour • Niveau Débutant',
-          french: '« Merci beaucoup pour votre accueil chaleureux. »',
+          title: 'Exercice du jour • Niveau débutant',
+          french: '« Merci beaucoup pour votre accueil chaleureux. »',
           dialectLabel: 'Dioula véhiculaire',
           tone: 'Ton Haut',
-          phrase: 'I ni ce kosɛbɛ ! I dansé.',
-          phonetics: '[Ee nee tché koh-seh-beh ! Ee dahn-say]',
+          phrase: 'I ni ce kosɛbɛ ! I dansé.',
+          phonetics: '[Ee nee tché koh-seh-beh ! Ee dahn-say]',
           speakerLocation: 'Abidjan (Treichville)',
         }
       : {
-          title: 'Exercice du Jour • Niveau Débutant',
-          french: '« Merci beaucoup pour votre accueil chaleureux. »',
+          title: 'Exercice du jour • Niveau débutant',
+          french: '« Merci beaucoup pour votre accueil chaleureux. »',
           dialectLabel: 'Baoulé authentique',
           tone: 'Ton Haut',
-          phrase: 'Mo kpa kpa ! Akwaba kpa.',
-          phonetics: '[Moh kpah kpah ! Ah-kwah-bah kpah]',
+          phrase: 'Mo kpa kpa ! Akwaba kpa.',
+          phonetics: '[Moh kpah kpah ! Ah-kwah-bah kpah]',
           speakerLocation: 'Yamoussoukro',
         };
 
@@ -76,11 +76,11 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
       const generatedScore = Math.floor(92 + Math.random() * 7);
       setUserScore(generatedScore);
       setHasPracticed(true);
-      showToast(`Bravo ! Score IA : ${generatedScore}% - Accent tonique maîtrisé !`);
+      showToast(`Bravo ! Score IA : ${generatedScore}% - Accent tonique maîtrisé !`);
     } else {
       setIsRecordingUser(true);
       soundEngine.playTone(660, 0.2);
-      showToast('Écoute de votre articulation... Répétez maintenant !');
+      showToast('Écoute de votre articulation... Répétez maintenant !');
     }
   };
 
@@ -139,10 +139,10 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-0.5">
             <span className="text-xs text-[#9e4229] font-bold uppercase tracking-wider">
-              Tuteur Vocal & Culture
+              Tuteur vocal & culture
             </span>
             <h2 className="text-xl lg:text-2xl text-[#1a1c1d] font-bold leading-tight">
-              Atelier de Langues
+              Atelier de langues
             </h2>
             <p className="text-xs text-[#3f4948]">
               Pratiquez l'oral et enrichissez votre vocabulaire au quotidien.
@@ -330,7 +330,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
             }`}
           >
             {isRecordingUser
-              ? 'Écoute active... Parlez maintenant !'
+              ? 'Écoute active... Parlez maintenant !'
               : 'Appuyez pour enregistrer votre voix'}
           </span>
         </div>
@@ -344,7 +344,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                   <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
                 </div>
                 <span className="text-sm font-bold text-[#003331]">
-                  Score IA : {userScore}%
+                  Score IA : {userScore}%
                 </span>
               </div>
               <span className="text-xs px-2.5 py-1 rounded-full bg-[#b1eeea] text-[#084f4d] font-bold">
@@ -394,7 +394,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
       <section className="lg:col-span-5 space-y-3">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <h3 className="text-sm font-bold text-[#1a1c1d]">Modules d'Immersion</h3>
+            <h3 className="text-sm font-bold text-[#1a1c1d]">Modules d'immersion</h3>
             <p className="text-xs text-[#3f4948]">
               Thématiques adaptées aux contextes de vie ivoiriens.
             </p>
@@ -491,7 +491,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
             </div>
 
             <h4 className="text-base text-[#1a1c1d] font-bold leading-tight">
-              Testez votre oreille (Quiz Audio)
+              Testez votre oreille (quiz audio)
             </h4>
 
             <p className="text-xs text-[#3f4948]">
@@ -504,7 +504,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                 className="px-4 py-2.5 rounded-full bg-[#004b49] text-white text-xs font-bold shadow-md hover:bg-[#003331] active:scale-95 transition-all inline-flex items-center space-x-2"
               >
                 <span className="material-symbols-outlined text-[18px]">play_circle</span>
-                <span>Lancer le Quiz Audio</span>
+                <span>Lancer le quiz audio</span>
               </button>
             </div>
           </div>
@@ -605,7 +605,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-[#9e4229]">headphones</span>
-                <span className="text-sm font-bold text-[#1a1c1d]">Quiz Tonalité Ivoirienne</span>
+                <span className="text-sm font-bold text-[#1a1c1d]">Quiz des tons ivoiriens</span>
               </div>
               <button
                 onClick={() => setIsQuizOpen(false)}
@@ -622,7 +622,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                     Question {quizIndex + 1} sur {QUIZ_QUESTIONS.length}
                   </span>
                   <span className="font-bold text-[#004b49]">
-                    Score : {quizScore} / {QUIZ_QUESTIONS.length}
+                    Score : {quizScore} / {QUIZ_QUESTIONS.length}
                   </span>
                 </div>
 
@@ -650,7 +650,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                 </div>
 
                 <p className="text-xs text-[#1a1c1d] font-bold text-center">
-                  Quel est le ton dominant de cette expression ?
+                  Quel est le ton dominant de cette expression ?
                 </p>
 
                 <div className="grid grid-cols-3 gap-2">
@@ -691,10 +691,10 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                 <div className="w-16 h-16 rounded-full bg-[#b1eeea] text-[#00201f] flex items-center justify-center shadow-md">
                   <span className="material-symbols-outlined text-[36px]">celebration</span>
                 </div>
-                <h4 className="text-lg font-bold text-[#004b49]">Félicitations !</h4>
+                <h4 className="text-lg font-bold text-[#004b49]">Félicitations !</h4>
                 <p className="text-xs text-[#3f4948]">
                   Vous avez obtenu un score de <strong>{quizScore} sur {QUIZ_QUESTIONS.length}</strong>.
-                  Vous remportez <span className="text-[#9e4229] font-bold">+50 XP</span> pour votre oreille ivoirienne !
+                  Vous remportez <span className="text-[#9e4229] font-bold">+50 XP</span> pour votre oreille ivoirienne !
                 </p>
                 <button
                   onClick={() => setIsQuizOpen(false)}

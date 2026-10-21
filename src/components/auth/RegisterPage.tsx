@@ -24,7 +24,7 @@ const LANGUAGE_CHOICES = [
     key: 'baoule' as const,
     name: 'Baoulé',
     family: 'Famille Akan',
-    greeting: '« N’zassa »',
+    greeting: '« N’zassa »',
     icon: 'eco',
     iconBg: 'bg-[#003331] text-white',
     chip: 'bg-[#b1eeea]/70 text-[#004b49]',
@@ -33,7 +33,7 @@ const LANGUAGE_CHOICES = [
     key: 'dioula' as const,
     name: 'Dioula',
     family: 'Famille Mandé',
-    greeting: '« I nice »',
+    greeting: '« I nice »',
     icon: 'light_mode',
     iconBg: 'bg-[#fe8b6d] text-[#3c0800]',
     chip: 'bg-[#ffdbd2] text-[#9e4229]',
@@ -67,7 +67,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
     if (!fullName.trim()) return setError('Indiquez votre nom ou prénom.');
     if (!isContactValid)
       return setError(useEmail ? 'Entrez une adresse email valide.' : 'Entrez un numéro ivoirien valide à 10 chiffres.');
-    if (score < 3) return setError('Mot de passe : 8 caractères minimum, avec un chiffre et un symbole.');
+    if (score < 3) return setError('Mot de passe : 8 caractères minimum, avec un chiffre et un symbole.');
     if (!acceptedTerms) return setError('Veuillez accepter les conditions d’utilisation.');
     setError(null);
     setIsLoading(true);
@@ -163,7 +163,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
           {/* Name */}
           <div className="flex flex-col gap-2">
             <label htmlFor="register-name" className="text-[14px] font-medium text-[#1a1c1d]">
-              Nom complet ou Prénom
+              Nom complet ou prénom
             </label>
             <div className="h-13 rounded-2xl bg-[#f3f3f5] flex items-center gap-3 px-4 focus-within:ring-2 focus-within:ring-[#004b49]/30 transition-all">
               <span className="material-symbols-outlined text-[22px] text-[#3f4948]">badge</span>
@@ -257,7 +257,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
             </div>
             <div className="flex items-center justify-between text-[12px]">
               <span className="font-medium text-[#1a1c1d]">
-                Force : {password ? STRENGTH_LABELS[score] : '—'}
+                Force : {password ? STRENGTH_LABELS[score] : '—'}
               </span>
               <span className="text-[#3f4948]">8+ car., chiffre &amp; symbole</span>
             </div>
@@ -329,7 +329,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
             <span className="material-symbols-outlined text-[22px]">verified_user</span>
           </span>
           <div>
-            <p className="text-[14px] font-semibold text-[#1a1c1d]">IA Éthique &amp; Préservation Vivante</p>
+            <p className="text-[14px] font-semibold text-[#1a1c1d]">IA éthique et préservation vivante</p>
             <p className="text-[13px] leading-snug text-[#3f4948]">
               Vos enregistrements vocaux restent anonymes et contribuent au patrimoine national.
             </p>
@@ -337,7 +337,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
         </div>
 
         <p className="mt-8 text-[16px] text-[#3f4948] text-center">
-          Déjà inscrit ?{' '}
+          Déjà inscrit ?{' '}
           <button type="button" onClick={onGoToLogin} className="text-[18px] font-semibold text-[#9e4229] hover:underline">
             Se connecter
           </button>
