@@ -35,7 +35,8 @@ const NavButton: React.FC<{
     disabled={item.disabled}
     onClick={onClick}
     aria-current={isActive ? 'page' : undefined}
-    className={`flex flex-col items-center justify-center min-w-[56px] h-12 transition-all duration-200 ${
+    title={item.disabled ? 'Bientôt disponible' : undefined}
+    className={`flex flex-col items-center justify-center min-w-[56px] h-12 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed ${
       isActive ? 'text-[#004b49] font-bold scale-105' : 'text-[#3f4948] hover:text-[#1a1c1d]'
     }`}
   >

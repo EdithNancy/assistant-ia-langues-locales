@@ -151,13 +151,6 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={toggleDialect}
-              className="px-2.5 py-1 rounded-full bg-[#ffdbd2] text-[#9e4229] text-xs font-bold active:scale-95 transition-all flex items-center gap-1"
-            >
-              <span className="material-symbols-outlined text-[14px]">swap_horiz</span>
-              <span>{currentDialect === 'dioula' ? 'Dioula' : 'Baoulé'}</span>
-            </button>
             <img
               src={BRAND_ASSETS.edithProfile}
               alt="Edith"
@@ -181,12 +174,16 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
               </span>
             </div>
 
+            {/* Seule commande de langue de la session */}
             <button
               onClick={toggleDialect}
-              className="flex items-center justify-center gap-1 px-3 py-1.5 rounded-full bg-[#003331] text-white text-xs font-bold active:scale-95 transition-all shadow-sm flex-1 min-w-0"
+              aria-label={`Langue : ${currentDialect === 'dioula' ? 'Dioula' : 'Baoulé'}. Passer en ${
+                currentDialect === 'dioula' ? 'Baoulé' : 'Dioula'
+              }`}
+              className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-[#003331] text-white text-xs font-bold active:scale-95 transition-all shadow-sm flex-1 min-w-0"
             >
               <span className="truncate">{currentDialect === 'dioula' ? 'Dioula (Mandé)' : 'Baoulé (Akan)'}</span>
-              {/* <span className="material-symbols-outlined text-[16px]">arrow_drop_down</span> */}
+              <span className="material-symbols-outlined text-[16px] shrink-0">swap_horiz</span>
             </button>
           </div>
         </div>
@@ -468,17 +465,6 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
             </span>
             <span className="text-[11px] font-semibold">
               {isPaused ? 'Reprendre' : 'Pause'}
-            </span>
-          </button>
-
-          {/* Language Switch Dialect Button */}
-          <button
-            onClick={toggleDialect}
-            className="flex-1 h-13 rounded-2xl bg-[#e2e2e4] hover:bg-[#d9dadc] active:scale-95 text-[#1a1c1d] flex flex-col items-center justify-center gap-0.5 transition-all shadow-xs"
-          >
-            <span className="material-symbols-outlined text-[22px]">swap_horiz</span>
-            <span className="text-[11px] font-semibold">
-              {currentDialect === 'dioula' ? 'Baoulé' : 'Dioula'}
             </span>
           </button>
 
