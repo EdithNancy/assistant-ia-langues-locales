@@ -3,6 +3,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router';
 import { Header } from './components/Header';
 import { BottomNav, NavTabKey, TabKey } from './components/BottomNav';
 import { Sidebar } from './components/Sidebar';
+import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { HomeTab } from './components/HomeTab';
 import { DiscussionsTab } from './components/DiscussionsTab';
 import { TraduireTab } from './components/TraduireTab';
@@ -38,6 +39,7 @@ export default function App() {
     () => loadSession()?.language ?? 'baoule'
   );
   const [voiceFirst, setVoiceFirst] = useState(() => loadPreferences().voiceFirst);
+  const isOnline = useOnlineStatus();
   const currentTab: NavTabKey = tabFromPath(pathname) ?? 'accueil';
   const setCurrentTab = (tab: NavTabKey) => navigate(TAB_PATHS[tab]);
   const [isVoiceSessionOpen, setIsVoiceSessionOpen] = useState(false);
@@ -169,6 +171,17 @@ export default function App() {
           }
           onOpenProfile={() => setIsProfileModalOpen(true)}
         />
+
+        {/* Bandeau hors connexion */}
+        {!isOnline && (
+          <div
+            role="status"
+            className="fixed top-[calc(3.5rem+env(safe-area-inset-top))] lg:top-16 inset-x-0 lg:left-64 z-30 px-4 py-2 bg-[#9e4229] text-white text-xs font-semibold flex items-center justify-center gap-2"
+          >
+            <span className="material-symbols-outlined text-[16px]">wifi_off</span>
+            Hors connexion : Aya, la traduction et la voix sont indisponibles.
+          </div>
+        )}
 
         {/* Floating Notification Toast */}
         {notificationToast && (

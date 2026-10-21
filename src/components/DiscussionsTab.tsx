@@ -32,6 +32,9 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
   const { ensureConsent } = useVoiceConsent();
   const isRecording = recorder.status === 'recording';
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [isAiTyping, setIsAiTyping] = useState(false);
+  /** Dernier message resté sans réponse, pour proposer « Réessayer ». */
+  const [failedText, setFailedText] = useState<string | null>(null);
   const [likedMap, setLikedMap] = useState<Record<string, boolean>>({});
   const [toast, setToast] = useState<string | null>(null);
 
@@ -60,8 +63,30 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
     });
   };
 
+  const requestReply = async (userText: string) => {
+    setFailedText(null);
+    setIsAiTyping(true);
+    try {
+      const reply = await api.chat({ message: userText, language: currentLanguage });
+      const aiMsg: ChatMessage = {
+        ...reply,
+        id: `ai-${Date.now()}`,
+        sender: 'ai',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        language: currentLanguage,
+      };
+      setMessages((prev) => [...prev, aiMsg]);
+      if (voiceFirst) handlePlayMessageAudio(aiMsg);
+      else soundEngine.playTonePitch('Haut');
+    } catch {
+      setFailedText(userText);
+    } finally {
+      setIsAiTyping(false);
+    }
+  };
+
   const handleSendMessage = async () => {
-    if (!inputText.trim()) return;
+    if (!inputText.trim() || isAiTyping) return;
     const userText = inputText.trim();
     setInputText('');
 
@@ -76,22 +101,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
 
     setMessages((prev) => [...prev, userMsg]);
     soundEngine.playTone(480, 0.1);
-
-    try {
-      const reply = await api.chat({ message: userText, language: currentLanguage });
-      const aiMsg: ChatMessage = {
-        ...reply,
-        id: `ai-${Date.now()}`,
-        sender: 'ai',
-        timestamp: now(),
-        language: currentLanguage,
-      };
-      setMessages((prev) => [...prev, aiMsg]);
-      if (voiceFirst) handlePlayMessageAudio(aiMsg);
-      else soundEngine.playTonePitch('Haut');
-    } catch {
-      showToast("Aya n'a pas pu répondre. Vérifiez votre connexion.");
-    }
+    await requestReply(userText);
   };
 
   const handleMicToggle = async () => {
@@ -416,6 +426,32 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
             </div>
           );
         })}
+
+        {isAiTyping && (
+          <div role="status" className="flex items-center gap-2 mr-auto px-4 py-3 rounded-3xl rounded-tl-sm bg-white border border-[#edeef0] text-sm text-[#3f4948]">
+            <span className="flex gap-1" aria-hidden="true">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#004b49] animate-bounce [animation-delay:-0.3s]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#004b49] animate-bounce [animation-delay:-0.15s]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#004b49] animate-bounce" />
+            </span>
+            Aya réfléchit…
+          </div>
+        )}
+
+        {failedText && !isAiTyping && (
+          <div role="alert" className="flex flex-wrap items-center gap-3 mr-auto px-4 py-3 rounded-2xl bg-[#ffdad6] text-sm text-[#93000a]">
+            <span className="flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-[18px]">error</span>
+              Aya n'a pas pu répondre.
+            </span>
+            <button
+              onClick={() => void requestReply(failedText)}
+              className="px-3 py-1.5 rounded-full bg-white text-[#93000a] text-xs font-bold active:scale-95 transition-transform"
+            >
+              Réessayer
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Sticky Bottom Composer Section */}

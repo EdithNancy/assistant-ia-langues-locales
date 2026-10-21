@@ -55,6 +55,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   const [isTranslating, setIsTranslating] = useState(false);
   const [translateFailed, setTranslateFailed] = useState(false);
   const speakNextResultRef = useRef(false);
+  const [retryCount, setRetryCount] = useState(0);
   const [sourceText, setSourceText] = useState('Combien coûte le régime de bananes plantain ?');
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [audioSpeedIdx, setAudioSpeedIdx] = useState(0);
@@ -176,7 +177,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [sourceText, sourceLang, targetLang]);
+  }, [sourceText, sourceLang, targetLang, retryCount]);
 
   const handlePlayAudio = () => {
     if (isPlayingAudio || !currentTrans) return;
@@ -487,10 +488,18 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
               <span className="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
             )}
             {translateFailed
-              ? 'La traduction a échoué. Vérifiez votre connexion et réessayez.'
+              ? 'La traduction a échoué. Vérifiez votre connexion.'
               : isTranslating
               ? 'Traduction en cours…'
               : 'Saisissez ou dictez une phrase pour la traduire.'}
+            {translateFailed && !isTranslating && (
+              <button
+                onClick={() => setRetryCount((n) => n + 1)}
+                className="ml-auto px-3 py-1.5 rounded-full bg-[#62fae3] text-[#00201c] text-xs font-bold active:scale-95 transition-transform"
+              >
+                Réessayer
+              </button>
+            )}
           </p>
         )}
       </div>
