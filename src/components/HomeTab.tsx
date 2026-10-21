@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { Chip } from './ui/Chip';
+import { Card } from './ui/Card';
+import { IconButton } from './ui/IconButton';
 import { LanguageToggle } from './LanguageToggle';
 import { useToast } from '../hooks/useToast';
 import { Toast } from './Toast';
@@ -68,7 +71,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       <Toast message={toastMessage} icon="check_circle" />
 
       {/* Top User Profile & Welcome Bar */}
-      <section className="lg:col-span-12 flex flex-wrap items-center gap-x-4 gap-y-4 bg-white p-4 lg:p-5 rounded-3xl shadow-soft border border-surface-container/60">
+      <Card as="section" className="lg:col-span-12 flex flex-wrap items-center gap-x-4 gap-y-4 p-4 lg:p-5">
         <div className="flex-1 flex flex-col min-w-0">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-on-surface-variant">
             Bienvenue
@@ -91,13 +94,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
         <div className="flex items-center gap-2 shrink-0">
           {voiceFirst && (
-            <button
-              onClick={handlePlayHelp}
-              aria-label="Écouter l'aide"
-              className="w-11 h-11 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center active:scale-95 transition-transform"
-            >
-              <span className="material-symbols-outlined text-[22px]">help</span>
-            </button>
+            <IconButton onClick={handlePlayHelp} aria-label="Écouter l'aide" icon="help" size="xl" iconClassName="text-[22px]" className="bg-secondary-fixed text-on-secondary-fixed active:scale-95 transition-transform" />
           )}
           <button
             onClick={onToggleVoiceFirst}
@@ -110,7 +107,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             <span className="hidden min-[400px]:inline">Mode voix</span>
           </button>
         </div>
-      </section>
+      </Card>
 
       {/* Hero Voice Interactive Card */}
       <section className="lg:col-span-7 flex flex-col justify-center relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-container via-primary to-primary-deep text-white p-6 lg:p-8 shadow-raised">
@@ -178,7 +175,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       </section>
 
       {/* Daily Learning Card: Mot du Jour */}
-      <section className="lg:col-span-5 flex flex-col bg-white p-5 lg:p-6 rounded-3xl shadow-soft relative overflow-hidden border border-surface-container/60">
+      <Card as="section" className="lg:col-span-5 flex flex-col p-5 lg:p-6 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-2 h-full bg-secondary"></div>
 
         <div className="flex items-start justify-between gap-3">
@@ -273,7 +270,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             )}
           </span>
         </div>
-      </section>
+      </Card>
 
       {/* Quick Actions Grid */}
       <section className="lg:col-span-12 flex flex-col gap-2">
@@ -290,9 +287,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-4">
           {/* Action 1: Traduire */}
-          <button
+          <Card as="button"
             onClick={() => onNavigateTab('traduire')}
-            className="bg-white p-4 lg:p-5 rounded-3xl shadow-soft hover:shadow-raised transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-surface-container/60"
+            className="p-4 lg:p-5 hover:shadow-raised transition-all flex flex-col justify-between text-left group active:scale-[0.98]"
           >
             <div className="w-12 h-12 rounded-2xl bg-primary-fixed text-on-primary-fixed flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <span className="material-symbols-outlined text-[26px]">translate</span>
@@ -301,12 +298,12 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               <h4 className="text-sm font-bold text-on-surface leading-tight">Traduire</h4>
               <p className="text-xs text-on-surface-variant mt-1">Voix et texte instantanés</p>
             </div>
-          </button>
+          </Card>
 
           {/* Action 2: Tuteur IA */}
-          <button
+          <Card as="button"
             onClick={() => onNavigateTab('discussions')}
-            className="bg-white p-4 lg:p-5 rounded-3xl shadow-soft hover:shadow-raised transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-surface-container/60"
+            className="p-4 lg:p-5 hover:shadow-raised transition-all flex flex-col justify-between text-left group active:scale-[0.98]"
           >
             <div className="w-12 h-12 rounded-2xl bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <span className="material-symbols-outlined text-[26px]">psychology</span>
@@ -315,12 +312,12 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               <h4 className="text-sm font-bold text-on-surface leading-tight">Tuteur IA</h4>
               <p className="text-xs text-on-surface-variant mt-1">Correction vocale</p>
             </div>
-          </button>
+          </Card>
 
           {/* Action 3: Vocabulaire */}
-          <button
+          <Card as="button"
             onClick={onOpenVocabularyModal}
-            className="bg-white p-4 lg:p-5 rounded-3xl shadow-soft hover:shadow-raised transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-surface-container/60"
+            className="p-4 lg:p-5 hover:shadow-raised transition-all flex flex-col justify-between text-left group active:scale-[0.98]"
           >
             <div className="w-12 h-12 rounded-2xl bg-tertiary-container text-tertiary-fixed flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <span className="material-symbols-outlined text-[26px]">storefront</span>
@@ -329,12 +326,12 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               <h4 className="text-sm font-bold text-on-surface leading-tight">Vocabulaire</h4>
               <p className="text-xs text-on-surface-variant mt-1">Marché & salutations</p>
             </div>
-          </button>
+          </Card>
 
           {/* Action 4: Histoires */}
-          <button
+          <Card as="button"
             onClick={onOpenStoryModal}
-            className="bg-white p-4 lg:p-5 rounded-3xl shadow-soft hover:shadow-raised transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-surface-container/60"
+            className="p-4 lg:p-5 hover:shadow-raised transition-all flex flex-col justify-between text-left group active:scale-[0.98]"
           >
             <div className="w-12 h-12 rounded-2xl bg-surface-container text-secondary flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <span className="material-symbols-outlined text-[26px]">auto_stories</span>
@@ -343,14 +340,14 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               <h4 className="text-sm font-bold text-on-surface leading-tight">Histoires</h4>
               <p className="text-xs text-on-surface-variant mt-1">Contes & sagesses</p>
             </div>
-          </button>
+          </Card>
         </div>
       </section>
 
       {/* Cultural Inspiration & Visual Strip */}
       {/* <section
         onClick={onOpenStoryModal}
-        className="bg-white p-4 rounded-3xl shadow-soft flex items-center gap-4 cursor-pointer hover:shadow-raised transition-all border border-surface-container/60 group"
+        className="bg-surface-container-lowest p-4 rounded-3xl shadow-soft flex items-center gap-4 cursor-pointer hover:shadow-raised transition-all border border-surface-container/60 group"
       >
         <div className="relative w-20 h-20 rounded-2xl overflow-hidden shrink-0 shadow-soft">
           <img
@@ -386,8 +383,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4">
           {/* Card 1 */}
-          <div
-            className="relative bg-white p-3.5 rounded-3xl shadow-soft hover:shadow-raised transition-all flex items-center justify-between gap-3 cursor-pointer border border-surface-container/60 active:scale-[0.99]"
+          <Card
+            className="relative p-3.5 hover:shadow-raised transition-all flex items-center justify-between gap-3 cursor-pointer active:scale-[0.99]"
           >
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-12 h-12 rounded-2xl bg-secondary-container/20 text-secondary flex items-center justify-center shrink-0">
@@ -398,9 +395,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                   Négociation au marché de Treichville
                 </h4>
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-xs text-outline">
-                  <span className="px-2 py-0.5 rounded-full bg-surface-container text-[11px] text-on-surface font-bold">
-                    Dioula
-                  </span>
+                  <Chip>Dioula</Chip>
                   <span>•</span>
                   <span>Il y a 2h</span>
                   <span>•</span>
@@ -408,18 +403,12 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 </div>
               </div>
             </div>
-            <button
-              onClick={() => onSelectDiscussion('Négociation au marché de Treichville', 'dioula')}
-              aria-label="Continuer la discussion : Négociation au marché de Treichville"
-              className="after:absolute after:inset-0 after:rounded-3xl w-9 h-9 rounded-full bg-surface-container-low text-on-surface-variant flex items-center justify-center shrink-0 hover:bg-primary hover:text-white transition-colors"
-            >
-              <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-            </button>
-          </div>
+            <IconButton onClick={() => onSelectDiscussion('Négociation au marché de Treichville', 'dioula')} aria-label="Continuer la discussion : Négociation au marché de Treichville" icon="chevron_right" iconClassName="text-[18px]" className="after:absolute after:inset-0 after:rounded-3xl bg-surface-container-low text-on-surface-variant hover:bg-primary hover:text-white transition-colors" />
+          </Card>
 
           {/* Card 2 */}
-          <div
-            className="relative bg-white p-3.5 rounded-3xl shadow-soft hover:shadow-raised transition-all flex items-center justify-between gap-3 cursor-pointer border border-surface-container/60 active:scale-[0.99]"
+          <Card
+            className="relative p-3.5 hover:shadow-raised transition-all flex items-center justify-between gap-3 cursor-pointer active:scale-[0.99]"
           >
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-12 h-12 rounded-2xl bg-primary-container/10 text-primary-container flex items-center justify-center shrink-0">
@@ -430,9 +419,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                   Salutations traditionnelles en pays Baoulé
                 </h4>
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-xs text-outline">
-                  <span className="px-2 py-0.5 rounded-full bg-surface-container text-[11px] text-on-surface font-bold">
-                    Baoulé
-                  </span>
+                  <Chip>Baoulé</Chip>
                   <span>•</span>
                   <span>Hier</span>
                   <span>•</span>
@@ -445,14 +432,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 </div>
               </div>
             </div>
-            <button
-              onClick={() => onSelectDiscussion('Salutations traditionnelles en pays Baoulé', 'baoule')}
-              aria-label="Continuer la discussion : Salutations traditionnelles en pays Baoulé"
-              className="after:absolute after:inset-0 after:rounded-3xl w-9 h-9 rounded-full bg-surface-container-low text-on-surface-variant flex items-center justify-center shrink-0 hover:bg-primary hover:text-white transition-colors"
-            >
-              <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-            </button>
-          </div>
+            <IconButton onClick={() => onSelectDiscussion('Salutations traditionnelles en pays Baoulé', 'baoule')} aria-label="Continuer la discussion : Salutations traditionnelles en pays Baoulé" icon="chevron_right" iconClassName="text-[18px]" className="after:absolute after:inset-0 after:rounded-3xl bg-surface-container-low text-on-surface-variant hover:bg-primary hover:text-white transition-colors" />
+          </Card>
         </div>
       </section>
     </div>

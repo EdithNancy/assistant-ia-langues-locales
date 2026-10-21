@@ -112,7 +112,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
         <form
           onSubmit={handleSubmit}
           noValidate
-          className="mt-8 w-full rounded-3xl bg-white p-5 shadow-soft flex flex-col gap-5"
+          className="mt-8 w-full rounded-3xl bg-surface-container-lowest p-5 shadow-soft flex flex-col gap-5"
         >
           {/* Priority language */}
           <div className="flex flex-col gap-3">
@@ -306,7 +306,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
             type="button"
             disabled
             title="Bientôt disponible"
-            className="relative h-12 rounded-full bg-white flex items-center justify-center gap-2 text-[15px] font-medium text-on-surface shadow-soft hover:bg-surface-container-low active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
+            className="relative h-12 rounded-full bg-surface-container-lowest flex items-center justify-center gap-2 text-[15px] font-medium text-on-surface shadow-soft hover:bg-surface-container-low active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
           >
             <ComingSoonBadge />
             <GoogleIcon />
@@ -316,7 +316,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
             type="button"
             disabled
             title="Bientôt disponible"
-            className="relative h-12 rounded-full bg-white flex items-center justify-center gap-2 text-[15px] font-medium text-on-surface shadow-soft hover:bg-surface-container-low active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
+            className="relative h-12 rounded-full bg-surface-container-lowest flex items-center justify-center gap-2 text-[15px] font-medium text-on-surface shadow-soft hover:bg-surface-container-low active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
           >
             <ComingSoonBadge />
             <AppleIcon />

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Button } from './ui/Button';
+import { IconButton } from './ui/IconButton';
 import { Modal } from './ui/Modal';
 import { useCelebration } from '../hooks/useCelebration';
 import { LanguageToggle } from './LanguageToggle';
@@ -179,16 +181,10 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
               </div>
             </div>
 
-            <button
-              onClick={() => {
+            <IconButton onClick={() => {
                 celebrate();
                 showToast('7 jours d’affilée, bravo ! Historique bientôt disponible.');
-              }}
-              aria-label="Voir statistiques"
-              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 transition-all flex items-center justify-center text-white"
-            >
-              <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-            </button>
+              }} aria-label="Voir statistiques" icon="chevron_right" size="sm" iconClassName="text-[18px]" className="bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white" />
           </div>
 
           {/* Weekly Progress Micro-Dots */}
@@ -226,7 +222,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
       </section>
 
       {/* Pronunciation Trainer Hero Interactive Widget */}
-      <section className="lg:col-span-7 lg:row-span-2 bg-white rounded-3xl p-5 lg:p-6 shadow-soft space-y-4 border border-surface-container">
+      <section className="lg:col-span-7 lg:row-span-2 bg-surface-container-lowest rounded-3xl p-5 lg:p-6 shadow-soft space-y-4 border border-surface-container">
         {/* Card Header Tag & Progress */}
         <div className="flex items-center justify-between">
           <div className="inline-flex items-center space-x-1.5 px-3 py-1 bg-secondary-fixed/60 text-on-secondary-fixed-variant rounded-full">
@@ -366,7 +362,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
 
             {/* Feedback Criteria Details */}
             <div className="grid grid-cols-3 gap-2 pt-1 text-center">
-              <div className="bg-white p-2.5 rounded-xl shadow-soft border border-surface-container">
+              <div className="bg-surface-container-lowest p-2.5 rounded-xl shadow-soft border border-surface-container">
                 <span className="material-symbols-outlined text-tertiary-container text-[18px]">
                   graphic_eq
                 </span>
@@ -374,7 +370,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                 <p className="text-xs text-primary font-bold">Excellente</p>
               </div>
 
-              <div className="bg-white p-2.5 rounded-xl shadow-soft border border-surface-container">
+              <div className="bg-surface-container-lowest p-2.5 rounded-xl shadow-soft border border-surface-container">
                 <span className="material-symbols-outlined text-tertiary-container text-[18px]">
                   speed
                 </span>
@@ -382,7 +378,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                 <p className="text-xs text-primary font-bold">Fluide</p>
               </div>
 
-              <div className="bg-white p-2.5 rounded-xl shadow-soft border border-surface-container">
+              <div className="bg-surface-container-lowest p-2.5 rounded-xl shadow-soft border border-surface-container">
                 <span className="material-symbols-outlined text-secondary text-[18px]">
                   verified
                 </span>
@@ -417,7 +413,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
           {LEARNING_MODULES.map((mod) => (
             <div
               key={mod.id}
-              className="relative bg-white p-3 rounded-2xl shadow-soft flex flex-col justify-between space-y-2.5 hover:bg-surface transition-all cursor-pointer border border-surface-container group active:scale-[0.98]"
+              className="relative bg-surface-container-lowest p-3 rounded-2xl shadow-soft flex flex-col justify-between space-y-2.5 hover:bg-surface transition-all cursor-pointer border border-surface-container group active:scale-[0.98]"
             >
               <button
                 type="button"
@@ -503,13 +499,9 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
             </p>
 
             <div className="pt-2">
-              <button
-                onClick={handleStartQuiz}
-                className="px-4 py-2.5 rounded-full bg-primary-container text-white text-xs font-bold shadow-raised hover:bg-primary active:scale-95 transition-all inline-flex items-center space-x-2"
-              >
-                <span className="material-symbols-outlined text-[18px]">play_circle</span>
-                <span>Lancer le quiz audio</span>
-              </button>
+              <Button onClick={handleStartQuiz} size="sm" icon="play_circle">
+                Lancer le quiz audio
+              </Button>
             </div>
           </div>
 
@@ -521,7 +513,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
 
       {/* Interactive Module Detail Modal */}
       {selectedModule && (
-        <Modal onClose={() => setSelectedModule(null)} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-md bg-white rounded-3xl p-5 shadow-overlay flex flex-col gap-4 max-h-[85vh] overflow-y-auto animate-in zoom-in-95 duration-200">
+        <Modal onClose={() => setSelectedModule(null)} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-md bg-surface-container-lowest rounded-3xl p-5 shadow-overlay flex flex-col gap-4 max-h-[85vh] overflow-y-auto animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-start">
               <div>
                 <span className="text-xs text-secondary font-bold uppercase">
@@ -532,12 +524,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                 </h3>
                 <p className="text-xs text-on-surface-variant">{selectedModule.subtitle}</p>
               </div>
-              <button
-                onClick={() => setSelectedModule(null)}
-                className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant"
-              >
-                <span className="material-symbols-outlined text-[18px]">close</span>
-              </button>
+              <IconButton aria-label="Fermer" onClick={() => setSelectedModule(null)} icon="close" size="sm" iconClassName="text-[18px]" className="bg-surface-container text-on-surface-variant" />
             </div>
 
             <div className="flex flex-col gap-3">
@@ -550,15 +537,10 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                     <span className="text-xs font-bold text-primary-container">
                       Leçon {idx + 1} : {lesson.title}
                     </span>
-                    <button
-                      onClick={() => {
+                    <IconButton aria-label="Écouter la prononciation" onClick={() => {
                         soundEngine.playTonePitch('Haut');
                         voicePlayer.speak(lesson.phrase, currentLanguage, 0.9);
-                      }}
-                      className="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center active:scale-90 transition-transform"
-                    >
-                      <span className="material-symbols-outlined text-[16px]">volume_up</span>
-                    </button>
+                      }} icon="volume_up" size="sm" iconClassName="text-[16px]" className="bg-primary-container text-white active:scale-90 transition-transform" />
                   </div>
                   <p className="text-xs text-on-surface-variant">{lesson.description}</p>
                   <p className="text-sm font-bold text-on-surface mt-1">
@@ -586,13 +568,13 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
 
       {/* Interactive Quiz Modal */}
       {isQuizOpen && (
-        <Modal onClose={() => setIsQuizOpen(false)} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-overlay flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
+        <Modal onClose={() => setIsQuizOpen(false)} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-sm bg-surface-container-lowest rounded-3xl p-5 shadow-overlay flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-secondary">headphones</span>
                 <span className="text-sm font-bold text-on-surface">Quiz des tons ivoiriens</span>
               </div>
-              <button
+              <button aria-label="Fermer"
                 onClick={() => setIsQuizOpen(false)}
                 className="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant"
               >

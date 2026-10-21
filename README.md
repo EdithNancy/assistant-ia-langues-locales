@@ -78,3 +78,10 @@ npm run build   # build de production dans dist/
 L'app ne charge que les icônes Material Symbols qu'elle utilise (~20 Ko au lieu de ~1 Mo).
 Pour une nouvelle icône, ajoutez son nom dans `icon_names` (ordre alphabétique) dans `index.html` ;
 `npm test` signale toute icône utilisée mais non chargée.
+
+### 6. Système de design
+
+- **Couleurs** : uniquement les tokens de `src/index.css` (`bg-primary-container`, `text-on-surface-variant`…), jamais `bg-[#004b49]`.
+- **Ombres** : `shadow-soft` (cartes), `shadow-raised` (actions, bandeaux), `shadow-overlay` (fenêtres), `shadow-glow` (éléments vocaux).
+- **Arrondis** : `rounded-full` (pilules), `rounded-3xl` (cartes), `rounded-2xl` (blocs internes), `rounded-xl` (petits éléments).
+- **Composants** (`src/components/ui`) : `Modal`, `Card`, `Button`, `IconButton`, `Chip`.

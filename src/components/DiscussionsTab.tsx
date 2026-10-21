@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { IconButton } from './ui/IconButton';
 import { Modal } from './ui/Modal';
 import { LANGUAGE_LABEL } from '../data/languages';
 import { Flag } from './Flag';
@@ -237,13 +238,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
             </span>
           </button>
 
-          <button
-            onClick={onOpenVoiceSession}
-            aria-label="Lancer la session vocale en direct"
-            className="w-9 h-9 rounded-full flex items-center justify-center text-primary-container hover:bg-surface-container transition-colors"
-          >
-            <span className="material-symbols-outlined text-[22px]">call</span>
-          </button>
+          <IconButton onClick={onOpenVoiceSession} aria-label="Lancer la session vocale en direct" icon="call" iconClassName="text-[22px]" className="text-primary-container hover:bg-surface-container transition-colors" />
         </div>
       </div>
 
@@ -296,7 +291,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                 <span className="text-on-surface-variant">{msg.timestamp}</span>
               </div>
 
-              <div className="bg-white rounded-3xl rounded-tl-sm p-4 shadow-soft flex flex-col gap-3 text-on-surface border border-surface-container">
+              <div className="bg-surface-container-lowest rounded-3xl rounded-tl-sm p-4 shadow-soft flex flex-col gap-3 text-on-surface border border-surface-container">
                 {/* Main Text */}
                 <p className="text-sm leading-relaxed text-on-surface font-medium">
                   {msg.text}
@@ -411,24 +406,8 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                 {/* Actions Footer */}
                 <div className="flex items-center justify-between pt-1 border-t border-surface-container/60 text-on-surface-variant">
                   <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => handleCopy(msg.text)}
-                      className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors"
-                      title="Copier le texte"
-                    >
-                      <span className="material-symbols-outlined text-[18px]">
-                        content_copy
-                      </span>
-                    </button>
-                    <button
-                      onClick={onOpenVoiceSession}
-                      className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors"
-                      title="Pratiquer la prononciation"
-                    >
-                      <span className="material-symbols-outlined text-[18px]">
-                        graphic_eq
-                      </span>
-                    </button>
+                    <IconButton onClick={() => handleCopy(msg.text)} title="Copier le texte" icon="content_copy" size="sm" iconClassName="text-[18px]" className="hover:bg-surface-container transition-colors" />
+                    <IconButton onClick={onOpenVoiceSession} title="Pratiquer la prononciation" icon="graphic_eq" size="sm" iconClassName="text-[18px]" className="hover:bg-surface-container transition-colors" />
                   </div>
 
                   <div className="flex items-center gap-1">
@@ -479,7 +458,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                       value={feedbackComment}
                       onChange={(e) => setFeedbackComment(e.target.value)}
                       placeholder="Ex. : mauvaise traduction, mauvais ton…"
-                      className="h-10 px-3 rounded-xl bg-white border border-surface-container text-sm focus:outline-none focus:ring-2 focus:ring-primary-container/30"
+                      className="h-10 px-3 rounded-xl bg-surface-container-lowest border border-surface-container text-sm focus:outline-none focus:ring-2 focus:ring-primary-container/30"
                     />
                     <div className="flex justify-end gap-2">
                       <button
@@ -504,7 +483,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
         })}
 
         {isAiTyping && (
-          <div role="status" className="animate-in fade-in duration-300 flex items-center gap-2 mr-auto px-4 py-3 rounded-3xl rounded-tl-sm bg-white border border-surface-container text-sm text-on-surface-variant">
+          <div role="status" className="animate-in fade-in duration-300 flex items-center gap-2 mr-auto px-4 py-3 rounded-3xl rounded-tl-sm bg-surface-container-lowest border border-surface-container text-sm text-on-surface-variant">
             <span className="flex gap-1" aria-hidden="true">
               <span className="w-1.5 h-1.5 rounded-full bg-primary-container animate-bounce [animation-delay:-0.3s]" />
               <span className="w-1.5 h-1.5 rounded-full bg-primary-container animate-bounce [animation-delay:-0.15s]" />
@@ -522,7 +501,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
             </span>
             <button
               onClick={() => void requestReply(failedText)}
-              className="px-3 py-1.5 rounded-full bg-white text-on-error-container text-xs font-bold active:scale-95 transition-transform"
+              className="px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-error-container text-xs font-bold active:scale-95 transition-transform"
             >
               Réessayer
             </button>
@@ -534,7 +513,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
       <div className="fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] lg:bottom-0 left-0 right-0 lg:left-64 z-30 bg-gradient-to-t from-surface via-surface/95 to-transparent pt-3 pb-2 lg:pb-6 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl lg:max-w-4xl mx-auto flex flex-col gap-2">
           {/* Special African Characters Toolbar */}
-          <div className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-full bg-white shadow-soft border border-surface-container">
+          <div className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-full bg-surface-container-lowest shadow-soft border border-surface-container">
             <div className="flex items-center gap-1.5 min-w-0">
               <span className="text-xs text-on-surface-variant font-bold px-1 flex items-center gap-1">
                 <span className="material-symbols-outlined text-[14px] text-primary-container">
@@ -565,13 +544,13 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
             <button
               onClick={() => showToast('Ajout d’image ou audio contextuel')}
               aria-label="Joindre un document"
-              className="w-12 h-12 rounded-full bg-white text-on-surface-variant hover:text-primary-container flex items-center justify-center shadow-raised active:scale-95 transition-all shrink-0 border border-surface-container"
+              className="w-12 h-12 rounded-full bg-surface-container-lowest text-on-surface-variant hover:text-primary-container flex items-center justify-center shadow-raised active:scale-95 transition-all shrink-0 border border-surface-container"
             >
               <span className="material-symbols-outlined text-[24px]">add</span>
             </button>
 
             {/* Rounded Text Input Container */}
-            <div className="flex-1 h-12 rounded-full bg-white shadow-raised px-4 flex items-center justify-between gap-2 border border-surface-container focus-within:ring-2 focus-within:ring-primary-container/30">
+            <div className="flex-1 h-12 rounded-full bg-surface-container-lowest shadow-raised px-4 flex items-center justify-between gap-2 border border-surface-container focus-within:ring-2 focus-within:ring-primary-container/30">
               <input
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
@@ -583,21 +562,9 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                 type="text"
               />
               {inputText ? (
-                <button
-                  onClick={handleSendMessage}
-                  aria-label="Envoyer le message"
-                  className="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center shrink-0 active:scale-90 transition-transform"
-                >
-                  <span className="material-symbols-outlined text-[18px]">send</span>
-                </button>
+                <IconButton onClick={handleSendMessage} aria-label="Envoyer le message" icon="send" size="sm" iconClassName="text-[18px]" className="bg-primary-container text-white active:scale-90 transition-transform" />
               ) : (
-                <button
-                  onClick={handleMicToggle}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-secondary transition-colors"
-                  title="Activer le micro"
-                >
-                  <span className="material-symbols-outlined text-[20px]">graphic_eq</span>
-                </button>
+                <IconButton onClick={handleMicToggle} title="Activer le micro" icon="graphic_eq" size="sm" iconClassName="text-[20px]" className="text-on-surface-variant hover:text-secondary transition-colors" />
               )}
             </div>
 
@@ -629,7 +596,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
 
       {/* Language / Dialect Selection Modal Drawer */}
       {isDialectModalOpen && (
-        <Modal onClose={() => setIsDialectModalOpen(false)} overlayClassName="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/40 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in" className="w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-5 shadow-overlay flex flex-col gap-4 animate-in slide-in-from-bottom duration-300">
+        <Modal onClose={() => setIsDialectModalOpen(false)} overlayClassName="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/40 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in" className="w-full max-w-md bg-surface-container-lowest rounded-t-3xl sm:rounded-3xl p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-5 shadow-overlay flex flex-col gap-4 animate-in slide-in-from-bottom duration-300">
             <div className="sm:hidden w-12 h-1.5 bg-outline-variant/60 rounded-full mx-auto"></div>
 
             <div className="flex justify-between items-center">
@@ -641,12 +608,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                   L'IA s'adapte immédiatement aux tonalités locales.
                 </p>
               </div>
-              <button
-                onClick={() => setIsDialectModalOpen(false)}
-                className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant"
-              >
-                <span className="material-symbols-outlined text-[20px]">close</span>
-              </button>
+              <IconButton aria-label="Fermer" onClick={() => setIsDialectModalOpen(false)} icon="close" iconClassName="text-[20px]" className="bg-surface-container text-on-surface-variant" />
             </div>
 
             <div className="flex flex-col gap-2 pt-1">

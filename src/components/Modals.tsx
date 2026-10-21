@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Button } from './ui/Button';
+import { IconButton } from './ui/IconButton';
 import { Modal } from './ui/Modal';
 import { LANGUAGE_LABEL } from '../data/languages';
 import { BRAND_ASSETS, CULTURAL_STORIES, VOCABULARY_LIST } from '../data/mockData';
@@ -31,7 +33,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
   };
 
   return (
-    <Modal onClose={onClose} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-md bg-white rounded-3xl p-5 shadow-overlay flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-surface-container">
+    <Modal onClose={onClose} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-md bg-surface-container-lowest rounded-3xl p-5 shadow-overlay flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-surface-container">
         <div className="relative w-full h-44 rounded-2xl overflow-hidden shadow-soft">
           <img
             alt={story.title}
@@ -39,12 +41,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
             decoding="async"
             className="w-full h-full object-cover"
           />
-          <button
-            onClick={onClose}
-            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center backdrop-blur-xs hover:bg-black/60"
-          >
-            <span className="material-symbols-outlined text-[18px]">close</span>
-          </button>
+          <IconButton aria-label="Fermer" onClick={onClose} icon="close" size="sm" iconClassName="text-[18px]" className="absolute top-3 right-3 bg-black/40 text-white backdrop-blur-xs hover:bg-black/60" />
           <span className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full bg-primary/80 backdrop-blur-xs text-tertiary-fixed text-[11px] font-bold">
             {story.category}
           </span>
@@ -75,7 +72,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
             </span>
           </div>
 
-          <button
+          <button aria-label={isPlayingAudio ? 'Mettre en pause' : 'Écouter le proverbe'}
             onClick={handlePlayProverb}
             className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-90 ${
               isPlayingAudio
@@ -89,12 +86,9 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <button
-          onClick={onClose}
-          className="w-full py-2.5 rounded-full bg-primary-container text-white text-xs font-bold active:scale-95 transition-transform"
-        >
+        <Button onClick={onClose} size="sm" fullWidth>
           Fermer l'histoire
-        </button>
+        </Button>
       </Modal>
   );
 };
@@ -115,7 +109,7 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({ isOpen, onClos
   );
 
   return (
-    <Modal onClose={onClose} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-md bg-white rounded-3xl p-5 shadow-overlay flex flex-col gap-3 max-h-[85vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-surface-container">
+    <Modal onClose={onClose} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-md bg-surface-container-lowest rounded-3xl p-5 shadow-overlay flex flex-col gap-3 max-h-[85vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-surface-container">
         <div className="flex justify-between items-center">
           <div>
             <h3 className="text-base font-bold text-on-surface">
@@ -123,12 +117,7 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({ isOpen, onClos
             </h3>
             <p className="text-xs text-on-surface-variant">Vocabulaire pratique Baoulé & Dioula</p>
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant"
-          >
-            <span className="material-symbols-outlined text-[18px]">close</span>
-          </button>
+          <IconButton aria-label="Fermer" onClick={onClose} icon="close" size="sm" iconClassName="text-[18px]" className="bg-surface-container text-on-surface-variant" />
         </div>
 
         <div className="relative">
@@ -166,15 +155,10 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({ isOpen, onClos
                 </span>
               </div>
 
-              <button
-                onClick={() => {
+              <IconButton aria-label="Écouter la prononciation" onClick={() => {
                   soundEngine.playTonePitch(item.tone);
                   voicePlayer.speak(item.word, item.language, 0.9);
-                }}
-                className="w-8 h-8 rounded-full bg-surface-container hover:bg-primary-fixed text-primary-container flex items-center justify-center shrink-0 active:scale-90 transition-transform ml-2"
-              >
-                <span className="material-symbols-outlined text-[18px]">volume_up</span>
-              </button>
+                }} icon="volume_up" size="sm" iconClassName="text-[18px]" className="bg-surface-container hover:bg-primary-fixed text-primary-container active:scale-90 transition-transform ml-2" />
             </div>
           ))}
         </div>
@@ -210,15 +194,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <Modal onClose={onClose} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-overlay flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-surface-container">
+    <Modal onClose={onClose} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-sm bg-surface-container-lowest rounded-3xl p-5 shadow-overlay flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-surface-container">
         <div className="flex justify-between items-center">
           <h3 className="text-base font-bold text-on-surface">Mon profil IvoirAI</h3>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant"
-          >
-            <span className="material-symbols-outlined text-[18px]">close</span>
-          </button>
+          <IconButton aria-label="Fermer" onClick={onClose} icon="close" size="sm" iconClassName="text-[18px]" className="bg-surface-container text-on-surface-variant" />
         </div>
 
         <div className="flex flex-col items-center text-center gap-2">
@@ -283,7 +262,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             {consent && (
               <button
                 onClick={withdraw}
-                className="shrink-0 px-3 py-1.5 rounded-full bg-white text-error text-xs font-bold border border-surface-container active:scale-95 transition-transform"
+                className="shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-error text-xs font-bold border border-surface-container active:scale-95 transition-transform"
               >
                 Retirer
               </button>
@@ -291,12 +270,9 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           </div>
         </div>
 
-        <button
-          onClick={onClose}
-          className="w-full py-2.5 rounded-full bg-primary-container text-white text-xs font-bold active:scale-95 transition-transform"
-        >
+        <Button onClick={onClose} size="sm" fullWidth>
           Retour à l'application
-        </button>
+        </Button>
         <button
           onClick={onLogout}
           className="w-full py-2.5 -mt-2 rounded-full text-error text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-error-container transition-colors"
@@ -329,7 +305,7 @@ export const VoiceFirstSwitch: React.FC<{ checked: boolean; onToggle: () => void
       }`}
     >
       <span
-        className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${
+        className={`absolute top-0.5 w-5 h-5 rounded-full bg-surface-container-lowest shadow transition-all ${
           checked ? 'left-[22px]' : 'left-0.5'
         }`}
       />

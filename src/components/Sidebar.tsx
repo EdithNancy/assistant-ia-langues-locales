@@ -17,7 +17,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenProfile,
 }) => {
   return (
-    <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-64 flex-col bg-white border-r border-surface-container shadow-soft">
+    <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-64 flex-col bg-surface-container-lowest border-r border-surface-container shadow-soft">
       {/* Brand */}
       <div className="h-16 px-5 flex items-center gap-3 border-b border-surface-container/60">
         <div className="relative">

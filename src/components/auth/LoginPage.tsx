@@ -25,7 +25,7 @@ const LoginEmblem = () => (
     <div className="absolute inset-0 rounded-full border border-dashed border-outline-variant" />
     <div className="absolute inset-3 rounded-full bg-primary-fixed/60" />
     <div className="relative w-28 h-28 rounded-full p-[5px] bg-gradient-to-br from-secondary via-on-secondary-fixed-variant to-primary-container shadow-raised">
-      <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
+      <div className="w-full h-full rounded-full bg-surface-container-lowest flex items-center justify-center">
         <svg viewBox="0 0 64 40" className="w-16 h-10" aria-hidden="true">
           <rect x="2" y="10" width="7" height="20" rx="3.5" fill="#3cddc7" />
           <rect x="15" y="2" width="7" height="36" rx="3.5" fill="#9e4229" />
@@ -92,7 +92,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
         <form
           onSubmit={handleSubmit}
           noValidate
-          className="mt-8 w-full rounded-3xl bg-white p-5 shadow-soft flex flex-col gap-5"
+          className="mt-8 w-full rounded-3xl bg-surface-container-lowest p-5 shadow-soft flex flex-col gap-5"
         >
           {/* Phone / email switch */}
           <div className="grid grid-cols-2 p-1.5 rounded-full bg-surface-container">
@@ -182,7 +182,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
                 Langue<span className="hidden min-[420px]:inline"> de session</span>
               </span>
             </span>
-            <div className="flex p-1 rounded-full bg-white">
+            <div className="flex p-1 rounded-full bg-surface-container-lowest">
               {(
                 [
                   { key: 'baoule', label: 'Baoulé' },

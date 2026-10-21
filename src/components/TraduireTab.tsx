@@ -1,4 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Chip } from './ui/Chip';
+import { Button } from './ui/Button';
+import { IconButton } from './ui/IconButton';
 import { Modal } from './ui/Modal';
 import { categoryIcon, LANGUAGE_LABEL } from '../data/languages';
 import { Flag } from './Flag';
@@ -263,7 +266,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
         <button
           onClick={handleChangeSource}
           aria-label={`Langue source : ${sourceLabel(sourceLang)}. Changer`}
-          className="flex-1 min-w-0 flex items-center justify-center gap-2 py-2.5 px-2 sm:px-3 rounded-full bg-white text-on-surface shadow-soft transition-all active:scale-95 text-left border border-surface-container"
+          className="flex-1 min-w-0 flex items-center justify-center gap-2 py-2.5 px-2 sm:px-3 rounded-full bg-surface-container-lowest text-on-surface shadow-soft transition-all active:scale-95 text-left border border-surface-container"
         >
           {sourceLang === 'auto' ? (
             <span className="material-symbols-outlined text-[20px] text-primary-container">language</span>
@@ -289,20 +292,14 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
 
         {/* Swap Button */}
         <div className="relative z-10 px-1">
-          <button
-            onClick={handleSwap}
-            aria-label="Permuter les langues"
-            className="w-10 h-10 rounded-full bg-secondary hover:bg-on-secondary-fixed-variant text-white flex items-center justify-center shadow-raised active:scale-90 transition-transform duration-300"
-          >
-            <span className="material-symbols-outlined text-[20px]">swap_horiz</span>
-          </button>
+          <IconButton onClick={handleSwap} aria-label="Permuter les langues" icon="swap_horiz" size="lg" iconClassName="text-[20px]" className="bg-secondary hover:bg-on-secondary-fixed-variant text-white shadow-raised active:scale-90 transition-transform duration-300" />
         </div>
 
         {/* Target Language Button */}
         <button
           onClick={handleChangeTarget}
           aria-label={`Langue cible : ${LANGUAGE_LABEL[targetLang]}. Changer`}
-          className="flex-1 min-w-0 flex items-center justify-center gap-2 py-2.5 px-2 sm:px-3 rounded-full bg-white text-on-surface shadow-soft transition-all active:scale-95 text-left border border-surface-container"
+          className="flex-1 min-w-0 flex items-center justify-center gap-2 py-2.5 px-2 sm:px-3 rounded-full bg-surface-container-lowest text-on-surface shadow-soft transition-all active:scale-95 text-left border border-surface-container"
         >
           <Flag country={targetLang === 'fr' ? 'fr' : 'ci'} />
           <div className="flex flex-col min-w-0">
@@ -320,7 +317,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       </div>
 
       {/* Source Input Box */}
-      <div className="flex flex-col bg-white rounded-3xl p-4 lg:p-5 shadow-soft relative transition-all border border-surface-container focus-within:ring-2 focus-within:ring-primary-container/20">
+      <div className="flex flex-col bg-surface-container-lowest rounded-3xl p-4 lg:p-5 shadow-soft relative transition-all border border-surface-container focus-within:ring-2 focus-within:ring-primary-container/20">
         <div className="flex justify-between items-center mb-2">
           <span className="text-xs font-bold text-outline uppercase tracking-wider">
             Texte source
@@ -454,21 +451,9 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
             </div>
 
             <div className="flex items-center gap-1.5">
-              <button
-                onClick={handleCopy}
-                aria-label="Copier la traduction"
-                className="w-9 h-9 rounded-full bg-tertiary/50 text-white flex items-center justify-center active:scale-90 transition-transform hover:bg-tertiary"
-              >
-                <span className="material-symbols-outlined text-[18px]">content_copy</span>
-              </button>
+              <IconButton onClick={handleCopy} aria-label="Copier la traduction" icon="content_copy" iconClassName="text-[18px]" className="bg-tertiary/50 text-white active:scale-90 transition-transform hover:bg-tertiary" />
 
-              <button
-                onClick={handleShare}
-                aria-label="Partager la traduction"
-                className="w-9 h-9 rounded-full bg-tertiary/50 text-white flex items-center justify-center active:scale-90 transition-transform hover:bg-tertiary"
-              >
-                <span className="material-symbols-outlined text-[18px]">share</span>
-              </button>
+              <IconButton onClick={handleShare} aria-label="Partager la traduction" icon="share" iconClassName="text-[18px]" className="bg-tertiary/50 text-white active:scale-90 transition-transform hover:bg-tertiary" />
 
               <button
                 onClick={() => {
@@ -540,7 +525,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
           {savedExpressions.map((item) => (
             <div
               key={item.id}
-              className="bg-white p-3.5 rounded-2xl shadow-soft flex items-center justify-between border border-surface-container hover:bg-surface transition-colors"
+              className="bg-surface-container-lowest p-3.5 rounded-2xl shadow-soft flex items-center justify-between border border-surface-container hover:bg-surface transition-colors"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-primary-container shrink-0">
@@ -551,9 +536,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
                     <span className="text-sm font-bold text-on-surface truncate">
                       {item.word}
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-surface-container text-[11px] text-on-surface-variant font-semibold">
-                      {LANGUAGE_LABEL[item.language]}
-                    </span>
+                    <Chip>{LANGUAGE_LABEL[item.language]}</Chip>
                   </div>
                   <span className="text-xs text-on-surface-variant truncate">
                     {item.meaning}
@@ -562,13 +545,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
               </div>
 
               <div className="flex items-center gap-1 shrink-0">
-                <button
-                  onClick={() => playVocabAudio(item.word, item.tone, item.language)}
-                  aria-label={`Prononcer ${item.word}`}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary-container active:scale-90 transition-transform"
-                >
-                  <span className="material-symbols-outlined text-[18px]">volume_up</span>
-                </button>
+                <IconButton onClick={() => playVocabAudio(item.word, item.tone, item.language)} aria-label={`Prononcer ${item.word}`} icon="volume_up" size="sm" iconClassName="text-[18px]" className="text-on-surface-variant hover:text-primary-container active:scale-90 transition-transform" />
 
                 <button
                   onClick={() => toggleFavoriteItem(item.id)}
@@ -603,19 +580,16 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
           </div>
         </div>
 
-        <button
-          onClick={() => setIsDualMicModalOpen(true)}
-          className="z-10 px-3.5 py-1.5 rounded-full bg-primary text-white text-xs active:scale-95 transition-transform shrink-0 font-semibold shadow-soft"
-        >
+        <Button onClick={() => setIsDualMicModalOpen(true)} size="sm" className="z-10 shrink-0">
           Lancer
-        </button>
+        </Button>
 
         <div className="absolute -right-4 -bottom-6 w-24 h-24 rounded-full bg-primary-fixed-dim/20 pointer-events-none blur-xl"></div>
       </div>
 
       {/* Dual Mic Conversation Modal */}
       {isDualMicModalOpen && (
-        <Modal onClose={() => setIsDualMicModalOpen(false)} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-overlay flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
+        <Modal onClose={() => setIsDualMicModalOpen(false)} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-sm bg-surface-container-lowest rounded-3xl p-5 shadow-overlay flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-secondary">record_voice_over</span>
@@ -623,12 +597,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
                   Traduction instantanée à deux
                 </h3>
               </div>
-              <button
-                onClick={() => setIsDualMicModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant"
-              >
-                <span className="material-symbols-outlined text-[18px]">close</span>
-              </button>
+              <IconButton aria-label="Fermer" onClick={() => setIsDualMicModalOpen(false)} icon="close" size="sm" iconClassName="text-[18px]" className="bg-surface-container text-on-surface-variant" />
             </div>
 
             <p className="text-xs text-on-surface-variant">

@@ -22,7 +22,7 @@ const DEFAULT_OVERLAY =
   'fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in';
 
 /**
- * Fenêtre de dialogue de l'app : fond cliquable, Échap, focus gardé dans la fenêtre
+ * Fenêtre de dialogue de l'app : fond cliquable, Échap, focus placé puis gardé dans la fenêtre
  * puis rendu à l'élément d'origine, défilement de la page bloqué.
  * Monter le composant l'ouvre ; le démonter le ferme.
  */
@@ -40,7 +40,8 @@ export const Modal: React.FC<ModalProps> = ({
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null;
     const panel = panelRef.current;
-    (panel?.querySelector<HTMLElement>(FOCUSABLE) ?? panel)?.focus();
+    // Focus sur la fenêtre elle-même : annoncée par les lecteurs d'écran, sans anneau sur un bouton
+    panel?.focus();
 
     const { overflow } = document.body.style;
     document.body.style.overflow = 'hidden';
@@ -52,7 +53,10 @@ export const Modal: React.FC<ModalProps> = ({
       if (items.length === 0) return;
       const first = items[0];
       const last = items[items.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
+      if (document.activeElement === panel) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
         last.focus();
       } else if (!event.shiftKey && document.activeElement === last) {

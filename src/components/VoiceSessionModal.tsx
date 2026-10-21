@@ -288,7 +288,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
                   }`}
                 ></span>
                 <span
-                  className={`w-1.5 rounded-full bg-white transition-all ${
+                  className={`w-1.5 rounded-full bg-surface-container-lowest transition-all ${
                     speakingState === 'speaking'
                       ? 'h-14 animate-[bounce_1s_infinite_200ms]'
                       : 'h-11'
@@ -302,7 +302,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
                   }`}
                 ></span>
                 <span
-                  className={`w-1.5 rounded-full bg-white transition-all ${
+                  className={`w-1.5 rounded-full bg-surface-container-lowest transition-all ${
                     speakingState === 'speaking'
                       ? 'h-12 animate-[bounce_0.9s_infinite_300ms]'
                       : 'h-10'
