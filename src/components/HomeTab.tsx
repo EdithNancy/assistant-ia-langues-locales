@@ -68,12 +68,12 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       <Toast message={toastMessage} icon="check_circle" />
 
       {/* Top User Profile & Welcome Bar */}
-      <section className="lg:col-span-12 flex flex-wrap items-center gap-x-4 gap-y-4 bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_20px_-2px_rgba(0,75,73,0.05)] border border-[#edeef0]/60">
+      <section className="lg:col-span-12 flex flex-wrap items-center gap-x-4 gap-y-4 bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_20px_-2px_rgba(0,75,73,0.05)] border border-surface-container/60">
         <div className="flex-1 flex flex-col min-w-0">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#3f4948]">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-on-surface-variant">
             Bienvenue
           </p>
-          <h2 className="text-2xl lg:text-3xl font-bold text-[#1a1c1d] truncate mt-1">
+          <h2 className="text-2xl lg:text-3xl font-bold text-on-surface truncate mt-1">
             Akwaba, Edith
           </h2>
         </div>
@@ -94,7 +94,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             <button
               onClick={handlePlayHelp}
               aria-label="Écouter l'aide"
-              className="w-11 h-11 rounded-full bg-[#ffdbd2] text-[#3c0800] flex items-center justify-center active:scale-95 transition-transform"
+              className="w-11 h-11 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center active:scale-95 transition-transform"
             >
               <span className="material-symbols-outlined text-[22px]">help</span>
             </button>
@@ -103,7 +103,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             onClick={onToggleVoiceFirst}
             aria-pressed={voiceFirst}
             className={`h-11 px-3 rounded-full flex items-center gap-1.5 text-xs font-bold transition-colors active:scale-95 ${
-              voiceFirst ? 'bg-[#004b49] text-white' : 'bg-[#f3f3f5] text-[#3f4948] hover:bg-[#edeef0]'
+              voiceFirst ? 'bg-primary-container text-white' : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
             }`}
           >
             <span className="material-symbols-outlined text-[20px]">record_voice_over</span>
@@ -113,10 +113,10 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       </section>
 
       {/* Hero Voice Interactive Card */}
-      <section className="lg:col-span-7 flex flex-col justify-center relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#004b49] via-[#003331] to-[#002422] text-white p-6 lg:p-8 shadow-[0_16px_36px_-6px_rgba(0,43,41,0.35)]">
+      <section className="lg:col-span-7 flex flex-col justify-center relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-container via-primary to-primary-deep text-white p-6 lg:p-8 shadow-[0_16px_36px_-6px_rgba(0,43,41,0.35)]">
         {/* Traditional Geometric Accent Watermark Pattern */}
         <svg
-          className="absolute -right-8 -top-8 w-52 h-52 text-[#62fae3] opacity-10 pointer-events-none"
+          className="absolute -right-8 -top-8 w-52 h-52 text-tertiary-fixed opacity-10 pointer-events-none"
           fill="currentColor"
           viewBox="0 0 100 100"
         >
@@ -131,7 +131,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         </svg>
 
         <div className="relative z-10 flex flex-col items-center text-center">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#004c43]/80 backdrop-blur-md text-[#62fae3] text-xs font-semibold mb-2 shadow-xs border border-[#62fae3]/20">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-container/80 backdrop-blur-md text-tertiary-fixed text-xs font-semibold mb-2 shadow-xs border border-tertiary-fixed/20">
             <span className="material-symbols-outlined text-[14px]">graphic_eq</span>
             <span>Reconnaissance vocale ivoirienne</span>
           </div>
@@ -142,21 +142,21 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               : 'Parlez en Dioula véhiculaire'}
           </h3>
 
-          <p className="text-xs lg:text-sm text-[#7ebab7] mt-1.5 max-w-xs lg:max-w-md text-balance leading-relaxed">
+          <p className="text-xs lg:text-sm text-on-primary-container mt-1.5 max-w-xs lg:max-w-md text-balance leading-relaxed">
             L'IA comprend vos dialectes, intonations et accents ivoiriens sans filtre.
           </p>
 
           {/* Central Floating Microphone with Animated Waves */}
           <div className="relative my-7 flex items-center justify-center">
             {/* Concentric Glow Pulse Rings */}
-            <div className="absolute w-28 h-28 rounded-full bg-[#62fae3]/15 animate-pulse-glow pointer-events-none"></div>
-            <div className="absolute w-24 h-24 rounded-full bg-[#3cddc7]/25 animate-pulse-glow [animation-delay:1.5s] pointer-events-none"></div>
+            <div className="absolute w-28 h-28 rounded-full bg-tertiary-fixed/15 animate-pulse-glow pointer-events-none"></div>
+            <div className="absolute w-24 h-24 rounded-full bg-tertiary-fixed-dim/25 animate-pulse-glow [animation-delay:1.5s] pointer-events-none"></div>
 
             {/* Interactive Orb Button */}
             <button
               onClick={onOpenVoiceSession}
               aria-label="Démarrer la discussion vocale"
-              className="relative z-20 w-20 h-20 rounded-full bg-gradient-to-tr from-[#3cddc7] to-[#62fae3] text-[#003331] flex items-center justify-center shadow-[0_0_32px_8px_rgba(60,221,199,0.45)] hover:scale-105 active:scale-95 transition-all duration-200 group"
+              className="relative z-20 w-20 h-20 rounded-full bg-gradient-to-tr from-tertiary-fixed-dim to-tertiary-fixed text-primary flex items-center justify-center shadow-[0_0_32px_8px_rgba(60,221,199,0.45)] hover:scale-105 active:scale-95 transition-all duration-200 group"
             >
               <span className="material-symbols-outlined text-[36px] font-bold group-hover:scale-110 transition-transform">
                 mic
@@ -169,7 +169,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             onClick={onOpenVoiceSession}
             className="flex items-center gap-2 cursor-pointer hover:opacity-90 active:scale-95 transition-all"
           >
-            <span className="w-2 h-2 rounded-full bg-[#fe8b6d] animate-pulse"></span>
+            <span className="w-2 h-2 rounded-full bg-secondary-container animate-pulse"></span>
             <span className="text-xs text-white font-semibold tracking-wide">
               Appuyez pour parler en direct
             </span>
@@ -178,22 +178,22 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       </section>
 
       {/* Daily Learning Card: Mot du Jour */}
-      <section className="lg:col-span-5 flex flex-col bg-white p-5 lg:p-6 rounded-3xl shadow-[0_6px_24px_-4px_rgba(0,75,73,0.06)] relative overflow-hidden border border-[#edeef0]/60">
-        <div className="absolute top-0 left-0 w-2 h-full bg-[#9e4229]"></div>
+      <section className="lg:col-span-5 flex flex-col bg-white p-5 lg:p-6 rounded-3xl shadow-[0_6px_24px_-4px_rgba(0,75,73,0.06)] relative overflow-hidden border border-surface-container/60">
+        <div className="absolute top-0 left-0 w-2 h-full bg-secondary"></div>
 
         <div className="flex items-start justify-between gap-3">
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[#9e4229] text-[18px]">lightbulb</span>
-              <span className="text-xs uppercase tracking-wider text-[#9e4229] font-bold">
+              <span className="material-symbols-outlined text-secondary text-[18px]">lightbulb</span>
+              <span className="text-xs uppercase tracking-wider text-secondary font-bold">
                 Mot du jour • {currentLanguage === 'dioula' ? 'Dioula' : 'Baoulé'}
               </span>
             </div>
 
-            <h4 className="text-xl text-[#1a1c1d] font-extrabold mt-1">
+            <h4 className="text-xl text-on-surface font-extrabold mt-1">
               {currentLanguage === 'dioula' ? 'An Sɔgɔma' : 'Akwaba !'}
             </h4>
-            <span className="text-xs text-[#707978] font-medium tracking-tight mt-0.5">
+            <span className="text-xs text-outline font-medium tracking-tight mt-0.5">
               {currentLanguage === 'dioula' ? '[ An Sɔ-gɔ-ma ]' : '[ Ah-kwah-bah ]'}
             </span>
           </div>
@@ -204,8 +204,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               aria-label="Écouter la prononciation"
               className={`w-11 h-11 rounded-full flex items-center justify-center transition-all shadow-sm active:scale-95 ${
                 isPlayingWord
-                  ? 'bg-[#62fae3] text-[#003331] animate-pulse'
-                  : 'bg-[#ffdbd2] text-[#3c0800] hover:scale-105'
+                  ? 'bg-tertiary-fixed text-primary animate-pulse'
+                  : 'bg-secondary-fixed text-on-secondary-fixed hover:scale-105'
               }`}
             >
               <span className="material-symbols-outlined text-[22px]">
@@ -218,8 +218,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               aria-label="Sauvegarder dans mon lexique"
               className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors active:scale-95 ${
                 isBookmarked
-                  ? 'bg-[#fe8b6d]/30 text-[#9e4229]'
-                  : 'bg-[#f3f3f5] text-[#3f4948] hover:text-[#9e4229]'
+                  ? 'bg-secondary-container/30 text-secondary'
+                  : 'bg-surface-container-low text-on-surface-variant hover:text-secondary'
               }`}
             >
               <span
@@ -234,21 +234,21 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         </div>
 
         {/* Meaning & Cultural Context */}
-        <div className="mt-4 p-3.5 rounded-2xl bg-[#f3f3f5]">
+        <div className="mt-4 p-3.5 rounded-2xl bg-surface-container-low">
           <div className="flex flex-wrap items-baseline justify-between gap-x-2 mb-1">
-            <span className="text-xs text-[#1a1c1d] font-bold">Traduction :</span>
-            <span className="text-xs text-[#9e4229] font-bold">
+            <span className="text-xs text-on-surface font-bold">Traduction :</span>
+            <span className="text-xs text-secondary font-bold">
               {currentLanguage === 'dioula'
                 ? '« Bonjour / Bonne matinée »'
                 : '« Bienvenue / Sois le bienvenu »'}
             </span>
           </div>
-          <p className="text-xs text-[#3f4948] italic">
+          <p className="text-xs text-on-surface-variant italic">
             {currentLanguage === 'dioula'
               ? '« An sɔgɔma, i ka kɛnɛ wa ? »'
               : '« Akwaba o awlo nun, an nian amun bo »'}
           </p>
-          <span className="text-xs text-[#707978] block mt-0.5">
+          <span className="text-xs text-outline block mt-0.5">
             {currentLanguage === 'dioula'
               ? '(Bonjour, te portes-tu bien ?)'
               : '(Bienvenue dans notre maison, installez-vous paisiblement)'}
@@ -256,8 +256,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         </div>
 
         {/* Pronunciation Micro Tip */}
-        <div className="mt-3 lg:mt-auto lg:pt-4 flex items-center gap-2 text-[#3f4948] text-xs pt-1">
-          <span className="material-symbols-outlined text-[#fe8b6d] text-[18px] shrink-0">
+        <div className="mt-3 lg:mt-auto lg:pt-4 flex items-center gap-2 text-on-surface-variant text-xs pt-1">
+          <span className="material-symbols-outlined text-secondary-container text-[18px] shrink-0">
             record_voice_over
           </span>
           <span>
@@ -278,11 +278,11 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       {/* Quick Actions Grid */}
       <section className="lg:col-span-12 flex flex-col gap-2">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-sm lg:text-base font-bold text-[#1a1c1d]">Pratique rapide</h3>
+          <h3 className="text-sm lg:text-base font-bold text-on-surface">Pratique rapide</h3>
           <button
             disabled
             onClick={() => onNavigateTab('apprendre')}
-            className="text-xs text-[#9e4229] font-bold hover:underline"
+            className="text-xs text-secondary font-bold hover:underline"
           >
             Explorer tout
           </button>
@@ -292,56 +292,56 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           {/* Action 1: Traduire */}
           <button
             onClick={() => onNavigateTab('traduire')}
-            className="bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-[#edeef0]/60"
+            className="bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-surface-container/60"
           >
-            <div className="w-12 h-12 rounded-2xl bg-[#b1eeea] text-[#00201f] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+            <div className="w-12 h-12 rounded-2xl bg-primary-fixed text-on-primary-fixed flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <span className="material-symbols-outlined text-[26px]">translate</span>
             </div>
             <div>
-              <h4 className="text-sm font-bold text-[#1a1c1d] leading-tight">Traduire</h4>
-              <p className="text-xs text-[#3f4948] mt-1">Voix et texte instantanés</p>
+              <h4 className="text-sm font-bold text-on-surface leading-tight">Traduire</h4>
+              <p className="text-xs text-on-surface-variant mt-1">Voix et texte instantanés</p>
             </div>
           </button>
 
           {/* Action 2: Tuteur IA */}
           <button
             onClick={() => onNavigateTab('discussions')}
-            className="bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-[#edeef0]/60"
+            className="bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-surface-container/60"
           >
-            <div className="w-12 h-12 rounded-2xl bg-[#ffdbd2] text-[#3c0800] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+            <div className="w-12 h-12 rounded-2xl bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <span className="material-symbols-outlined text-[26px]">psychology</span>
             </div>
             <div>
-              <h4 className="text-sm font-bold text-[#1a1c1d] leading-tight">Tuteur IA</h4>
-              <p className="text-xs text-[#3f4948] mt-1">Correction vocale</p>
+              <h4 className="text-sm font-bold text-on-surface leading-tight">Tuteur IA</h4>
+              <p className="text-xs text-on-surface-variant mt-1">Correction vocale</p>
             </div>
           </button>
 
           {/* Action 3: Vocabulaire */}
           <button
             onClick={onOpenVocabularyModal}
-            className="bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-[#edeef0]/60"
+            className="bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-surface-container/60"
           >
-            <div className="w-12 h-12 rounded-2xl bg-[#004c43] text-[#62fae3] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+            <div className="w-12 h-12 rounded-2xl bg-tertiary-container text-tertiary-fixed flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <span className="material-symbols-outlined text-[26px]">storefront</span>
             </div>
             <div>
-              <h4 className="text-sm font-bold text-[#1a1c1d] leading-tight">Vocabulaire</h4>
-              <p className="text-xs text-[#3f4948] mt-1">Marché & salutations</p>
+              <h4 className="text-sm font-bold text-on-surface leading-tight">Vocabulaire</h4>
+              <p className="text-xs text-on-surface-variant mt-1">Marché & salutations</p>
             </div>
           </button>
 
           {/* Action 4: Histoires */}
           <button
             onClick={onOpenStoryModal}
-            className="bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-[#edeef0]/60"
+            className="bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-surface-container/60"
           >
-            <div className="w-12 h-12 rounded-2xl bg-[#edeef0] text-[#9e4229] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+            <div className="w-12 h-12 rounded-2xl bg-surface-container text-secondary flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <span className="material-symbols-outlined text-[26px]">auto_stories</span>
             </div>
             <div>
-              <h4 className="text-sm font-bold text-[#1a1c1d] leading-tight">Histoires</h4>
-              <p className="text-xs text-[#3f4948] mt-1">Contes & sagesses</p>
+              <h4 className="text-sm font-bold text-on-surface leading-tight">Histoires</h4>
+              <p className="text-xs text-on-surface-variant mt-1">Contes & sagesses</p>
             </div>
           </button>
         </div>
@@ -350,7 +350,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       {/* Cultural Inspiration & Visual Strip */}
       {/* <section
         onClick={onOpenStoryModal}
-        className="bg-white p-4 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] flex items-center gap-4 cursor-pointer hover:shadow-md transition-all border border-[#edeef0]/60 group"
+        className="bg-white p-4 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] flex items-center gap-4 cursor-pointer hover:shadow-md transition-all border border-surface-container/60 group"
       >
         <div className="relative w-20 h-20 rounded-2xl overflow-hidden shrink-0 shadow-sm">
           <img
@@ -360,13 +360,13 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           />
         </div>
         <div className="flex flex-col min-w-0">
-          <span className="text-xs text-[#9e4229] font-bold uppercase">
+          <span className="text-xs text-secondary font-bold uppercase">
             Patrimoine Oral
           </span>
-          <h5 className="text-sm text-[#1a1c1d] font-bold truncate mt-0.5">
+          <h5 className="text-sm text-on-surface font-bold truncate mt-0.5">
             La sagesse du pagne Baoulé
           </h5>
-          <p className="text-xs text-[#3f4948] line-clamp-2 mt-1 leading-relaxed">
+          <p className="text-xs text-on-surface-variant line-clamp-2 mt-1 leading-relaxed">
             Découvrez les proverbes ancestraux tissés dans les motifs traditionnels avec l'écoute guidée.
           </p>
         </div>
@@ -375,10 +375,10 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       {/* Recent Discussions Section */}
       <section className="lg:col-span-12 flex flex-col gap-2">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-sm lg:text-base font-bold text-[#1a1c1d]">Discussions récentes</h3>
+          <h3 className="text-sm lg:text-base font-bold text-on-surface">Discussions récentes</h3>
           <button
             onClick={() => onNavigateTab('discussions')}
-            className="text-xs text-[#9e4229] font-bold hover:underline"
+            className="text-xs text-secondary font-bold hover:underline"
           >
             Historique
           </button>
@@ -387,31 +387,31 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4">
           {/* Card 1 */}
           <div
-            className="relative bg-white p-3.5 rounded-3xl shadow-[0_2px_12px_rgba(0,75,73,0.03)] hover:shadow-md transition-all flex items-center justify-between gap-3 cursor-pointer border border-[#edeef0]/60 active:scale-[0.99]"
+            className="relative bg-white p-3.5 rounded-3xl shadow-[0_2px_12px_rgba(0,75,73,0.03)] hover:shadow-md transition-all flex items-center justify-between gap-3 cursor-pointer border border-surface-container/60 active:scale-[0.99]"
           >
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-12 h-12 rounded-2xl bg-[#fe8b6d]/20 text-[#9e4229] flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-secondary-container/20 text-secondary flex items-center justify-center shrink-0">
                 <span className="material-symbols-outlined text-[24px]">shopping_bag</span>
               </div>
               <div className="flex flex-col min-w-0">
-                <h4 className="text-sm text-[#1a1c1d] font-bold truncate">
+                <h4 className="text-sm text-on-surface font-bold truncate">
                   Négociation au marché de Treichville
                 </h4>
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-xs text-[#707978]">
-                  <span className="px-2 py-0.5 rounded-full bg-[#edeef0] text-[11px] text-[#1a1c1d] font-bold">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-xs text-outline">
+                  <span className="px-2 py-0.5 rounded-full bg-surface-container text-[11px] text-on-surface font-bold">
                     Dioula
                   </span>
                   <span>•</span>
                   <span>Il y a 2h</span>
                   <span>•</span>
-                  <span className="text-[#3f4948]">3 messages</span>
+                  <span className="text-on-surface-variant">3 messages</span>
                 </div>
               </div>
             </div>
             <button
               onClick={() => onSelectDiscussion('Négociation au marché de Treichville', 'dioula')}
               aria-label="Continuer la discussion : Négociation au marché de Treichville"
-              className="after:absolute after:inset-0 after:rounded-3xl w-9 h-9 rounded-full bg-[#f3f3f5] text-[#3f4948] flex items-center justify-center shrink-0 hover:bg-[#003331] hover:text-white transition-colors"
+              className="after:absolute after:inset-0 after:rounded-3xl w-9 h-9 rounded-full bg-surface-container-low text-on-surface-variant flex items-center justify-center shrink-0 hover:bg-primary hover:text-white transition-colors"
             >
               <span className="material-symbols-outlined text-[18px]">chevron_right</span>
             </button>
@@ -419,25 +419,25 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
           {/* Card 2 */}
           <div
-            className="relative bg-white p-3.5 rounded-3xl shadow-[0_2px_12px_rgba(0,75,73,0.03)] hover:shadow-md transition-all flex items-center justify-between gap-3 cursor-pointer border border-[#edeef0]/60 active:scale-[0.99]"
+            className="relative bg-white p-3.5 rounded-3xl shadow-[0_2px_12px_rgba(0,75,73,0.03)] hover:shadow-md transition-all flex items-center justify-between gap-3 cursor-pointer border border-surface-container/60 active:scale-[0.99]"
           >
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-12 h-12 rounded-2xl bg-[#004b49]/10 text-[#004b49] flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-primary-container/10 text-primary-container flex items-center justify-center shrink-0">
                 <span className="material-symbols-outlined text-[24px]">handshake</span>
               </div>
               <div className="flex flex-col min-w-0">
-                <h4 className="text-sm text-[#1a1c1d] font-bold truncate">
+                <h4 className="text-sm text-on-surface font-bold truncate">
                   Salutations traditionnelles en pays Baoulé
                 </h4>
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-xs text-[#707978]">
-                  <span className="px-2 py-0.5 rounded-full bg-[#edeef0] text-[11px] text-[#1a1c1d] font-bold">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-xs text-outline">
+                  <span className="px-2 py-0.5 rounded-full bg-surface-container text-[11px] text-on-surface font-bold">
                     Baoulé
                   </span>
                   <span>•</span>
                   <span>Hier</span>
                   <span>•</span>
-                  <span className="text-[#3f4948] flex items-center gap-0.5">
-                    <span className="material-symbols-outlined text-[14px] text-[#3cddc7]">
+                  <span className="text-on-surface-variant flex items-center gap-0.5">
+                    <span className="material-symbols-outlined text-[14px] text-tertiary-fixed-dim">
                       mic
                     </span>
                     1m 45s
@@ -448,7 +448,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             <button
               onClick={() => onSelectDiscussion('Salutations traditionnelles en pays Baoulé', 'baoule')}
               aria-label="Continuer la discussion : Salutations traditionnelles en pays Baoulé"
-              className="after:absolute after:inset-0 after:rounded-3xl w-9 h-9 rounded-full bg-[#f3f3f5] text-[#3f4948] flex items-center justify-center shrink-0 hover:bg-[#003331] hover:text-white transition-colors"
+              className="after:absolute after:inset-0 after:rounded-3xl w-9 h-9 rounded-full bg-surface-container-low text-on-surface-variant flex items-center justify-center shrink-0 hover:bg-primary hover:text-white transition-colors"
             >
               <span className="material-symbols-outlined text-[18px]">chevron_right</span>
             </button>

@@ -72,50 +72,50 @@ const VoiceConsentDialog: React.FC<{ onAnswer: (consent: VoiceConsent | null) =>
         className="animate-in slide-in-from-bottom sm:slide-in-from-bottom-4 sm:fade-in sm:zoom-in-95 duration-300 w-full max-w-md bg-white rounded-t-[32px] sm:rounded-3xl p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto"
       >
         <div className="flex items-center gap-3">
-          <span className="w-11 h-11 rounded-2xl bg-[#b1eeea] text-[#00201f] flex items-center justify-center shrink-0">
+          <span className="w-11 h-11 rounded-2xl bg-primary-fixed text-on-primary-fixed flex items-center justify-center shrink-0">
             <span className="material-symbols-outlined text-[24px]">mic</span>
           </span>
-          <h2 id="consent-title" className="text-lg font-bold text-[#1a1c1d] leading-tight">
+          <h2 id="consent-title" className="text-lg font-bold text-on-surface leading-tight">
             Avant d'utiliser votre voix
           </h2>
         </div>
 
-        <ul className="flex flex-col gap-2 text-sm text-[#3f4948] leading-relaxed">
+        <ul className="flex flex-col gap-2 text-sm text-on-surface-variant leading-relaxed">
           <li className="flex gap-2">
-            <span className="material-symbols-outlined text-[18px] text-[#004b49] shrink-0">graphic_eq</span>
+            <span className="material-symbols-outlined text-[18px] text-primary-container shrink-0">graphic_eq</span>
             Votre enregistrement est envoyé à IvoirAI pour être transcrit, puis traité.
           </li>
           <li className="flex gap-2">
-            <span className="material-symbols-outlined text-[18px] text-[#004b49] shrink-0">shield_person</span>
+            <span className="material-symbols-outlined text-[18px] text-primary-container shrink-0">shield_person</span>
             Les informations personnelles sont retirées avant tout stockage.
           </li>
           <li className="flex gap-2">
-            <span className="material-symbols-outlined text-[18px] text-[#004b49] shrink-0">undo</span>
+            <span className="material-symbols-outlined text-[18px] text-primary-container shrink-0">undo</span>
             Vous pouvez retirer votre accord à tout moment depuis votre profil.
           </li>
         </ul>
 
-        <label className="flex items-start gap-3 p-3 rounded-2xl bg-[#f3f3f5] cursor-pointer">
+        <label className="flex items-start gap-3 p-3 rounded-2xl bg-surface-container-low cursor-pointer">
           <input
             type="checkbox"
             checked={accepted}
             onChange={(e) => setAccepted(e.target.checked)}
-            className="mt-0.5 w-5 h-5 accent-[#004b49] shrink-0"
+            className="mt-0.5 w-5 h-5 accent-primary-container shrink-0"
           />
-          <span className="text-sm text-[#1a1c1d] font-medium">
+          <span className="text-sm text-on-surface font-medium">
             J'accepte que ma voix soit enregistrée et envoyée pour être transcrite.
-            <span className="text-[#ba1a1a]"> *</span>
+            <span className="text-error"> *</span>
           </span>
         </label>
 
-        <label className="flex items-start gap-3 p-3 rounded-2xl bg-[#f3f3f5] cursor-pointer">
+        <label className="flex items-start gap-3 p-3 rounded-2xl bg-surface-container-low cursor-pointer">
           <input
             type="checkbox"
             checked={improveModel}
             onChange={(e) => setImproveModel(e.target.checked)}
-            className="mt-0.5 w-5 h-5 accent-[#004b49] shrink-0"
+            className="mt-0.5 w-5 h-5 accent-primary-container shrink-0"
           />
-          <span className="text-sm text-[#3f4948]">
+          <span className="text-sm text-on-surface-variant">
             Facultatif : mes enregistrements anonymisés peuvent servir à améliorer la reconnaissance
             du Baoulé et du Dioula.
           </span>
@@ -124,14 +124,14 @@ const VoiceConsentDialog: React.FC<{ onAnswer: (consent: VoiceConsent | null) =>
         <div className="grid grid-cols-2 gap-3 pt-1">
           <button
             onClick={() => onAnswer(null)}
-            className="h-12 rounded-full bg-[#edeef0] text-[#1a1c1d] text-sm font-bold active:scale-95 transition-transform"
+            className="h-12 rounded-full bg-surface-container text-on-surface text-sm font-bold active:scale-95 transition-transform"
           >
             Refuser
           </button>
           <button
             disabled={!accepted}
             onClick={() => onAnswer({ acceptedAt: new Date().toISOString(), improveModel })}
-            className="h-12 rounded-full bg-[#004b49] text-white text-sm font-bold active:scale-95 transition-transform disabled:opacity-40 disabled:active:scale-100"
+            className="h-12 rounded-full bg-primary-container text-white text-sm font-bold active:scale-95 transition-transform disabled:opacity-40 disabled:active:scale-100"
           >
             Accepter
           </button>

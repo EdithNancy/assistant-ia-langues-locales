@@ -17,18 +17,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenProfile,
 }) => {
   return (
-    <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-64 flex-col bg-white border-r border-[#edeef0] shadow-[4px_0_24px_rgba(0,75,73,0.04)]">
+    <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-64 flex-col bg-white border-r border-surface-container shadow-[4px_0_24px_rgba(0,75,73,0.04)]">
       {/* Brand */}
-      <div className="h-16 px-5 flex items-center gap-3 border-b border-[#edeef0]/60">
+      <div className="h-16 px-5 flex items-center gap-3 border-b border-surface-container/60">
         <div className="relative">
           <img src={BRAND_ASSETS.logo} alt="IvoirAI Brand Logo" className="h-9 w-9 object-contain" />
-          <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#62fae3] ring-1 ring-white"></span>
+          <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-tertiary-fixed ring-1 ring-white"></span>
         </div>
         <div className="flex flex-col">
-          <span className="text-base font-extrabold text-[#003331] tracking-tight leading-none">
+          <span className="text-base font-extrabold text-primary tracking-tight leading-none">
             IvoirAI
           </span>
-          <span className="text-xs text-[#3f4948] font-medium mt-0.5">Baoulé & Dioula</span>
+          <span className="text-xs text-on-surface-variant font-medium mt-0.5">Baoulé & Dioula</span>
         </div>
       </div>
 
@@ -37,16 +37,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           onClick={onStartVoiceSession}
           aria-label="Lancer la session vocale en direct"
-          className="w-full h-12 rounded-2xl bg-gradient-to-tr from-[#003331] via-[#004b49] to-[#005a57] text-white flex items-center justify-center gap-2 font-bold text-sm shadow-[0_4px_24px_rgba(45,212,191,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all"
+          className="w-full h-12 rounded-2xl bg-gradient-to-tr from-primary via-primary-container to-primary-bright text-white flex items-center justify-center gap-2 font-bold text-sm shadow-[0_4px_24px_rgba(45,212,191,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all"
         >
-          <span className="material-symbols-outlined text-[22px] text-[#62fae3]">mic</span>
+          <span className="material-symbols-outlined text-[22px] text-tertiary-fixed">mic</span>
           Session vocale
         </button>
       </div>
 
       {/* Nav items */}
       <nav className="flex-1 px-3 pt-5 flex flex-col gap-1" aria-label="Navigation principale">
-        <span className="px-3 pb-1 text-xs font-bold uppercase tracking-wider text-[#707978]">
+        <span className="px-3 pb-1 text-xs font-bold uppercase tracking-wider text-outline">
           Menu
         </span>
         {NAV_ITEMS.map((item) => {
@@ -59,8 +59,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               aria-current={isActive ? 'page' : undefined}
               className={`h-11 px-3 rounded-xl flex items-center gap-3 text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                 isActive
-                  ? 'bg-[#b1eeea]/50 text-[#004b49] font-bold'
-                  : 'text-[#3f4948] font-medium hover:bg-[#f3f3f5] hover:text-[#1a1c1d]'
+                  ? 'bg-primary-fixed/50 text-primary-container font-bold'
+                  : 'text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface'
               }`}
             >
               <span className={`material-symbols-outlined text-[22px] ${isActive ? 'fill' : ''}`}>
@@ -75,16 +75,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Profile */}
       <button
         onClick={onOpenProfile}
-        className="m-3 p-3 rounded-2xl flex items-center gap-3 bg-[#f3f3f5] hover:bg-[#edeef0] transition-colors text-left"
+        className="m-3 p-3 rounded-2xl flex items-center gap-3 bg-surface-container-low hover:bg-surface-container transition-colors text-left"
       >
         <img
           src={BRAND_ASSETS.edithProfile}
           alt="Profil Edith"
-          className="w-9 h-9 rounded-full object-cover ring-2 ring-[#004b49]/20"
+          className="w-9 h-9 rounded-full object-cover ring-2 ring-primary-container/20"
         />
         <div className="flex flex-col min-w-0">
-          <span className="text-sm font-bold text-[#1a1c1d] truncate">Edith</span>
-          <span className="text-xs text-[#3f4948]">Voir mon profil</span>
+          <span className="text-sm font-bold text-on-surface truncate">Edith</span>
+          <span className="text-xs text-on-surface-variant">Voir mon profil</span>
         </div>
       </button>
     </aside>

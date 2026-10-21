@@ -28,7 +28,7 @@ export const LanguageToggle: React.FC<LanguageToggleProps> = ({
   <div
     role="radiogroup"
     aria-label="Langue d'apprentissage"
-    className={`bg-[#edeef0] p-1 rounded-full flex items-center shadow-inner ${className}`}
+    className={`bg-surface-container p-1 rounded-full flex items-center shadow-inner ${className}`}
   >
     {options.map(({ key, label, hint }) => {
       const selected = value === key;
@@ -39,11 +39,11 @@ export const LanguageToggle: React.FC<LanguageToggleProps> = ({
           aria-checked={selected}
           onClick={() => onChange(key)}
           className={`flex-1 min-w-0 py-2 px-3 rounded-full text-xs font-bold transition-all duration-300 flex items-center justify-center gap-1.5 ${
-            selected ? 'bg-[#004b49] text-white shadow-sm' : 'text-[#3f4948] hover:text-[#1a1c1d]'
+            selected ? 'bg-primary-container text-white shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
           }`}
         >
           <span
-            className={`w-2 h-2 rounded-full shrink-0 ${selected ? 'bg-[#62fae3]' : inactiveDotClassName}`}
+            className={`w-2 h-2 rounded-full shrink-0 ${selected ? 'bg-tertiary-fixed' : inactiveDotClassName}`}
           ></span>
           <span className="truncate">
             {label}

@@ -41,7 +41,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
       <div
         role="dialog"
             aria-modal="true"
-        className="w-full max-w-md bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-[#edeef0]"
+        className="w-full max-w-md bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-surface-container"
       >
         <div className="relative w-full h-44 rounded-2xl overflow-hidden shadow-sm">
           <img
@@ -56,32 +56,32 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
           >
             <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
-          <span className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full bg-[#003331]/80 backdrop-blur-xs text-[#62fae3] text-[11px] font-bold">
+          <span className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full bg-primary/80 backdrop-blur-xs text-tertiary-fixed text-[11px] font-bold">
             {story.category}
           </span>
         </div>
 
         <div>
-          <h3 className="text-lg font-bold text-[#1a1c1d] leading-snug">
+          <h3 className="text-lg font-bold text-on-surface leading-snug">
             {story.title}
           </h3>
-          <span className="text-xs text-[#707978]">Lecture : {story.readTime}</span>
+          <span className="text-xs text-outline">Lecture : {story.readTime}</span>
         </div>
 
-        <p className="text-xs text-[#3f4948] leading-relaxed whitespace-pre-line">
+        <p className="text-xs text-on-surface-variant leading-relaxed whitespace-pre-line">
           {story.content}
         </p>
 
         {/* Audio Proverb Player Card */}
-        <div className="p-3.5 rounded-2xl bg-[#ffdbd2]/40 border border-[#ffdbd2] flex items-center justify-between gap-3">
+        <div className="p-3.5 rounded-2xl bg-secondary-fixed/40 border border-secondary-fixed flex items-center justify-between gap-3">
           <div className="flex flex-col min-w-0">
-            <span className="text-[11px] text-[#9e4229] font-bold uppercase tracking-wider">
+            <span className="text-[11px] text-secondary font-bold uppercase tracking-wider">
               Proverbe en Baoulé
             </span>
-            <p className="text-xs font-bold text-[#3c0800] truncate mt-0.5">
+            <p className="text-xs font-bold text-on-secondary-fixed truncate mt-0.5">
               « {story.audioPhrase} »
             </p>
-            <span className="text-[11px] text-[#7e2b14] truncate">
+            <span className="text-[11px] text-on-secondary-fixed-variant truncate">
               {story.audioTranslation}
             </span>
           </div>
@@ -90,8 +90,8 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
             onClick={handlePlayProverb}
             className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-90 ${
               isPlayingAudio
-                ? 'bg-[#9e4229] text-white animate-pulse'
-                : 'bg-[#9e4229] text-white shadow-sm'
+                ? 'bg-secondary text-white animate-pulse'
+                : 'bg-secondary text-white shadow-sm'
             }`}
           >
             <span className="material-symbols-outlined text-[20px]">
@@ -102,7 +102,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
 
         <button
           onClick={onClose}
-          className="w-full py-2.5 rounded-full bg-[#004b49] text-white text-xs font-bold active:scale-95 transition-transform"
+          className="w-full py-2.5 rounded-full bg-primary-container text-white text-xs font-bold active:scale-95 transition-transform"
         >
           Fermer l'histoire
         </button>
@@ -136,18 +136,18 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({ isOpen, onClos
       <div
         role="dialog"
             aria-modal="true"
-        className="w-full max-w-md bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-3 max-h-[85vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-[#edeef0]"
+        className="w-full max-w-md bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-3 max-h-[85vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-surface-container"
       >
         <div className="flex justify-between items-center">
           <div>
-            <h3 className="text-base font-bold text-[#1a1c1d]">
+            <h3 className="text-base font-bold text-on-surface">
               Lexique & expressions essentielles
             </h3>
-            <p className="text-xs text-[#3f4948]">Vocabulaire pratique Baoulé & Dioula</p>
+            <p className="text-xs text-on-surface-variant">Vocabulaire pratique Baoulé & Dioula</p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-[#edeef0] flex items-center justify-center text-[#3f4948]"
+            className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant"
           >
             <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
@@ -159,9 +159,9 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({ isOpen, onClos
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Rechercher un mot, un marché, une salutation..."
-            className="w-full h-10 pl-9 pr-4 rounded-xl bg-[#f3f3f5] text-xs text-[#1a1c1d] focus:outline-none focus:ring-1 focus:ring-[#004b49]"
+            className="w-full h-10 pl-9 pr-4 rounded-xl bg-surface-container-low text-xs text-on-surface focus:outline-none focus:ring-1 focus:ring-primary-container"
           />
-          <span className="material-symbols-outlined absolute left-2.5 top-2.5 text-[#707978] text-[18px]">
+          <span className="material-symbols-outlined absolute left-2.5 top-2.5 text-outline text-[18px]">
             search
           </span>
         </div>
@@ -170,20 +170,20 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({ isOpen, onClos
           {filtered.map((item) => (
             <div
               key={item.id}
-              className="p-3 rounded-2xl bg-[#f9f9fb] border border-[#edeef0] flex items-center justify-between"
+              className="p-3 rounded-2xl bg-surface border border-surface-container flex items-center justify-between"
             >
               <div className="flex flex-col min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-[#004b49]">{item.word}</span>
-                  <span className="text-[11px] text-[#707978]">{item.phonetic}</span>
-                  <span className="px-1.5 py-0.2 rounded bg-[#edeef0] text-[9px] font-bold uppercase text-[#3f4948]">
+                  <span className="text-xs font-bold text-primary-container">{item.word}</span>
+                  <span className="text-[11px] text-outline">{item.phonetic}</span>
+                  <span className="px-1.5 py-0.2 rounded bg-surface-container text-[9px] font-bold uppercase text-on-surface-variant">
                     {item.language}
                   </span>
                 </div>
-                <span className="text-xs text-[#1a1c1d] font-medium mt-0.5">
+                <span className="text-xs text-on-surface font-medium mt-0.5">
                   {item.meaning}
                 </span>
-                <span className="text-xs text-[#707978] italic mt-0.5">
+                <span className="text-xs text-outline italic mt-0.5">
                   « {item.example} » ({item.exampleMeaning})
                 </span>
               </div>
@@ -193,7 +193,7 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({ isOpen, onClos
                   soundEngine.playTonePitch(item.tone);
                   voicePlayer.speak(item.word, item.language, 0.9);
                 }}
-                className="w-8 h-8 rounded-full bg-[#edeef0] hover:bg-[#b1eeea] text-[#004b49] flex items-center justify-center shrink-0 active:scale-90 transition-transform ml-2"
+                className="w-8 h-8 rounded-full bg-surface-container hover:bg-primary-fixed text-primary-container flex items-center justify-center shrink-0 active:scale-90 transition-transform ml-2"
               >
                 <span className="material-symbols-outlined text-[18px]">volume_up</span>
               </button>
@@ -203,7 +203,7 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({ isOpen, onClos
 
         <button
           onClick={onClose}
-          className="w-full py-2.5 rounded-full bg-[#004b49] text-white text-xs font-bold active:scale-95 transition-transform"
+          className="w-full py-2.5 rounded-full bg-primary-container text-white text-xs font-bold active:scale-95 transition-transform"
         >
           Fermer le lexique
         </button>
@@ -242,13 +242,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
       <div
         role="dialog"
             aria-modal="true"
-        className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-[#edeef0]"
+        className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-surface-container"
       >
         <div className="flex justify-between items-center">
-          <h3 className="text-base font-bold text-[#1a1c1d]">Mon profil IvoirAI</h3>
+          <h3 className="text-base font-bold text-on-surface">Mon profil IvoirAI</h3>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-[#edeef0] flex items-center justify-center text-[#3f4948]"
+            className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant"
           >
             <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
@@ -259,42 +259,42 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             <img
               src={BRAND_ASSETS.edithProfile}
               alt="Portrait Edith"
-              className="w-20 h-20 rounded-full object-cover shadow-sm ring-4 ring-[#004b49]/20"
+              className="w-20 h-20 rounded-full object-cover shadow-sm ring-4 ring-primary-container/20"
             />
-            <span className="absolute bottom-0 right-1 w-4 h-4 bg-[#62fae3] rounded-full ring-2 ring-white"></span>
+            <span className="absolute bottom-0 right-1 w-4 h-4 bg-tertiary-fixed rounded-full ring-2 ring-white"></span>
           </div>
 
           <div>
-            <h4 className="text-base font-bold text-[#1a1c1d]">Edith Kouadio</h4>
-            <span className="text-xs text-[#3f4948]">kouadioedith440@gmail.com</span>
+            <h4 className="text-base font-bold text-on-surface">Edith Kouadio</h4>
+            <span className="text-xs text-on-surface-variant">kouadioedith440@gmail.com</span>
           </div>
 
           <div className="flex items-center gap-2 mt-1">
-            <span className="px-3 py-1 rounded-full bg-[#ffdbd2] text-[#3c0800] text-xs font-bold">
+            <span className="px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-xs font-bold">
               Intermédiaire B2
             </span>
-            <span className="px-3 py-1 rounded-full bg-[#b1eeea] text-[#00201f] text-xs font-bold">
+            <span className="px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed text-xs font-bold">
               840 XP
             </span>
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 pt-2 border-t border-[#edeef0]">
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#f3f3f5]">
-            <span className="text-xs text-[#1a1c1d] font-semibold">Tuteur IA actif</span>
-            <span className="text-xs text-[#004b49] font-bold">Aya d'Abidjan</span>
+        <div className="flex flex-col gap-2 pt-2 border-t border-surface-container">
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low">
+            <span className="text-xs text-on-surface font-semibold">Tuteur IA actif</span>
+            <span className="text-xs text-primary-container font-bold">Aya d'Abidjan</span>
           </div>
 
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#f3f3f5]">
-            <span className="text-xs text-[#1a1c1d] font-semibold">Langue favorite</span>
-            <span className="text-xs text-[#004b49] font-bold">
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low">
+            <span className="text-xs text-on-surface font-semibold">Langue favorite</span>
+            <span className="text-xs text-primary-container font-bold">
               {LANGUAGE_LABEL[currentLanguage]}
             </span>
           </div>
 
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#f3f3f5]">
-            <span className="text-xs text-[#1a1c1d] font-semibold">Série de connexion</span>
-            <span className="text-xs text-[#9e4229] font-bold inline-flex items-center gap-1">
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low">
+            <span className="text-xs text-on-surface font-semibold">Série de connexion</span>
+            <span className="text-xs text-secondary font-bold inline-flex items-center gap-1">
               7 jours consécutifs
               <span className="material-symbols-outlined fill text-[16px]">local_fire_department</span>
             </span>
@@ -302,10 +302,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
           <VoiceFirstSwitch checked={voiceFirst} onToggle={onToggleVoiceFirst} />
 
-          <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-[#f3f3f5]">
+          <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-surface-container-low">
             <div className="flex flex-col min-w-0">
-              <span className="text-xs text-[#1a1c1d] font-semibold">Utilisation de ma voix</span>
-              <span className="text-xs text-[#3f4948]">
+              <span className="text-xs text-on-surface font-semibold">Utilisation de ma voix</span>
+              <span className="text-xs text-on-surface-variant">
                 {consent
                   ? `Acceptée le ${new Date(consent.acceptedAt).toLocaleDateString('fr-FR')}${
                       consent.improveModel ? ' • aide à l’amélioration' : ''
@@ -316,7 +316,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             {consent && (
               <button
                 onClick={withdraw}
-                className="shrink-0 px-3 py-1.5 rounded-full bg-white text-[#ba1a1a] text-xs font-bold border border-[#edeef0] active:scale-95 transition-transform"
+                className="shrink-0 px-3 py-1.5 rounded-full bg-white text-error text-xs font-bold border border-surface-container active:scale-95 transition-transform"
               >
                 Retirer
               </button>
@@ -326,13 +326,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
         <button
           onClick={onClose}
-          className="w-full py-2.5 rounded-full bg-[#004b49] text-white text-xs font-bold active:scale-95 transition-transform"
+          className="w-full py-2.5 rounded-full bg-primary-container text-white text-xs font-bold active:scale-95 transition-transform"
         >
           Retour à l'application
         </button>
         <button
           onClick={onLogout}
-          className="w-full py-2.5 -mt-2 rounded-full text-[#ba1a1a] text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[#ffdad6] transition-colors"
+          className="w-full py-2.5 -mt-2 rounded-full text-error text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-error-container transition-colors"
         >
           <span className="material-symbols-outlined text-[18px]">logout</span>
           Se déconnecter
@@ -351,15 +351,15 @@ export const VoiceFirstSwitch: React.FC<{ checked: boolean; onToggle: () => void
     role="switch"
     aria-checked={checked}
     onClick={onToggle}
-    className="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-[#f3f3f5] text-left w-full"
+    className="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-surface-container-low text-left w-full"
   >
     <span className="flex flex-col min-w-0">
-      <span className="text-xs text-[#1a1c1d] font-semibold">Mode voix d’abord</span>
-      <span className="text-xs text-[#3f4948]">Réponses lues à voix haute, textes agrandis</span>
+      <span className="text-xs text-on-surface font-semibold">Mode voix d’abord</span>
+      <span className="text-xs text-on-surface-variant">Réponses lues à voix haute, textes agrandis</span>
     </span>
     <span
       className={`relative w-11 h-6 rounded-full shrink-0 transition-colors ${
-        checked ? 'bg-[#004b49]' : 'bg-[#bfc8c7]'
+        checked ? 'bg-primary-container' : 'bg-outline-variant'
       }`}
     >
       <span

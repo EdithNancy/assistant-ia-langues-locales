@@ -127,16 +127,16 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label="Session vocale"
-      className="fixed inset-0 z-50 bg-[#f9f9fb] flex flex-col justify-between overflow-y-auto animate-in fade-in duration-300"
+      className="fixed inset-0 z-50 bg-surface flex flex-col justify-between overflow-y-auto animate-in fade-in duration-300"
     >
       {/* Top Header Bar */}
-      <div className="sticky top-0 z-10 w-full bg-[#f9f9fb]/90 backdrop-blur-md px-4 sm:px-6 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-2 border-b border-[#edeef0]">
+      <div className="sticky top-0 z-10 w-full bg-surface/90 backdrop-blur-md px-4 sm:px-6 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-2 border-b border-surface-container">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
               aria-label="Retour"
-              className="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#1a1c1d] hover:bg-[#edeef0] active:scale-95 transition-all"
+              className="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container active:scale-95 transition-all"
             >
               <span className="material-symbols-outlined text-[24px]">arrow_back</span>
             </button>
@@ -145,7 +145,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
               alt="Logo"
               className="h-7 w-7 object-contain"
             />
-            <h1 className="text-base font-bold text-[#1a1c1d] tracking-tight">
+            <h1 className="text-base font-bold text-on-surface tracking-tight">
               Session vocale
             </h1>
           </div>
@@ -154,7 +154,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
             <img
               src={BRAND_ASSETS.edithProfile}
               alt="Edith"
-              className="w-7 h-7 rounded-full object-cover ring-1 ring-[#004b49]/20"
+              className="w-7 h-7 rounded-full object-cover ring-1 ring-primary-container/20"
             />
           </div>
         </div>
@@ -166,10 +166,10 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
         <div className="flex items-center justify-between w-full">
           {/* Center Status: Live Timer Pill & Dialect selector */}
           <div className="flex items-center gap-2 w-full">
-            <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-[#e2e2e4] shadow-xs flex-1 min-w-0">
-              <span className="w-2 h-2 rounded-full bg-[#9e4229] animate-ping"></span>
-              <span className="w-2 h-2 rounded-full bg-[#9e4229] -ml-3.5"></span>
-              <span className="text-xs font-bold text-[#1a1c1d] tracking-wide uppercase whitespace-nowrap">
+            <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-highest shadow-xs flex-1 min-w-0">
+              <span className="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
+              <span className="w-2 h-2 rounded-full bg-secondary -ml-3.5"></span>
+              <span className="text-xs font-bold text-on-surface tracking-wide uppercase whitespace-nowrap">
                 En direct • {formatTimer(seconds)}
               </span>
             </div>
@@ -180,7 +180,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
               aria-label={`Langue : ${currentDialect === 'dioula' ? 'Dioula' : 'Baoulé'}. Passer en ${
                 currentDialect === 'dioula' ? 'Baoulé' : 'Dioula'
               }`}
-              className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-[#003331] text-white text-xs font-bold active:scale-95 transition-all shadow-sm flex-1 min-w-0"
+              className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-white text-xs font-bold active:scale-95 transition-all shadow-sm flex-1 min-w-0"
             >
               <span className="truncate">{currentDialect === 'dioula' ? 'Dioula (Mandé)' : 'Baoulé (Akan)'}</span>
               <span className="material-symbols-outlined text-[16px] shrink-0">swap_horiz</span>
@@ -192,17 +192,17 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
         <div className="flex items-center justify-center gap-3">
           <div className="relative">
             <img
-              className="w-11 h-11 rounded-full object-cover shadow-sm ring-2 ring-[#004b49]/20"
+              className="w-11 h-11 rounded-full object-cover shadow-sm ring-2 ring-primary-container/20"
               alt="Aya Tuteur"
               src={BRAND_ASSETS.ayaAvatar}
             />
-            <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#3cddc7] ring-2 ring-[#f9f9fb]"></span>
+            <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-tertiary-fixed-dim ring-2 ring-surface"></span>
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-[#1a1c1d] leading-tight">
+            <span className="text-sm font-bold text-on-surface leading-tight">
               Aya d'IvoirAI
             </span>
-            <span className="text-xs text-[#3f4948]">
+            <span className="text-xs text-on-surface-variant">
               Tuteur vocal natif • Abidjan
             </span>
           </div>
@@ -211,12 +211,12 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
         {/* Central Visualizer: 3D Organic Glowing Voice Sphere & Particle Halo */}
         <div className="relative w-full flex flex-col items-center justify-center py-2">
           {/* Halo Aura Layer 1 */}
-          <div className="absolute w-64 h-64 rounded-full bg-gradient-to-tr from-[#95d1ce]/20 via-[#62fae3]/30 to-[#fe8b6d]/20 blur-2xl animate-pulse pointer-events-none"></div>
+          <div className="absolute w-64 h-64 rounded-full bg-gradient-to-tr from-primary-fixed-dim/20 via-tertiary-fixed/30 to-secondary-container/20 blur-2xl animate-pulse pointer-events-none"></div>
 
           {/* Outer Resonant SVG Wave Ripples */}
           <svg className="w-72 h-72 absolute pointer-events-none" fill="none" viewBox="0 0 300 300">
             <circle
-              className="text-[#3cddc7] opacity-25"
+              className="text-tertiary-fixed-dim opacity-25"
               cx="150"
               cy="150"
               r="130"
@@ -234,7 +234,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
               />
             </circle>
             <circle
-              className="text-[#fe8b6d] opacity-30"
+              className="text-secondary-container opacity-30"
               cx="150"
               cy="150"
               r="112"
@@ -273,10 +273,10 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
             }`}
           >
             {/* Multilayered Liquid Gradients */}
-            <div className="w-full h-full rounded-full bg-gradient-to-br from-[#004b49] via-[#003331] to-[#9e4229] flex items-center justify-center relative overflow-hidden">
+            <div className="w-full h-full rounded-full bg-gradient-to-br from-primary-container via-primary to-secondary flex items-center justify-center relative overflow-hidden">
               {/* Liquid Organic Wave Reflections */}
-              <div className="absolute -top-10 -left-10 w-36 h-36 rounded-full bg-[#3cddc7]/40 blur-xl animate-pulse"></div>
-              <div className="absolute -bottom-8 -right-8 w-32 h-32 rounded-full bg-[#fe8b6d]/45 blur-lg"></div>
+              <div className="absolute -top-10 -left-10 w-36 h-36 rounded-full bg-tertiary-fixed-dim/40 blur-xl animate-pulse"></div>
+              <div className="absolute -bottom-8 -right-8 w-32 h-32 rounded-full bg-secondary-container/45 blur-lg"></div>
 
               {/* Pulsing Sound Wave Core Motif */}
               <div className="flex items-center gap-1.5 z-20">
@@ -295,7 +295,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
                   }`}
                 ></span>
                 <span
-                  className={`w-2 rounded-full bg-[#62fae3] shadow-xs transition-all ${
+                  className={`w-2 rounded-full bg-tertiary-fixed shadow-xs transition-all ${
                     speakingState === 'speaking'
                       ? 'h-18 animate-[bounce_0.7s_infinite_50ms]'
                       : 'h-16'
@@ -321,38 +321,38 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
 
           {/* Real-time Audio EQ Indicator & Status */}
           <div className="mt-5 flex flex-col items-center gap-1.5">
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#edeef0] shadow-xs">
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-container shadow-xs">
               <div className="flex items-end gap-1 h-3.5 px-0.5">
                 <span
-                  className={`w-1 bg-[#003331] rounded-full transition-all ${
+                  className={`w-1 bg-primary rounded-full transition-all ${
                     speakingState === 'speaking'
                       ? 'h-3.5 animate-pulse'
                       : 'h-2'
                   }`}
                 ></span>
                 <span
-                  className={`w-1 bg-[#004c43] rounded-full transition-all ${
+                  className={`w-1 bg-tertiary-container rounded-full transition-all ${
                     speakingState === 'speaking'
                       ? 'h-4 animate-pulse delay-75'
                       : 'h-3.5'
                   }`}
                 ></span>
                 <span
-                  className={`w-1 bg-[#9e4229] rounded-full transition-all ${
+                  className={`w-1 bg-secondary rounded-full transition-all ${
                     speakingState === 'speaking'
                       ? 'h-3 animate-pulse delay-150'
                       : 'h-2.5'
                   }`}
                 ></span>
                 <span
-                  className={`w-1 bg-[#004b49] rounded-full transition-all ${
+                  className={`w-1 bg-primary-container rounded-full transition-all ${
                     speakingState === 'speaking'
                       ? 'h-4 animate-pulse delay-200'
                       : 'h-3'
                   }`}
                 ></span>
               </div>
-              <span className="text-xs font-bold text-[#1a1c1d]">
+              <span className="text-xs font-bold text-on-surface">
                 {isPaused
                   ? 'Conversation en pause'
                   : speakingState === 'speaking'
@@ -360,74 +360,74 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
                   : 'Aya écoute votre accent...'}
               </span>
             </div>
-            <p className="text-xs text-[#3f4948] text-center max-w-[280px]">
+            <p className="text-xs text-on-surface-variant text-center max-w-[280px]">
               Parlez naturellement. Le modèle détecte les tons hauts et bas.
             </p>
           </div>
         </div>
 
         {/* Live Transcript Glassmorphism Card */}
-        <div className="w-full bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-[#edeef0] flex flex-col gap-2 relative">
+        <div className="w-full bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-surface-container flex flex-col gap-2 relative">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[#9e4229] text-[18px]">
+              <span className="material-symbols-outlined text-secondary text-[18px]">
                 record_voice_over
               </span>
-              <span className="text-xs text-[#3f4948] font-bold uppercase tracking-wider">
+              <span className="text-xs text-on-surface-variant font-bold uppercase tracking-wider">
                 Transcription en direct
               </span>
             </div>
 
-            <span className="px-2 py-0.5 rounded-full bg-[#ffdbd2] text-[#3c0800] text-[11px] font-bold">
+            <span className="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[11px] font-bold">
               {activeContent.tone}
             </span>
           </div>
 
           <div className="flex flex-col gap-1">
-            <p className="text-base font-bold text-[#1a1c1d] tracking-tight">
+            <p className="text-base font-bold text-on-surface tracking-tight">
               {activeContent.text}
             </p>
 
             <div className="flex items-center gap-1.5 flex-wrap">
               {activeContent.phonetics.map((syl: string, i: number) => (
                 <React.Fragment key={i}>
-                  <span className="px-1.5 py-0.5 rounded bg-[#edeef0] text-[#3f4948] text-xs font-mono">
+                  <span className="px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant text-xs font-mono">
                     {syl}
                   </span>
                   {i < activeContent.phonetics.length - 1 && (
-                    <span className="text-[#bfc8c7] text-xs">•</span>
+                    <span className="text-outline-variant text-xs">•</span>
                   )}
                 </React.Fragment>
               ))}
             </div>
           </div>
 
-          <div className="pt-1 flex items-start gap-2 border-t border-[#edeef0]/60">
-            <span className="material-symbols-outlined text-[#707978] text-[16px] mt-0.5">
+          <div className="pt-1 flex items-start gap-2 border-t border-surface-container/60">
+            <span className="material-symbols-outlined text-outline text-[16px] mt-0.5">
               translate
             </span>
-            <p className="text-xs text-[#3f4948] italic">
+            <p className="text-xs text-on-surface-variant italic">
               {activeContent.translation}
             </p>
           </div>
         </div>
 
         {/* Live Audio Feedback Snapshot Card */}
-        <div className="w-full bg-[#edeef0] rounded-2xl p-3.5 flex items-center justify-between shadow-xs">
+        <div className="w-full bg-surface-container rounded-2xl p-3.5 flex items-center justify-between shadow-xs">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-[#004c43] text-white flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-tertiary-container text-white flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-[20px]">graphic_eq</span>
             </div>
             <div className="flex flex-col min-w-0">
-              <span className="text-xs font-bold text-[#1a1c1d] truncate">
+              <span className="text-xs font-bold text-on-surface truncate">
                 Précision tonale
               </span>
-              <span className="text-xs text-[#3f4948] truncate">
+              <span className="text-xs text-on-surface-variant truncate">
                 {activeContent.feedback}
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-1 shrink-0 px-2.5 py-1 rounded-full bg-[#b1eeea] text-[#00201f] text-xs font-extrabold">
+          <div className="flex items-center gap-1 shrink-0 px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed text-xs font-extrabold">
             <span>{accuracyScore}%</span>
           </div>
         </div>
@@ -439,8 +439,8 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
             onClick={toggleMute}
             className={`flex-1 h-13 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-all shadow-xs active:scale-95 ${
               isMuted
-                ? 'bg-[#ffdad6] text-[#ba1a1a]'
-                : 'bg-[#e2e2e4] text-[#1a1c1d] hover:bg-[#d9dadc]'
+                ? 'bg-error-container text-error'
+                : 'bg-surface-container-highest text-on-surface hover:bg-surface-dim'
             }`}
           >
             <span className="material-symbols-outlined text-[22px]">
@@ -456,8 +456,8 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
             onClick={togglePause}
             className={`flex-1 h-13 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-all shadow-xs active:scale-95 ${
               isPaused
-                ? 'bg-[#b1eeea] text-[#00201f]'
-                : 'bg-[#e2e2e4] text-[#1a1c1d] hover:bg-[#d9dadc]'
+                ? 'bg-primary-fixed text-on-primary-fixed'
+                : 'bg-surface-container-highest text-on-surface hover:bg-surface-dim'
             }`}
           >
             <span className="material-symbols-outlined text-[22px]">
@@ -472,7 +472,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
           <button
             onClick={handleEndCall}
             aria-label="Terminer la session vocale"
-            className="w-13 h-13 rounded-2xl bg-[#ba1a1a] hover:bg-[#93000a] active:scale-90 text-white flex items-center justify-center transition-all shadow-md shrink-0"
+            className="w-13 h-13 rounded-2xl bg-error hover:bg-on-error-container active:scale-90 text-white flex items-center justify-center transition-all shadow-md shrink-0"
           >
             <span className="material-symbols-outlined text-[26px]">call_end</span>
           </button>

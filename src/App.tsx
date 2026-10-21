@@ -120,11 +120,11 @@ export default function App() {
       window.scrollTo({ top: 0 });
     };
     return (
-      <div className="min-h-screen bg-[#f9f9fb] text-[#1a1c1d] lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+      <div className="min-h-screen bg-surface text-on-surface lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
         {/* Panneau de marque : visible uniquement sur grand écran */}
         <AuthBrandPanel />
 
-        <div className="w-full max-w-md lg:max-w-lg mx-auto min-h-screen bg-[#f9f9fb] relative shadow-[0_0_50px_rgba(0,51,49,0.08)] lg:shadow-none">
+        <div className="w-full max-w-md lg:max-w-lg mx-auto min-h-screen bg-surface relative shadow-[0_0_50px_rgba(0,51,49,0.08)] lg:shadow-none">
           {!isRegister ? (
             <LoginPage onAuthenticated={handleAuthenticated} onGoToRegister={() => goTo('register')} />
           ) : (
@@ -158,7 +158,7 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen bg-[#f9f9fb] text-[#1a1c1d] ${voiceFirst ? 'voice-first' : ''}`}>
+    <div className={`min-h-screen bg-surface text-on-surface ${voiceFirst ? 'voice-first' : ''}`}>
       {/* Desktop Side Navigation (lg+) */}
       <Sidebar
         currentTab={currentTab}
@@ -168,7 +168,7 @@ export default function App() {
       />
 
       {/* Container wrapper: pleine largeur sur mobile, décalé de la barre latérale sur desktop */}
-      <div className="w-full min-h-screen bg-[#f9f9fb] flex flex-col relative lg:pl-64">
+      <div className="w-full min-h-screen bg-surface flex flex-col relative lg:pl-64">
         {/* Top Header */}
         <Header
           title={getHeaderTitle()}
@@ -184,7 +184,7 @@ export default function App() {
         {!isOnline && (
           <div
             role="status"
-            className="fixed top-[calc(3.5rem+env(safe-area-inset-top))] lg:top-16 inset-x-0 lg:left-64 z-30 px-4 py-2 bg-[#9e4229] text-white text-xs font-semibold flex items-center justify-center gap-2"
+            className="fixed top-[calc(3.5rem+env(safe-area-inset-top))] lg:top-16 inset-x-0 lg:left-64 z-30 px-4 py-2 bg-secondary text-white text-xs font-semibold flex items-center justify-center gap-2"
           >
             <span className="material-symbols-outlined text-[16px]">wifi_off</span>
             Hors connexion : Aya, la traduction et la voix sont indisponibles.
@@ -195,7 +195,7 @@ export default function App() {
         <Toast
           message={notificationToast}
           icon="notifications_active"
-          className="shadow-xl border border-[#62fae3]/20"
+          className="shadow-xl border border-tertiary-fixed/20"
         />
 
         {/* Tab Content Stream */}
@@ -287,10 +287,10 @@ export default function App() {
 
 /** Panneau gauche de l'écran d'authentification, affiché à partir de lg. */
 const AuthBrandPanel = () => (
-  <aside className="hidden lg:flex sticky top-0 h-screen flex-col justify-between overflow-hidden bg-gradient-to-br from-[#004b49] via-[#003331] to-[#002422] text-white p-10 xl:p-14">
+  <aside className="hidden lg:flex sticky top-0 h-screen flex-col justify-between overflow-hidden bg-gradient-to-br from-primary-container via-primary to-primary-deep text-white p-10 xl:p-14">
     {/* Motif géométrique traditionnel */}
     <svg
-      className="absolute -right-24 -bottom-24 w-[28rem] h-[28rem] text-[#62fae3] opacity-10 pointer-events-none"
+      className="absolute -right-24 -bottom-24 w-[28rem] h-[28rem] text-tertiary-fixed opacity-10 pointer-events-none"
       fill="currentColor"
       viewBox="0 0 100 100"
       aria-hidden="true"
@@ -305,14 +305,14 @@ const AuthBrandPanel = () => (
     </div>
 
     <div className="relative max-w-md">
-      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#004c43]/80 text-[#62fae3] text-xs font-semibold border border-[#62fae3]/20">
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-container/80 text-tertiary-fixed text-xs font-semibold border border-tertiary-fixed/20">
         <span className="material-symbols-outlined text-[14px]">graphic_eq</span>
         Reconnaissance vocale ivoirienne
       </span>
       <h2 className="mt-5 text-4xl xl:text-5xl font-extrabold leading-tight">
         Parlez, apprenez et traduisez en Baoulé & Dioula.
       </h2>
-      <p className="mt-4 text-[#7ebab7] text-base leading-relaxed">
+      <p className="mt-4 text-on-primary-container text-base leading-relaxed">
         L'IA comprend vos dialectes, intonations et accents ivoiriens sans filtre.
       </p>
 
@@ -323,7 +323,7 @@ const AuthBrandPanel = () => (
           { icon: 'school', label: 'Apprentissage des tons et proverbes' },
         ].map((f) => (
           <li key={f.icon} className="flex items-center gap-3">
-            <span className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-[#62fae3]">
+            <span className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-tertiary-fixed">
               <span className="material-symbols-outlined text-[20px]">{f.icon}</span>
             </span>
             {f.label}

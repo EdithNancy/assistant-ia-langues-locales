@@ -7,22 +7,22 @@ interface AuthHeaderProps {
 }
 
 export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, onBack }) => (
-  <header className="sticky top-0 z-40 w-full bg-[#f9f9fb]/90 backdrop-blur-xl">
+  <header className="sticky top-0 z-40 w-full bg-surface/90 backdrop-blur-xl">
     <div className="h-16 px-4 flex items-center justify-between">
       <div className="flex items-center gap-3">
         {onBack && (
           <button
             onClick={onBack}
             aria-label="Retour"
-            className="w-9 h-9 flex items-center justify-center rounded-full text-[#1a1c1d] hover:bg-[#edeef0] active:scale-95 transition-all"
+            className="w-9 h-9 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container active:scale-95 transition-all"
           >
             <span className="material-symbols-outlined text-[24px]">arrow_back</span>
           </button>
         )}
         <img src={BRAND_ASSETS.logo} alt="" className="h-9 w-9 rounded-xl object-contain" />
-        <span className="text-xl font-semibold text-[#1a1c1d] tracking-tight">IvoirAI</span>
+        <span className="text-xl font-semibold text-on-surface tracking-tight">IvoirAI</span>
       </div>
-      <span className="text-[15px] font-medium text-[#3f4948]">{title}</span>
+      <span className="text-[15px] font-medium text-on-surface-variant">{title}</span>
     </div>
   </header>
 );
@@ -51,21 +51,21 @@ export const PasswordField: React.FC<PasswordFieldProps> = ({
 }) => {
   const [visible, setVisible] = useState(false);
   return (
-    <div className="h-14 rounded-2xl bg-[#f3f3f5] flex items-center gap-3 px-4 focus-within:ring-2 focus-within:ring-[#004b49]/30 transition-all">
-      <span className="material-symbols-outlined text-[22px] text-[#3f4948]">lock</span>
+    <div className="h-14 rounded-2xl bg-surface-container-low flex items-center gap-3 px-4 focus-within:ring-2 focus-within:ring-primary-container/30 transition-all">
+      <span className="material-symbols-outlined text-[22px] text-on-surface-variant">lock</span>
       <input
         type={visible ? 'text' : 'password'}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         autoComplete={autoComplete}
-        className="flex-1 min-w-0 bg-transparent outline-none text-[15px] text-[#1a1c1d] placeholder:text-[#bfc8c7] tracking-widest"
+        className="flex-1 min-w-0 bg-transparent outline-none text-[15px] text-on-surface placeholder:text-outline-variant tracking-widest"
       />
       <button
         type="button"
         onClick={() => setVisible((v) => !v)}
         aria-label={visible ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-        className="text-[#3f4948] hover:text-[#003331] transition-colors"
+        className="text-on-surface-variant hover:text-primary transition-colors"
       >
         <span className="material-symbols-outlined text-[22px]">
           {visible ? 'visibility_off' : 'visibility'}
@@ -77,9 +77,9 @@ export const PasswordField: React.FC<PasswordFieldProps> = ({
 
 export const OrDivider: React.FC<{ label: string; className?: string }> = ({ label, className = '' }) => (
   <div className={`flex items-center gap-4 ${className}`}>
-    <span className="flex-1 h-px bg-[#e2e2e4]" />
-    <span className="text-xs font-semibold text-[#3f4948] tracking-wide">{label}</span>
-    <span className="flex-1 h-px bg-[#e2e2e4]" />
+    <span className="flex-1 h-px bg-surface-container-highest" />
+    <span className="text-xs font-semibold text-on-surface-variant tracking-wide">{label}</span>
+    <span className="flex-1 h-px bg-surface-container-highest" />
   </div>
 );
 
@@ -101,7 +101,7 @@ export const AppleIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h
 /** Small inline error message used by both auth forms. */
 export const FormError: React.FC<{ message: string | null }> = ({ message }) =>
   message ? (
-    <p className="flex items-center gap-1.5 text-[13px] font-medium text-[#ba1a1a]">
+    <p className="flex items-center gap-1.5 text-[13px] font-medium text-error">
       <span className="material-symbols-outlined text-[18px]">error</span>
       {message}
     </p>
@@ -109,7 +109,7 @@ export const FormError: React.FC<{ message: string | null }> = ({ message }) =>
 
 /** Pastille des méthodes de connexion pas encore disponibles. */
 export const ComingSoonBadge: React.FC = () => (
-  <span className="absolute -top-2 right-3 px-2 py-0.5 rounded-full bg-[#ffdbd2] text-[#9e4229] text-xs font-bold">
+  <span className="absolute -top-2 right-3 px-2 py-0.5 rounded-full bg-secondary-fixed text-secondary text-xs font-bold">
     Bientôt
   </span>
 );

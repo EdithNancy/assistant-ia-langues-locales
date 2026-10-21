@@ -20,6 +20,12 @@
   --color-on-secondary-fixed: #3c0800;
   --color-on-secondary-fixed-variant: #7e2b14;
 
+  /* Nuances complémentaires utilisées par l'interface */
+  --color-primary-bright: #005a57;
+  --color-primary-deep: #002422;
+  --color-secondary-soft: #e87a5d;
+  --color-tertiary-fixed-faint: #e0faf6;
+
   --color-tertiary: #00332d;
   --color-tertiary-container: #004c43;
   --color-on-tertiary: #ffffff;

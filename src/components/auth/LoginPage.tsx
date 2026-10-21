@@ -22,9 +22,9 @@ type LoginMethod = 'phone' | 'email';
 /** Hero emblem: soundwave bars inside a gradient ring with a dashed halo. */
 const LoginEmblem = () => (
   <div className="relative w-40 h-40 flex items-center justify-center">
-    <div className="absolute inset-0 rounded-full border border-dashed border-[#bfc8c7]" />
-    <div className="absolute inset-3 rounded-full bg-[#b1eeea]/60" />
-    <div className="relative w-28 h-28 rounded-full p-[5px] bg-gradient-to-br from-[#9e4229] via-[#7e2b14] to-[#004b49] shadow-lg">
+    <div className="absolute inset-0 rounded-full border border-dashed border-outline-variant" />
+    <div className="absolute inset-3 rounded-full bg-primary-fixed/60" />
+    <div className="relative w-28 h-28 rounded-full p-[5px] bg-gradient-to-br from-secondary via-on-secondary-fixed-variant to-primary-container shadow-lg">
       <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
         <svg viewBox="0 0 64 40" className="w-16 h-10" aria-hidden="true">
           <rect x="2" y="10" width="7" height="20" rx="3.5" fill="#3cddc7" />
@@ -77,15 +77,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
           <LoginEmblem />
         </div>
 
-        <span className="mt-2 lg:mt-6 text-[15px] font-semibold text-[#9e4229] inline-flex items-center gap-1.5">
+        <span className="mt-2 lg:mt-6 text-[15px] font-semibold text-secondary inline-flex items-center gap-1.5">
           <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
           Akwaba nimbâ ! • Bon retour
         </span>
 
-        <h1 className="mt-2 text-[24px] min-[380px]:text-[28px] font-bold text-[#003331] tracking-tight text-center">
+        <h1 className="mt-2 text-[24px] min-[380px]:text-[28px] font-bold text-primary tracking-tight text-center">
           Connexion à votre espace
         </h1>
-        <p className="mt-2 text-[15px] leading-relaxed text-[#3f4948] text-center text-balance">
+        <p className="mt-2 text-[15px] leading-relaxed text-on-surface-variant text-center text-balance">
           Reprenez vos conversations orales enrichies en Baoulé et Dioula.
         </p>
 
@@ -95,7 +95,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
           className="mt-8 w-full rounded-[28px] bg-white p-5 shadow-[0_8px_40px_rgba(0,51,49,0.06)] flex flex-col gap-5"
         >
           {/* Phone / email switch */}
-          <div className="grid grid-cols-2 p-1.5 rounded-full bg-[#edeef0]">
+          <div className="grid grid-cols-2 p-1.5 rounded-full bg-surface-container">
             {(
               [
                 { key: 'phone', icon: 'smartphone', label: 'Numéro (+225)' },
@@ -110,7 +110,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
                   setError(null);
                 }}
                 className={`h-12 rounded-full flex items-center justify-center gap-1.5 sm:gap-2 text-[13px] min-[380px]:text-[15px] font-medium transition-all ${
-                  method === tab.key ? 'bg-white text-[#1a1c1d] shadow-sm' : 'text-[#3f4948]'
+                  method === tab.key ? 'bg-white text-on-surface shadow-sm' : 'text-on-surface-variant'
                 }`}
               >
                 <span className="material-symbols-outlined text-[22px]">{tab.icon}</span>
@@ -121,12 +121,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
 
           {method === 'phone' ? (
             <div className="flex flex-col gap-2">
-              <label htmlFor="login-phone" className="text-[13px] font-semibold text-[#3f4948] uppercase tracking-wide">
+              <label htmlFor="login-phone" className="text-[13px] font-semibold text-on-surface-variant uppercase tracking-wide">
                 Numéro mobile
               </label>
-              <div className="h-14 rounded-2xl bg-[#f3f3f5] flex items-center gap-3 px-4 focus-within:ring-2 focus-within:ring-[#004b49]/30 transition-all">
+              <div className="h-14 rounded-2xl bg-surface-container-low flex items-center gap-3 px-4 focus-within:ring-2 focus-within:ring-primary-container/30 transition-all">
                 <Flag country="ci" className="w-6" labelled />
-                <span className="text-[17px] font-semibold text-[#1a1c1d]">+225</span>
+                <span className="text-[17px] font-semibold text-on-surface">+225</span>
                 <input
                   id="login-phone"
                   type="tel"
@@ -135,17 +135,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
                   value={phone}
                   onChange={(e) => setPhone(formatIvorianPhone(e.target.value))}
                   placeholder="07 01 23 45 67"
-                  className="flex-1 min-w-0 ml-3 bg-transparent outline-none text-[18px] tracking-wider text-[#1a1c1d] placeholder:text-[#bfc8c7]"
+                  className="flex-1 min-w-0 ml-3 bg-transparent outline-none text-[18px] tracking-wider text-on-surface placeholder:text-outline-variant"
                 />
               </div>
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              <label htmlFor="login-email" className="text-[13px] font-semibold text-[#3f4948] uppercase tracking-wide">
+              <label htmlFor="login-email" className="text-[13px] font-semibold text-on-surface-variant uppercase tracking-wide">
                 Adresse email
               </label>
-              <div className="h-14 rounded-2xl bg-[#f3f3f5] flex items-center gap-3 px-4 focus-within:ring-2 focus-within:ring-[#004b49]/30 transition-all">
-                <span className="material-symbols-outlined text-[22px] text-[#3f4948]">mail</span>
+              <div className="h-14 rounded-2xl bg-surface-container-low flex items-center gap-3 px-4 focus-within:ring-2 focus-within:ring-primary-container/30 transition-all">
+                <span className="material-symbols-outlined text-[22px] text-on-surface-variant">mail</span>
                 <input
                   id="login-email"
                   type="email"
@@ -153,7 +153,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="aya.kouassi@email.ci"
-                  className="flex-1 min-w-0 bg-transparent outline-none text-[16px] text-[#1a1c1d] placeholder:text-[#bfc8c7]"
+                  className="flex-1 min-w-0 bg-transparent outline-none text-[16px] text-on-surface placeholder:text-outline-variant"
                 />
               </div>
             </div>
@@ -161,12 +161,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-[13px] font-semibold text-[#3f4948] uppercase tracking-wide">Mot de passe</span>
+              <span className="text-[13px] font-semibold text-on-surface-variant uppercase tracking-wide">Mot de passe</span>
               <button
                 type="button"
                 disabled
                 title="Réinitialisation du mot de passe bientôt disponible"
-                className="text-[13px] font-semibold text-[#9e4229] hover:underline disabled:opacity-60 disabled:no-underline disabled:cursor-not-allowed"
+                className="text-[13px] font-semibold text-secondary hover:underline disabled:opacity-60 disabled:no-underline disabled:cursor-not-allowed"
               >
                 Oublié ?
               </button>
@@ -175,8 +175,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
           </div>
 
           {/* Session language */}
-          <div className="rounded-2xl bg-[#f3f3f5] p-3 pl-4 flex items-center justify-between gap-2">
-            <span className="flex items-center gap-2 text-[14px] font-medium text-[#3f4948]">
+          <div className="rounded-2xl bg-surface-container-low p-3 pl-4 flex items-center justify-between gap-2">
+            <span className="flex items-center gap-2 text-[14px] font-medium text-on-surface-variant">
               <span className="material-symbols-outlined text-[22px]">record_voice_over</span>
               <span className="whitespace-nowrap">
                 Langue<span className="hidden min-[420px]:inline"> de session</span>
@@ -194,7 +194,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
                   type="button"
                   onClick={() => setLanguage(lang.key)}
                   className={`px-4 py-1.5 rounded-full text-[15px] font-medium transition-all ${
-                    language === lang.key ? 'bg-[#003331] text-white' : 'text-[#3f4948]'
+                    language === lang.key ? 'bg-primary text-white' : 'text-on-surface-variant'
                   }`}
                 >
                   {lang.label}
@@ -208,7 +208,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
           <button
             type="submit"
             disabled={isLoading}
-            className="h-16 rounded-full bg-[#004b49] text-white text-[18px] font-semibold flex items-center justify-center gap-2 shadow-[0_10px_24px_rgba(0,75,73,0.25)] hover:bg-[#003331] active:scale-[0.98] disabled:opacity-70 transition-all"
+            className="h-16 rounded-full bg-primary-container text-white text-[18px] font-semibold flex items-center justify-center gap-2 shadow-[0_10px_24px_rgba(0,75,73,0.25)] hover:bg-primary active:scale-[0.98] disabled:opacity-70 transition-all"
           >
             {isLoading ? (
               <span className="w-5 h-5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
@@ -223,14 +223,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
           <button
             type="button"
             onClick={() => onAuthenticated(language)}
-            className="h-12 -mt-1 rounded-full text-[15px] font-semibold text-[#004b49] hover:bg-[#e0faf6] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+            className="h-12 -mt-1 rounded-full text-[15px] font-semibold text-primary-container hover:bg-tertiary-fixed-faint active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
             <span className="material-symbols-outlined text-[20px]">account_circle</span>
             Essayer sans compte (démo)
           </button>
 
-          <details className="group rounded-2xl border border-[#edeef0]">
-            <summary className="list-none cursor-pointer select-none px-4 h-12 flex items-center justify-between text-[14px] font-medium text-[#3f4948] [&::-webkit-details-marker]:hidden">
+          <details className="group rounded-2xl border border-surface-container">
+            <summary className="list-none cursor-pointer select-none px-4 h-12 flex items-center justify-between text-[14px] font-medium text-on-surface-variant [&::-webkit-details-marker]:hidden">
               Autres méthodes de connexion
               <span className="material-symbols-outlined text-[20px] transition-transform group-open:rotate-180">
                 expand_more
@@ -241,17 +241,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
                 type="button"
                 disabled
                 title="Bientôt disponible"
-                className="relative h-14 rounded-2xl bg-[#f3f3f5] flex items-center justify-center gap-2 text-[14px] font-medium text-[#1a1c1d] disabled:opacity-60 disabled:cursor-not-allowed"
+                className="relative h-14 rounded-2xl bg-surface-container-low flex items-center justify-center gap-2 text-[14px] font-medium text-on-surface disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <ComingSoonBadge />
-                <span className="material-symbols-outlined text-[22px] text-[#004b49]">fingerprint</span>
+                <span className="material-symbols-outlined text-[22px] text-primary-container">fingerprint</span>
                 Empreinte
               </button>
               <button
                 type="button"
                 disabled
                 title="Bientôt disponible"
-                className="relative h-14 rounded-2xl bg-[#f3f3f5] flex items-center justify-center gap-2 text-[14px] font-medium text-[#1a1c1d] disabled:opacity-60 disabled:cursor-not-allowed"
+                className="relative h-14 rounded-2xl bg-surface-container-low flex items-center justify-center gap-2 text-[14px] font-medium text-on-surface disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <ComingSoonBadge />
                 <GoogleIcon className="w-5 h-5" />
@@ -261,18 +261,18 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
           </details>
         </form>
 
-        <p className="mt-6 text-[15px] text-[#3f4948] text-center leading-relaxed">
+        <p className="mt-6 text-[15px] text-on-surface-variant text-center leading-relaxed">
           Vous n’avez pas encore de compte ?{' '}
           <button
             type="button"
             onClick={onGoToRegister}
-            className="font-semibold text-[#9e4229] underline underline-offset-4"
+            className="font-semibold text-secondary underline underline-offset-4"
           >
             S’inscrire gratuitement
           </button>
         </p>
 
-        <p className="mt-4 flex items-center gap-2 text-[13px] text-[#3f4948]">
+        <p className="mt-4 flex items-center gap-2 text-[13px] text-on-surface-variant">
           <span className="material-symbols-outlined text-[18px]">verified_user</span>
           Préservation linguistique Akan &amp; Mandingue certifiée
         </p>
