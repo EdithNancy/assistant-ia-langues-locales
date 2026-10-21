@@ -7,6 +7,17 @@
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#004b49" />
+    <!-- Thème appliqué avant l'affichage : pas de flash clair en mode sombre -->
+    <style>
+      html[data-theme='dark'] { background: #0e1415; color-scheme: dark; }
+    </style>
+    <script>
+      try {
+        var t = JSON.parse(localStorage.getItem('ivoirai.preferences') || '{}').theme || 'system';
+        var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      } catch (e) {}
+    </script>
     <meta name="description" content="Assistant vocal et tuteur culturel en Baoulé et Dioula avec apprentissage immersif, reconnaissance des intonations et traduction contextuelle." />
     <meta property="og:title" content="IvoirAI - Langues Ivoiriennes & Assistant Vocal" />
     <meta property="og:description" content="Assistant vocal et tuteur culturel en Baoulé et Dioula avec apprentissage immersif, reconnaissance des intonations et traduction contextuelle." />
@@ -17,9 +28,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
     <!-- Icônes : uniquement celles utilisées par l'app (~20 Ko au lieu de ~1 Mo).
          Nouvelle icône ? Ajoutez son nom (ordre alphabétique) dans icon_names. -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&amp;icon_names=account_circle,add,alternate_email,arrow_back,arrow_drop_down,arrow_forward,auto_awesome,auto_stories,badge,bookmark,call,call_end,celebration,chat_bubble,check,check_circle,chevron_right,close,content_copy,content_paste,done_all,eco,email,error,expand_more,fingerprint,fitness_center,graphic_eq,handshake,headphones,hearing,help,home,info,keyboard_alt,language,light_mode,lightbulb,local_fire_department,lock,login,logout,mail,mic,mic_off,notifications,notifications_active,password,pause,pause_circle,person,phone,play_arrow,play_circle,progress_activity,psychology,radio,radio_button_unchecked,record_voice_over,school,search,send,share,shield,shield_person,shopping_bag,smartphone,speed,star,stop,storefront,swap_horiz,switch,thumb_down,thumb_up,transform,translate,undo,verified,verified_user,visibility,visibility_off,volume_up,volunteer_activism,water_drop,waving_hand,wb_sunny,wifi_off,work&amp;display=block" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&amp;icon_names=account_circle,add,alternate_email,arrow_back,arrow_drop_down,arrow_forward,auto_awesome,auto_stories,badge,bookmark,brightness_auto,call,call_end,celebration,chat_bubble,check,check_circle,chevron_right,close,content_copy,content_paste,dark_mode,done_all,eco,email,error,expand_more,fingerprint,fitness_center,graphic_eq,handshake,headphones,hearing,help,home,info,keyboard_alt,language,light_mode,lightbulb,local_fire_department,lock,login,logout,mail,mic,mic_off,notifications,notifications_active,password,pause,pause_circle,person,phone,play_arrow,play_circle,progress_activity,psychology,radio,radio_button_unchecked,record_voice_over,school,search,send,share,shield,shield_person,shopping_bag,smartphone,speed,star,stop,storefront,swap_horiz,switch,thumb_down,thumb_up,transform,translate,undo,verified,verified_user,visibility,visibility_off,volume_up,volunteer_activism,water_drop,waving_hand,wb_sunny,wifi_off,work&amp;display=block" rel="stylesheet" />
   </head>
-  <body class="bg-[#f9f9fb] text-[#1a1c1d] antialiased selection:bg-[#95d1ce] selection:text-[#003331]">
+  <body class="bg-surface text-on-surface antialiased selection:bg-primary-fixed-dim selection:text-primary">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

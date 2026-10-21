@@ -110,7 +110,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
                   setError(null);
                 }}
                 className={`h-12 rounded-full flex items-center justify-center gap-1.5 sm:gap-2 text-[13px] min-[380px]:text-[15px] font-medium transition-all ${
-                  method === tab.key ? 'bg-white text-on-surface shadow-soft' : 'text-on-surface-variant'
+                  method === tab.key ? 'bg-surface-container-lowest text-on-surface shadow-soft' : 'text-on-surface-variant'
                 }`}
               >
                 <span className="material-symbols-outlined text-[22px]">{tab.icon}</span>

@@ -175,7 +175,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                   <span className="inline-block w-1.5 h-1.5 rounded-full bg-tertiary-fixed"></span>
                   <span className="text-xs text-on-primary-container">Série active</span>
                 </div>
-                <p className="text-xs text-surface-container opacity-90">
+                <p className="text-xs text-white/90 opacity-90">
                   42 mots et locutions maîtrisés
                 </p>
               </div>

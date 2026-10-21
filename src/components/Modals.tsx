@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ThemePreference } from '../utils/preferences';
 import { Button } from './ui/Button';
 import { IconButton } from './ui/IconButton';
 import { Modal } from './ui/Modal';
@@ -173,12 +174,20 @@ export const VocabularyModal: React.FC<VocabularyModalProps> = ({ isOpen, onClos
   );
 };
 
+const THEME_OPTIONS: readonly { key: ThemePreference; label: string; icon: string }[] = [
+  { key: 'system', label: 'Auto', icon: 'brightness_auto' },
+  { key: 'light', label: 'Clair', icon: 'light_mode' },
+  { key: 'dark', label: 'Sombre', icon: 'dark_mode' },
+];
+
 interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentLanguage: Language;
   voiceFirst: boolean;
   onToggleVoiceFirst: () => void;
+  theme: ThemePreference;
+  onThemeChange: (theme: ThemePreference) => void;
   onLogout: () => void;
 }
 
@@ -188,6 +197,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   currentLanguage,
   voiceFirst,
   onToggleVoiceFirst,
+  theme,
+  onThemeChange,
   onLogout,
 }) => {
   const { consent, withdraw } = useVoiceConsent();
@@ -247,6 +258,26 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           </div>
 
           <VoiceFirstSwitch checked={voiceFirst} onToggle={onToggleVoiceFirst} />
+
+          <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-surface-container-low">
+            <span className="text-xs text-on-surface font-semibold">Apparence</span>
+            <div role="radiogroup" aria-label="Apparence" className="flex p-0.5 rounded-full bg-surface-container">
+              {THEME_OPTIONS.map((option) => (
+                <button
+                  key={option.key}
+                  role="radio"
+                  aria-checked={theme === option.key}
+                  onClick={() => onThemeChange(option.key)}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors ${
+                    theme === option.key ? 'bg-primary-container text-white' : 'text-on-surface-variant'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-[14px]">{option.icon}</span>
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-surface-container-low">
             <div className="flex flex-col min-w-0">

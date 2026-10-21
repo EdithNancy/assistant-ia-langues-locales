@@ -4,6 +4,7 @@ import { Header } from './components/Header';
 import { BottomNav, NavTabKey, TabKey } from './components/BottomNav';
 import { Sidebar } from './components/Sidebar';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
+import { useTheme } from './hooks/useTheme';
 import { useToast } from './hooks/useToast';
 import { Toast } from './components/Toast';
 import { HomeTab } from './components/HomeTab';
@@ -42,6 +43,7 @@ export default function App() {
   );
   const [voiceFirst, setVoiceFirst] = useState(() => loadPreferences().voiceFirst);
   const isOnline = useOnlineStatus();
+  const { theme, setTheme } = useTheme();
   const currentTab: NavTabKey = tabFromPath(pathname) ?? 'accueil';
   const setCurrentTab = (tab: NavTabKey) => navigate(TAB_PATHS[tab], { viewTransition: true });
   const [isVoiceSessionOpen, setIsVoiceSessionOpen] = useState(false);
@@ -278,6 +280,8 @@ export default function App() {
           currentLanguage={currentLanguage}
           voiceFirst={voiceFirst}
           onToggleVoiceFirst={handleToggleVoiceFirst}
+          theme={theme}
+          onThemeChange={setTheme}
           onLogout={handleLogout}
         />
       </div>

@@ -46,7 +46,7 @@
   --color-on-surface: #1a1c1d;
   --color-on-surface-variant: #3f4948;
 
-  --color-outline: #707978;
+  --color-outline: #687170; /* contraste ≥ 4,5:1 sur blanc (WCAG AA) */
   --color-outline-variant: #bfc8c7;
   --color-error: #ba1a1a;
   --color-error-container: #ffdad6;
@@ -67,8 +67,8 @@
     margin: 0;
     padding: 0;
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #f9f9fb;
-    color: #1a1c1d;
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -87,6 +87,104 @@
   .material-symbols-outlined.fill {
     font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   }
+}
+
+/* ===================== Mode sombre =====================
+   Activé par data-theme="dark" sur <html> (réglage du téléphone ou choix dans le profil).
+   - Surfaces et textes neutres passent en sombre.
+   - Fonds de marque (vert, terre cuite) inchangés : le texte blanc posé dessus reste lisible.
+   - Textes de marque posés sur une surface : variante claire (--ink-*).
+   - « Îlots clairs » (pastilles sur fond pâle, qui restent pâles) : couleurs du mode clair. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-surface: #0e1415;
+  --color-surface-dim: #0e1415;
+  --color-surface-bright: #343a3b;
+  --color-surface-container-lowest: #172021;
+  --color-surface-container-low: #1b2425;
+  --color-surface-container: #222b2c;
+  --color-surface-container-high: #2a3334;
+  --color-surface-container-highest: #333c3d;
+  --color-on-surface: #e0e3e3;
+  --color-on-surface-variant: #bec9c8;
+  --color-outline: #889392;
+  --color-outline-variant: #3f4948;
+  --ink-primary: #95d1ce;
+  --ink-secondary: #ffb4a1;
+  --ink-tertiary: #3cddc7;
+}
+
+:root[data-theme='dark'] .text-primary {
+  color: var(--ink-primary, var(--color-primary));
+}
+:root[data-theme='dark'] .text-primary-container {
+  color: var(--ink-primary, var(--color-primary-container));
+}
+:root[data-theme='dark'] .text-secondary {
+  color: var(--ink-secondary, var(--color-secondary));
+}
+:root[data-theme='dark'] .text-tertiary-container {
+  color: var(--ink-tertiary, var(--color-tertiary-container));
+}
+
+/* Encres foncées prévues pour les pastilles claires : éclaircies quand elles sont posées sur du sombre */
+:root[data-theme='dark'] .text-on-primary-fixed {
+  color: var(--ink-primary, var(--color-on-primary-fixed));
+}
+:root[data-theme='dark'] .text-on-primary-fixed-variant {
+  color: var(--ink-primary, var(--color-on-primary-fixed-variant));
+}
+:root[data-theme='dark'] .text-on-tertiary-fixed {
+  color: var(--ink-primary, var(--color-on-tertiary-fixed));
+}
+:root[data-theme='dark'] .text-on-tertiary-fixed-variant {
+  color: var(--ink-primary, var(--color-on-tertiary-fixed-variant));
+}
+:root[data-theme='dark'] .text-on-secondary-fixed {
+  color: var(--ink-secondary, var(--color-on-secondary-fixed));
+}
+:root[data-theme='dark'] .text-on-secondary-fixed-variant {
+  color: var(--ink-secondary, var(--color-on-secondary-fixed-variant));
+}
+:root[data-theme='dark'] .text-on-secondary-container {
+  color: var(--ink-secondary, var(--color-on-secondary-container));
+}
+:root[data-theme='dark'] .text-on-error-container {
+  color: var(--ink-secondary, var(--color-on-error-container));
+}
+
+/* Pastilles semi-transparentes : pleines en sombre, pour rester des îlots clairs lisibles */
+:root[data-theme='dark'] [class~='bg-secondary-fixed/60'] {
+  background-color: var(--color-secondary-fixed);
+}
+:root[data-theme='dark'] [class~='bg-primary-fixed/60'] {
+  background-color: var(--color-primary-fixed);
+}
+
+/* Élément actif de la navigation : fond de marque plutôt qu'une teinte délavée */
+:root[data-theme='dark'] [class~='bg-primary-fixed/50'] {
+  background-color: color-mix(in srgb, var(--color-primary-container) 75%, transparent);
+}
+
+:root[data-theme='dark']
+  :is(
+    .bg-primary-fixed,
+    .bg-tertiary-fixed,
+    .bg-tertiary-fixed-dim,
+    .bg-tertiary-fixed-faint,
+    .bg-secondary-fixed,
+    .bg-secondary-container,
+    .bg-error-container,
+    [class~='bg-primary-fixed/60'],
+    [class~='bg-secondary-fixed/60']
+  ) {
+  --ink-primary: initial;
+  --ink-secondary: initial;
+  --ink-tertiary: initial;
+  --color-on-surface: #1a1c1d;
+  --color-on-surface-variant: #3f4948;
+  --color-outline: #687170;
+  --color-surface-container-lowest: #ffffff;
 }
 
 /* Custom subtle scrollbar */

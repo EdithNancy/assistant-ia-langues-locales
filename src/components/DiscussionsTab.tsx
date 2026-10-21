@@ -187,7 +187,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
       <Toast message={toast} icon="info" />
 
       {/* In-Chat Top Navigation Subheader */}
-      <div className="sticky top-14 lg:top-16 z-20 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-4 py-2 bg-surface/95 backdrop-blur-md flex items-center justify-between gap-2 border-b border-surface-container lg:border lg:rounded-2xl lg:bg-white/95">
+      <div className="sticky top-14 lg:top-16 z-20 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-4 py-2 bg-surface/95 backdrop-blur-md flex items-center justify-between gap-2 border-b border-surface-container lg:border lg:rounded-2xl lg:bg-surface-container-lowest/95">
         <div className="flex items-center gap-2 min-w-0">
           <button
             onClick={onBackToHome}
@@ -344,7 +344,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
                           onClick={() => setPlaybackSpeed(speed)}
                           className={`px-2 py-0.5 rounded-full text-[11px] font-bold transition-all ${
                             playbackSpeed === speed
-                              ? 'bg-white text-primary shadow-soft'
+                              ? 'bg-surface-container-lowest text-primary shadow-soft'
                               : 'text-on-surface-variant'
                           }`}
                         >

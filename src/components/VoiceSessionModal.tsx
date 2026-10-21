@@ -367,7 +367,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
         </div>
 
         {/* Live Transcript Glassmorphism Card */}
-        <div className="w-full bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-soft border border-surface-container flex flex-col gap-2 relative">
+        <div className="w-full bg-surface-container-lowest/95 backdrop-blur-md rounded-2xl p-4 shadow-soft border border-surface-container flex flex-col gap-2 relative">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-secondary text-[18px]">

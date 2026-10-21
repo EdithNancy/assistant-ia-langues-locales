@@ -409,7 +409,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
               <span className="text-[11px] text-tertiary-fixed-dim block font-bold mb-0.5">
                 Guide phonétique
               </span>
-              <p className="text-xs text-surface-container italic tracking-wide">
+              <p className="text-xs text-white/90 italic tracking-wide">
                 {currentTrans.phonetic}
               </p>
             </div>
