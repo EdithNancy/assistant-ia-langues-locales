@@ -267,7 +267,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
             return (
               <div
                 key={msg.id}
-                className="flex flex-col gap-1 max-w-[90%] sm:max-w-[75%] lg:max-w-[65%] ml-auto items-end animate-in fade-in"
+                className="flex flex-col gap-1 max-w-[90%] sm:max-w-[75%] lg:max-w-[65%] ml-auto items-end animate-in fade-in slide-in-from-bottom-2 duration-300"
               >
                 <div className="flex items-center gap-1 text-xs text-[#3f4948]">
                   <span>{msg.timestamp}</span>
@@ -291,7 +291,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
           return (
             <div
               key={msg.id}
-              className="flex flex-col gap-1 max-w-[95%] sm:max-w-[85%] lg:max-w-[75%] mr-auto animate-in fade-in"
+              className="flex flex-col gap-1 max-w-[95%] sm:max-w-[85%] lg:max-w-[75%] mr-auto animate-in fade-in slide-in-from-bottom-2 duration-300"
             >
               <div className="flex items-center gap-1.5 text-xs">
                 <span className="text-[#004b49] font-bold">Aya (IvoirAI)</span>
@@ -506,7 +506,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
         })}
 
         {isAiTyping && (
-          <div role="status" className="flex items-center gap-2 mr-auto px-4 py-3 rounded-3xl rounded-tl-sm bg-white border border-[#edeef0] text-sm text-[#3f4948]">
+          <div role="status" className="animate-in fade-in duration-300 flex items-center gap-2 mr-auto px-4 py-3 rounded-3xl rounded-tl-sm bg-white border border-[#edeef0] text-sm text-[#3f4948]">
             <span className="flex gap-1" aria-hidden="true">
               <span className="w-1.5 h-1.5 rounded-full bg-[#004b49] animate-bounce [animation-delay:-0.3s]" />
               <span className="w-1.5 h-1.5 rounded-full bg-[#004b49] animate-bounce [animation-delay:-0.15s]" />
@@ -517,7 +517,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
         )}
 
         {failedText && !isAiTyping && (
-          <div role="alert" className="flex flex-wrap items-center gap-3 mr-auto px-4 py-3 rounded-2xl bg-[#ffdad6] text-sm text-[#93000a]">
+          <div role="alert" className="animate-in fade-in slide-in-from-bottom-2 duration-300 flex flex-wrap items-center gap-3 mr-auto px-4 py-3 rounded-2xl bg-[#ffdad6] text-sm text-[#93000a]">
             <span className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-[18px]">error</span>
               Aya n'a pas pu répondre.

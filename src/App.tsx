@@ -43,7 +43,7 @@ export default function App() {
   const [voiceFirst, setVoiceFirst] = useState(() => loadPreferences().voiceFirst);
   const isOnline = useOnlineStatus();
   const currentTab: NavTabKey = tabFromPath(pathname) ?? 'accueil';
-  const setCurrentTab = (tab: NavTabKey) => navigate(TAB_PATHS[tab]);
+  const setCurrentTab = (tab: NavTabKey) => navigate(TAB_PATHS[tab], { viewTransition: true });
   const [isVoiceSessionOpen, setIsVoiceSessionOpen] = useState(false);
   const [isStoryModalOpen, setIsStoryModalOpen] = useState(false);
   const [isVocabularyModalOpen, setIsVocabularyModalOpen] = useState(false);
@@ -105,7 +105,7 @@ export default function App() {
     setCurrentLanguage(lang);
     saveSession({ language: lang });
     setIsAuthenticated(true);
-    navigate(TAB_PATHS.accueil, { replace: true });
+    navigate(TAB_PATHS.accueil, { replace: true, viewTransition: true });
     window.scrollTo({ top: 0 });
     showNotification(lang === 'dioula' ? 'I ni ce ! Bienvenue sur IvoirAI' : 'Akwaba ! Bienvenue sur IvoirAI');
   };
@@ -116,7 +116,7 @@ export default function App() {
       return <Navigate to={AUTH_PATHS.login} replace />;
     }
     const goTo = (view: keyof typeof AUTH_PATHS) => {
-      navigate(AUTH_PATHS[view]);
+      navigate(AUTH_PATHS[view], { viewTransition: true });
       window.scrollTo({ top: 0 });
     };
     return (

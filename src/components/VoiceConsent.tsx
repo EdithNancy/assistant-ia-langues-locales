@@ -69,7 +69,7 @@ const VoiceConsentDialog: React.FC<{ onAnswer: (consent: VoiceConsent | null) =>
         role="dialog"
         aria-modal="true"
         aria-labelledby="consent-title"
-        className="w-full max-w-md bg-white rounded-t-[32px] sm:rounded-3xl p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto"
+        className="animate-in slide-in-from-bottom sm:slide-in-from-bottom-4 sm:fade-in sm:zoom-in-95 duration-300 w-full max-w-md bg-white rounded-t-[32px] sm:rounded-3xl p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto"
       >
         <div className="flex items-center gap-3">
           <span className="w-11 h-11 rounded-2xl bg-[#b1eeea] text-[#00201f] flex items-center justify-center shrink-0">
