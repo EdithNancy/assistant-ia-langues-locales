@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BRAND_ASSETS, INITIAL_CHAT_MESSAGES } from '../data/mockData';
 import { ChatMessage, Language } from '../types';
+import { api } from '../services';
 import { soundEngine } from '../utils/audio';
 
 interface DiscussionsTabProps {
@@ -50,16 +51,16 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
     });
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!inputText.trim()) return;
     const userText = inputText.trim();
     setInputText('');
 
-    const newMsgId = `user-${Date.now()}`;
+    const now = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const userMsg: ChatMessage = {
-      id: newMsgId,
+      id: `user-${Date.now()}`,
       sender: 'user',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: now(),
       text: userText,
       language: currentLanguage,
     };
@@ -67,107 +68,20 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
     setMessages((prev) => [...prev, userMsg]);
     soundEngine.playTone(480, 0.1);
 
-    // AI intelligent answer generation
-    setTimeout(() => {
-      let aiText = '';
-      let phonetic = '';
-      let translation = '';
-      let tone = 'Ton Moyen-Haut';
-      let breakdown: { term: string; meaning: string }[] = [];
-
-      const lower = userText.toLowerCase();
-
-      if (lower.includes('bonjour') || lower.includes('salut')) {
-        if (currentLanguage === 'dioula') {
-          aiText = '« An sɔgɔma ! I ka kɛnɛ wa ? »';
-          phonetic = '[An Sɔ-gɔ-ma ! Ee kah keh-neh wah]';
-          translation = 'Bonjour ! Te portes-tu bien ce matin ?';
-          breakdown = [
-            { term: 'An sɔgɔma', meaning: 'Bonjour / Bonne matinée' },
-            { term: 'I ka kɛnɛ wa', meaning: 'Es-tu en bonne santé / Comment vas-tu ?' },
-          ];
-        } else {
-          aiText = '« Akwaba ! Nzoué o ? »';
-          phonetic = '[Ah-kwah-bah ! N-zoo-eh oh]';
-          translation = 'Bienvenue ! Comment vas-tu ?';
-          breakdown = [
-            { term: 'Akwaba', meaning: 'Bienvenue / Salutation d’accueil' },
-            { term: 'Nzoué o', meaning: 'Comment vas-tu ? (Lit. Comment est l’eau ?)' },
-          ];
-        }
-      } else if (lower.includes('merci')) {
-        if (currentLanguage === 'dioula') {
-          aiText = '« I ni ce kosɛbɛ ! »';
-          phonetic = '[Ee nee tché koh-seh-beh]';
-          translation = 'Merci beaucoup de tout coeur !';
-          breakdown = [
-            { term: 'I ni ce', meaning: 'Merci' },
-            { term: 'kosɛbɛ', meaning: 'Beaucoup / avec insistance' },
-          ];
-        } else {
-          aiText = '« Mo n’dri kpa kpa ! »';
-          phonetic = '[Moh n-dree kpah kpah]';
-          translation = 'Grand merci chaleureux à toi !';
-          breakdown = [
-            { term: 'Mo n’dri', meaning: 'Merci beaucoup' },
-            { term: 'kpa kpa', meaning: 'Vraiment / très bien' },
-          ];
-        }
-      } else if (lower.includes('prix') || lower.includes('marché') || lower.includes('combien')) {
-        if (currentLanguage === 'dioula') {
-          aiText = '« Sɔngɔ jolibɔ ? Dɔ bɔ a la n ma. »';
-          phonetic = '[Son-goh joh-lee-boh ? Doh boh ah lah n mah]';
-          translation = 'Quel est le prix ? Diminue un peu pour moi.';
-          breakdown = [
-            { term: 'Sɔngɔ', meaning: 'Le prix / la valeur' },
-            { term: 'Jolibɔ', meaning: 'Combien / quelle somme' },
-            { term: 'Dɔ bɔ', meaning: 'Enlève un peu / rabais de courtoisie' },
-          ];
-        } else {
-          aiText = '« N kplo kɛ n to bo afwé nun. »';
-          phonetic = '[N-kplo keh n-toh boh ah-fweh noon]';
-          translation = 'Je souhaite faire mes achats au marché.';
-          breakdown = [
-            { term: 'N to', meaning: 'Acheter' },
-            { term: 'Bo afwé nun', meaning: 'Au marché' },
-          ];
-        }
-      } else {
-        if (currentLanguage === 'dioula') {
-          aiText = `« N b’a mɛn ! "${userText}" bɛ fɔ ko : Aw bɛ kɛnɛ. »`;
-          phonetic = '[N beh ah men ! Aw beh keh-neh]';
-          translation = `Bien compris ! "${userText}" trouve son écho dans la tradition d'Abidjan.`;
-          breakdown = [
-            { term: 'N b’a mɛn', meaning: 'Je comprends / j’entends bien' },
-            { term: 'Bɛ fɔ ko', meaning: 'On l’exprime ainsi' },
-          ];
-        } else {
-          aiText = `« N ti ndɛ nun kpa. "${userText}" o ti ndɛ kpa. »`;
-          phonetic = '[N tee n-deh noon kpah]';
-          translation = `Je saisis parfaitement. "${userText}" s'exprime avec respect chez les Baoulés.`;
-          breakdown = [
-            { term: 'N ti ndɛ nun', meaning: 'Je comprends la parole' },
-            { term: 'Ndɛ kpa', meaning: 'Bonne parole / propos juste' },
-          ];
-        }
-      }
-
+    try {
+      const reply = await api.chat({ message: userText, language: currentLanguage });
       const aiMsg: ChatMessage = {
+        ...reply,
         id: `ai-${Date.now()}`,
         sender: 'ai',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        text: aiText,
+        timestamp: now(),
         language: currentLanguage,
-        phonetic,
-        translation,
-        tone,
-        linguisticBreakdown: breakdown,
-        audioDuration: '0:05',
       };
-
       setMessages((prev) => [...prev, aiMsg]);
       soundEngine.playTonePitch('Haut');
-    }, 800);
+    } catch {
+      showToast("Aya n'a pas pu répondre. Vérifiez votre connexion.");
+    }
   };
 
   const handleMicToggle = () => {
