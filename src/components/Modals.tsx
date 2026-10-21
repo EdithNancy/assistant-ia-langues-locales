@@ -46,6 +46,7 @@ export const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose }) => {
           <img
             alt={story.title}
             src={story.image}
+            decoding="async"
             className="w-full h-full object-cover"
           />
           <button

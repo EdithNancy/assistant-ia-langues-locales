@@ -427,6 +427,8 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
                     alt={mod.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     src={mod.imageUrl}
+                    loading="lazy"
+                    decoding="async"
                   />
                   {mod.tag && (
                     <span

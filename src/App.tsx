@@ -199,7 +199,11 @@ export default function App() {
         />
 
         {/* Tab Content Stream */}
-        <main className="flex-1 w-full max-w-2xl lg:max-w-6xl mx-auto pt-22 lg:pt-24 pb-28 lg:pb-10 px-4 sm:px-6 lg:px-8">
+        <main
+          className={`flex-1 w-full max-w-2xl lg:max-w-6xl mx-auto pb-28 lg:pb-10 px-4 sm:px-6 lg:px-8 ${
+            isOnline ? 'pt-22 lg:pt-24' : 'pt-32 lg:pt-32' // place pour le bandeau hors connexion
+          }`}
+        >
           {currentTab === 'accueil' && (
             <HomeTab
               currentLanguage={currentLanguage}

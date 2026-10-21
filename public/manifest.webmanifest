@@ -1,0 +1,11 @@
+{
+  "name": "IvoirAI - Langues Ivoiriennes & Assistant Vocal",
+  "short_name": "IvoirAI",
+  "description": "Assistant vocal et tuteur culturel en Baoulé et Dioula.",
+  "lang": "fr",
+  "start_url": "/accueil",
+  "display": "standalone",
+  "background_color": "#f9f9fb",
+  "theme_color": "#004b49",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

@@ -11,3 +11,10 @@ createRoot(document.getElementById('root')!).render(
     </VoiceConsentProvider>
   </BrowserRouter>
 );
+
+// Cache hors ligne (public/sw.js), en production seulement pour ne pas gêner le rechargement à chaud
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => undefined);
+  });
+}

@@ -72,3 +72,9 @@ npm run lint    # types TypeScript (strict) + oxlint (hooks React, accessibilit�
 npm test        # tests Vitest + Testing Library
 npm run build   # build de production dans dist/
 ```
+
+### 5. Ajouter une icône
+
+L'app ne charge que les icônes Material Symbols qu'elle utilise (~20 Ko au lieu de ~1 Mo).
+Pour une nouvelle icône, ajoutez son nom dans `icon_names` (ordre alphabétique) dans `index.html` ;
+`npm test` signale toute icône utilisée mais non chargée.

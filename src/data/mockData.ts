@@ -1,12 +1,12 @@
 import { ChatMessage, LearningModule, QuizQuestion, VocabularyItem } from '../types';
 import logo from '../assets/images/logo.svg';
-import edithProfile from '../assets/images/profile.jpg';
-import ayaAvatar from '../assets/images/avatar.jpg';
-import baouleTextile from '../assets/images/textile.jpg';
-import marketStall from '../assets/images/marche.jpg';
-import elders from '../assets/images/notable.jpg';
-import family from '../assets/images/famille.jpg';
-import goldWeights from '../assets/images/cultures.jpg';
+import edithProfile from '../assets/images/profile.webp';
+import ayaAvatar from '../assets/images/avatar.webp';
+import baouleTextile from '../assets/images/textile.webp';
+import marketStall from '../assets/images/marche.webp';
+import elders from '../assets/images/notable.webp';
+import family from '../assets/images/famille.webp';
+import goldWeights from '../assets/images/cultures.webp';
 
 
 export const BRAND_ASSETS = {
