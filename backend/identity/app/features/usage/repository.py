@@ -1,15 +1,15 @@
 import uuid
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession  # <-- Modifié
 
 from app.features.usage.entity import UsageEvent
 
 
 class UsageRepository:
     @staticmethod
-    def list_events(
-        db: Session,
+    async def list_events(  # <-- async def
+        db: AsyncSession,  # <-- AsyncSession
         user_id: uuid.UUID | None,
         event_type: str | None,
         offset: int,
@@ -23,4 +23,6 @@ class UsageRepository:
         statement = statement.order_by(
             UsageEvent.created_at.desc(), UsageEvent.id.desc()
         ).offset(offset).limit(limit)
-        return list(db.scalars(statement).all())
+
+        result = await db.execute(statement)  # <-- await + execute
+        return list(result.scalars().all())

@@ -4,7 +4,7 @@ from datetime import datetime, time, timedelta, timezone
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession  # <-- Modifié
 
 from app.config import settings
 from app.features.tokens.entity import TokenTransaction, TokenWallet
@@ -13,16 +13,19 @@ from app.features.usage.entity import UsageEvent
 
 class TokenService:
     @staticmethod
-    def _get_wallet(db: Session, user_id: uuid.UUID) -> TokenWallet:
-        wallet = db.scalar(
-            select(TokenWallet).where(TokenWallet.user_id == user_id).with_for_update()
+    async def _get_wallet(db: AsyncSession, user_id: uuid.UUID) -> TokenWallet:  # <-- async def
+        wallet = await db.scalar(  # <-- await
+            select(TokenWallet).where(
+                TokenWallet.user_id == user_id).with_for_update()
         )
         if wallet is None:
-            raise HTTPException(500, "Le portefeuille de tokens du compte est introuvable.")
+            raise HTTPException(
+                500, "Le portefeuille de tokens du compte est introuvable.")
         return wallet
 
     @staticmethod
-    def _refresh_free_tokens(db: Session, wallet: TokenWallet, now: datetime) -> None:
+    # <-- async def
+    async def _refresh_free_tokens(db: AsyncSession, wallet: TokenWallet, now: datetime) -> None:
         refill_at = wallet.next_free_refill_at
         if refill_at.tzinfo is None:
             refill_at = refill_at.replace(tzinfo=timezone.utc)
@@ -58,28 +61,31 @@ class TokenService:
             ))
 
     @staticmethod
-    def get_balance(db: Session, user_id: uuid.UUID) -> dict[str, object]:
-        wallet = TokenService._get_wallet(db, user_id)
-        TokenService._refresh_free_tokens(db, wallet, datetime.now(timezone.utc))
-        db.commit()
+    # <-- async def
+    async def get_balance(db: AsyncSession, user_id: uuid.UUID) -> dict[str, object]:
+        wallet = await TokenService._get_wallet(db, user_id)  # <-- await
+        # <-- await
+        await TokenService._refresh_free_tokens(db, wallet, datetime.now(timezone.utc))
+        await db.commit()  # <-- await
         return TokenService._as_balance(wallet)
 
     @staticmethod
-    def has_tokens(db: Session, user_id: uuid.UUID, amount: int = 1) -> bool:
+    async def has_tokens(db: AsyncSession, user_id: uuid.UUID, amount: int = 1) -> bool:  # <-- async def
         if amount < 1:
             raise ValueError("amount must be a positive integer")
-        balance = TokenService.get_balance(db, user_id)
+        balance = await TokenService.get_balance(db, user_id)  # <-- await
         return int(balance["total_tokens"]) >= amount
 
     @staticmethod
-    def consume_credit_tokens(
-        db: Session, user_id: uuid.UUID, credit_tokens: int
+    async def consume_credit_tokens(  # <-- async def
+        db: AsyncSession, user_id: uuid.UUID, credit_tokens: int
     ) -> dict[str, object]:
         """Debit conversational credits; authentication credentials are never wallet units."""
         if credit_tokens < 1:
             raise ValueError("credit_tokens must be a positive integer")
-        wallet = TokenService._get_wallet(db, user_id)
-        TokenService._refresh_free_tokens(db, wallet, datetime.now(timezone.utc))
+        wallet = await TokenService._get_wallet(db, user_id)  # <-- await
+        # <-- await
+        await TokenService._refresh_free_tokens(db, wallet, datetime.now(timezone.utc))
         available_credit_tokens = (
             wallet.free_tokens_remaining + wallet.purchased_tokens_remaining
         )
@@ -97,8 +103,9 @@ class TokenService:
                     "available_credit_tokens": available_credit_tokens,
                 },
             ))
-            db.commit()
-            raise HTTPException(402, "Tokens insuffisants. Attendez le prochain renouvellement.")
+            await db.commit()  # <-- await
+            raise HTTPException(
+                402, "Tokens insuffisants. Attendez le prochain renouvellement.")
 
         free_used = min(wallet.free_tokens_remaining, credit_tokens)
         paid_used = credit_tokens - free_used
@@ -126,17 +133,18 @@ class TokenService:
                 "purchased_credit_tokens": paid_used,
             },
         ))
-        db.commit()
+        await db.commit()  # <-- await
         return TokenService._as_balance(wallet)
 
     @staticmethod
-    def grant_purchased_tokens(
-        db: Session, user_id: uuid.UUID, amount: int, payment_reference: str
+    async def grant_purchased_tokens(  # <-- async def
+        db: AsyncSession, user_id: uuid.UUID, amount: int, payment_reference: str
     ) -> dict[str, object]:
         payment_reference = payment_reference.strip()
         if amount < 1 or not payment_reference:
-            raise ValueError("A positive amount and payment reference are required")
-        prior = db.scalar(
+            raise ValueError(
+                "A positive amount and payment reference are required")
+        prior = await db.scalar(  # <-- await
             select(TokenTransaction).where(
                 TokenTransaction.external_reference == payment_reference
             )
@@ -144,12 +152,14 @@ class TokenService:
         if prior is not None:
             if (prior.user_id != user_id or prior.amount != amount
                     or prior.reason != "purchase_grant"):
-                raise HTTPException(409, "Cette référence de paiement a déjà été utilisée.")
-            return TokenService.get_balance(db, user_id)
+                raise HTTPException(
+                    409, "Cette référence de paiement a déjà été utilisée.")
+            return await TokenService.get_balance(db, user_id)  # <-- await
 
-        wallet = TokenService._get_wallet(db, user_id)
-        TokenService._refresh_free_tokens(db, wallet, datetime.now(timezone.utc))
-        prior = db.scalar(
+        wallet = await TokenService._get_wallet(db, user_id)  # <-- await
+        # <-- await
+        await TokenService._refresh_free_tokens(db, wallet, datetime.now(timezone.utc))
+        prior = await db.scalar(  # <-- await
             select(TokenTransaction).where(
                 TokenTransaction.external_reference == payment_reference
             )
@@ -157,8 +167,9 @@ class TokenService:
         if prior is not None:
             if (prior.user_id != user_id or prior.amount != amount
                     or prior.reason != "purchase_grant"):
-                raise HTTPException(409, "Cette référence de paiement a déjà été utilisée.")
-            db.commit()
+                raise HTTPException(
+                    409, "Cette référence de paiement a déjà été utilisée.")
+            await db.commit()  # <-- await
             return TokenService._as_balance(wallet)
 
         wallet.purchased_tokens_remaining += amount
@@ -180,10 +191,10 @@ class TokenService:
             details={"amount": amount},
         ))
         try:
-            db.commit()
+            await db.commit()  # <-- await
         except IntegrityError:
-            db.rollback()
-            prior = db.scalar(
+            await db.rollback()  # <-- await
+            prior = await db.scalar(  # <-- await
                 select(TokenTransaction).where(
                     TokenTransaction.external_reference == payment_reference
                 )
@@ -192,8 +203,9 @@ class TokenService:
                 raise
             if (prior.user_id != user_id or prior.amount != amount
                     or prior.reason != "purchase_grant"):
-                raise HTTPException(409, "Cette référence de paiement a déjà été utilisée.")
-            return TokenService.get_balance(db, user_id)
+                raise HTTPException(
+                    409, "Cette référence de paiement a déjà été utilisée.")
+            return await TokenService.get_balance(db, user_id)  # <-- await
         return TokenService._as_balance(wallet)
 
     @staticmethod

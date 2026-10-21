@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, ConfigDict
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession  # <-- Modifié
 from app.core.database import get_db
 from app.core.dependencies import get_current_user
 from app.core.revocation import revoke_access_sessions
@@ -10,6 +10,7 @@ from app.features.sessions.service import SessionService
 from app.features.users.entity import User
 
 router = APIRouter(prefix="/sessions", tags=["Sessions"])
+
 
 class SessionResponse(BaseModel):
     id: uuid.UUID
@@ -22,19 +23,25 @@ class SessionResponse(BaseModel):
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
 
+
 @router.get("", response_model=list[SessionResponse])
-def list_sessions(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return SessionService.list_own(db, user.id)
+async def list_sessions(  # <-- async def
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)  # <-- AsyncSession
+):
+    return await SessionService.list_own(db, user.id)  # <-- await
+
 
 @router.delete("/{session_id}", response_model=SessionResponse)
 async def revoke_session(
     session_id: uuid.UUID,
     request: Request,
     user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),  # <-- AsyncSession
 ):
-    session = SessionService.revoke_own(db, session_id, user.id)
+    # <-- await
+    session = await SessionService.revoke_own(db, session_id, user.id)
     await revoke_access_sessions(request.app.state.redis, [session.id])
-    db.commit()
-    db.refresh(session)
+    await db.commit()  # <-- await
+    await db.refresh(session)  # <-- await
     return session

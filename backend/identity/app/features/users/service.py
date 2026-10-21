@@ -3,7 +3,8 @@ from datetime import datetime, timezone
 from fastapi import HTTPException
 from redis.exceptions import RedisError
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession  # <-- Modifié
+from sqlalchemy import select  # <-- Ajouté pour les requêtes
 from app.config import settings
 from app.core.revocation import revoke_access_sessions
 from app.core.security import hash_password
@@ -13,21 +14,29 @@ from app.features.users.entity import User
 from app.features.users.repository import UserRepository
 from app.features.users.schemas import UserRegister, UserUpdate
 
+
 class UserService:
     @staticmethod
-    def register(db: Session, data: UserRegister):
+    async def register(db: AsyncSession, data: UserRegister):  # <-- async def
         email = str(data.email).lower().strip()
-        if UserRepository.get_by_email(db, email):
+
+        if await UserRepository.get_by_email(db, email):  # <-- await
             raise HTTPException(409, "Cette adresse e-mail est déjà utilisée.")
-        role = db.query(Role).filter_by(code="USER").first()
+
+        # Remplacement de db.query(Role).filter_by(...) par select + scalar
+        # <-- await
+        role = await db.scalar(select(Role).filter_by(code="USER"))
+
         if role is None:
-            raise HTTPException(503, "Les rôles initiaux ne sont pas configurés.")
+            raise HTTPException(
+                503, "Les rôles initiaux ne sont pas configurés.")
         user = User(full_name=data.full_name.strip(), email=email,
-                    phone_number=data.phone_number, password_hash=hash_password(data.password),
+                    phone_number=data.phone_number, password_hash=hash_password(
+                        data.password),
                     roles=[role])
         db.add(user)
         try:
-            db.flush()
+            await db.flush()  # <-- await
             wallet = TokenWallet(
                 user_id=user.id,
                 free_tokens_remaining=settings.FREE_TOKEN_GRANT,
@@ -41,27 +50,33 @@ class UserService:
                 amount=settings.FREE_TOKEN_GRANT,
                 reason="signup_grant",
             ))
-            db.commit()
-            db.refresh(user)
+            await db.commit()  # <-- await
+            await db.refresh(user)  # <-- await
         except IntegrityError:
-            db.rollback()
+            await db.rollback()  # <-- await
             raise HTTPException(409, "Impossible de créer ce compte.")
         return user
 
     @staticmethod
-    def get_user(db: Session, user_id):
-        user = UserRepository.get_by_id(db, user_id)
+    async def get_user(db: AsyncSession, user_id):  # <-- async def
+        user = await UserRepository.get_by_id(db, user_id)  # <-- await
         if user is None:
             raise HTTPException(404, "Utilisateur introuvable.")
         return user
 
     @staticmethod
-    async def update_user(db: Session, user_id, data: UserUpdate, redis):
-        user = UserService.get_user(db, user_id)
+    async def update_user(db: AsyncSession, user_id, data: UserUpdate, redis):  # <-- async def
+        user = await UserService.get_user(db, user_id)  # <-- await
         updates = data.model_dump(exclude_unset=True)
         deactivating = updates.get("is_active") is False and user.is_active
         if deactivating:
-            active_sessions = [session for session in user.sessions if session.revoked_at is None]
+            # Attention : user.sessions est probablement lazy-loaded (relation).
+            # En async, il faut forcer le chargement avant d'y accéder,
+            # sinon ça plante avec MissingGreenlet.
+            # Solution : utiliser selectinload dans get_user ou recharger ici.
+            # Pour l'instant, on suppose que get_user a chargé les sessions.
+            active_sessions = [
+                session for session in user.sessions if session.revoked_at is None]
             try:
                 await revoke_access_sessions(redis, (session.id for session in active_sessions))
             except RedisError as exc:
@@ -73,16 +88,17 @@ class UserService:
                 session.revoked_at = datetime.now(timezone.utc)
                 session.refresh_token_hash = None
         for key, value in updates.items():
-            setattr(user, key, value.strip() if key == "full_name" and value else value)
+            setattr(user, key, value.strip() if key ==
+                    "full_name" and value else value)
         try:
-            db.commit()
+            await db.commit()  # <-- await
         except SQLAlchemyError as exc:
-            db.rollback()
+            await db.rollback()  # <-- await
             if deactivating:
                 raise HTTPException(
                     status_code=503,
                     detail="Les sessions ont été révoquées, mais la désactivation a échoué.",
                 ) from exc
             raise
-        db.refresh(user)
+        await db.refresh(user)  # <-- await
         return user

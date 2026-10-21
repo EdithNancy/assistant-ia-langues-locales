@@ -10,7 +10,8 @@ from jose import JWTError, jwt
 from pydantic import EmailStr, TypeAdapter, ValidationError
 from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.ext.asyncio import AsyncSession  # <-- Modifié
 from sqlalchemy import DateTime, ForeignKey, String, UniqueConstraint, func
 
 from app.config import settings
@@ -50,8 +51,10 @@ class SocialAuthNonce(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     provider: Mapped[str] = mapped_column(String(16), nullable=False)
-    nonce_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    nonce_hash: Mapped[str] = mapped_column(
+        String(64), unique=True, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False)
     used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
@@ -68,14 +71,16 @@ def _provider_keys(provider: str) -> list[dict[str, object]]:
         if not isinstance(keys, list) or not all(isinstance(item, dict) for item in keys):
             raise ValueError("Invalid provider key set")
     except (httpx.HTTPError, KeyError, TypeError, ValueError) as exc:
-        raise HTTPException(503, f"Impossible de vérifier l'identité auprès de {provider}.") from exc
+        raise HTTPException(
+            503, f"Impossible de vérifier l'identité auprès de {provider}.") from exc
     return keys
 
 
 def _verified_claims(provider: str, identity_token: str) -> dict[str, object]:
     client_ids = settings.client_ids_for(provider)
     if not client_ids:
-        raise HTTPException(503, f"La connexion {provider} n'est pas configurée.")
+        raise HTTPException(
+            503, f"La connexion {provider} n'est pas configurée.")
     try:
         header = jwt.get_unverified_header(identity_token)
         kid = header.get("kid")
@@ -99,7 +104,8 @@ def _verified_claims(provider: str, identity_token: str) -> dict[str, object]:
             options={"verify_iss": False},
         )
     except JWTError as exc:
-        raise HTTPException(401, "Jeton de connexion invalide ou expiré.") from exc
+        raise HTTPException(
+            401, "Jeton de connexion invalide ou expiré.") from exc
     _, expected_issuer = _PROVIDERS[provider]
     valid_issuers = {"https://accounts.google.com", "accounts.google.com"} if provider == "google" else {
         expected_issuer
@@ -113,15 +119,19 @@ class SocialAuthService:
     NONCE_TTL_SECONDS = 300
 
     @staticmethod
-    def create_nonce(db: Session, provider: str) -> str:
+    # <-- async def, AsyncSession
+    async def create_nonce(db: AsyncSession, provider: str) -> str:
         if not settings.client_ids_for(provider):
-            raise HTTPException(503, f"La connexion {provider} n'est pas configurée.")
+            raise HTTPException(
+                503, f"La connexion {provider} n'est pas configurée.")
         nonce = secrets.token_urlsafe(32)
         now = datetime.now(timezone.utc)
-        db.execute(delete(SocialAuthNonce).where(
+
+        await db.execute(delete(SocialAuthNonce).where(  # <-- await
             (SocialAuthNonce.expires_at <= now)
             | (SocialAuthNonce.used_at.is_not(None))
         ))
+
         db.add(SocialAuthNonce(
             provider=provider,
             nonce_hash=hashlib.sha256(nonce.encode()).hexdigest(),
@@ -129,26 +139,31 @@ class SocialAuthService:
                 seconds=SocialAuthService.NONCE_TTL_SECONDS
             ),
         ))
-        db.commit()
+
+        await db.commit()  # <-- await
         return nonce
 
     @staticmethod
-    def login(db: Session, data: SocialLoginRequest) -> User:
+    # <-- async def, AsyncSession
+    async def login(db: AsyncSession, data: SocialLoginRequest) -> User:
         claims = _verified_claims(data.provider, data.id_token)
         subject = claims.get("sub")
         if not isinstance(subject, str):
-            raise HTTPException(401, "Identifiant de compte du fournisseur invalide.")
+            raise HTTPException(
+                401, "Identifiant de compte du fournisseur invalide.")
 
         expected_nonce = (
             hashlib.sha256(data.nonce.encode()).hexdigest()
             if data.provider == "apple" else data.nonce
         )
         if claims.get("nonce") != expected_nonce:
-            raise HTTPException(401, "La vérification de sécurité de la connexion a échoué.")
+            raise HTTPException(
+                401, "La vérification de sécurité de la connexion a échoué.")
 
         now = datetime.now(timezone.utc)
         nonce_hash = hashlib.sha256(data.nonce.encode()).hexdigest()
-        nonce = db.scalar(
+
+        nonce = await db.scalar(  # <-- await
             select(SocialAuthNonce)
             .where(
                 SocialAuthNonce.provider == data.provider,
@@ -159,9 +174,10 @@ class SocialAuthService:
             .with_for_update()
         )
         if nonce is None:
-            raise HTTPException(401, "Code de connexion expiré ou déjà utilisé.")
+            raise HTTPException(
+                401, "Code de connexion expiré ou déjà utilisé.")
 
-        identity = db.scalar(
+        identity = await db.scalar(  # <-- await
             select(FederatedIdentity).where(
                 FederatedIdentity.provider == data.provider,
                 FederatedIdentity.provider_subject == subject,
@@ -169,9 +185,10 @@ class SocialAuthService:
         )
         try:
             if identity is not None:
-                user = db.get(User, identity.user_id)
+                user = await db.get(User, identity.user_id)  # <-- await
                 if user is None:
-                    raise HTTPException(401, "Compte de connexion indisponible.")
+                    raise HTTPException(
+                        401, "Compte de connexion indisponible.")
             else:
                 email = claims.get("email")
                 email_verified = claims.get("email_verified")
@@ -182,14 +199,20 @@ class SocialAuthService:
                         401, "Le fournisseur doit confirmer l'adresse e-mail pour créer ou lier le compte."
                     )
                 try:
-                    normalized_email = str(_EMAIL_ADAPTER.validate_python(email)).lower().strip()
+                    normalized_email = str(
+                        _EMAIL_ADAPTER.validate_python(email)).lower().strip()
                 except ValidationError as exc:
-                    raise HTTPException(401, "Adresse e-mail fournie par le fournisseur invalide.") from exc
-                user = UserRepository.get_by_email(db, normalized_email)
+                    raise HTTPException(
+                        401, "Adresse e-mail fournie par le fournisseur invalide.") from exc
+
+                # <-- await
+                user = await UserRepository.get_by_email(db, normalized_email)
+
                 if user is None:
                     provider_name = claims.get("name")
                     full_name = (
-                        data.full_name or (provider_name if isinstance(provider_name, str) else "")
+                        data.full_name or (provider_name if isinstance(
+                            provider_name, str) else "")
                     ).strip()
                     phone_number = data.phone_number
                     if len(full_name) < 2 or phone_number is None:
@@ -197,9 +220,13 @@ class SocialAuthService:
                             422,
                             "Pour terminer la création du compte, indiquez votre nom et votre numéro de téléphone.",
                         )
-                    role = db.scalar(select(Role).where(Role.code == "USER"))
+
+                    # <-- await
+                    role = await db.scalar(select(Role).where(Role.code == "USER"))
+
                     if role is None:
-                        raise HTTPException(503, "Les rôles initiaux ne sont pas configurés.")
+                        raise HTTPException(
+                            503, "Les rôles initiaux ne sont pas configurés.")
                     user = User(
                         full_name=full_name,
                         email=normalized_email,
@@ -209,7 +236,7 @@ class SocialAuthService:
                         roles=[role],
                     )
                     db.add(user)
-                    db.flush()
+                    await db.flush()  # <-- await
                     db.add(TokenWallet(
                         user_id=user.id,
                         free_tokens_remaining=settings.FREE_TOKEN_GRANT,
@@ -233,8 +260,9 @@ class SocialAuthService:
             if not user.is_active:
                 raise HTTPException(403, "Ce compte est désactivé.")
             nonce.used_at = now
-            db.commit()
+            await db.commit()  # <-- await
             return user
         except IntegrityError as exc:
-            db.rollback()
-            raise HTTPException(409, "Impossible de lier ce compte de connexion.") from exc
+            await db.rollback()  # <-- await
+            raise HTTPException(
+                409, "Impossible de lier ce compte de connexion.") from exc

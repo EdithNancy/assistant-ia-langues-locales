@@ -1,15 +1,23 @@
 from datetime import datetime, timezone
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession  # <-- Modifié
 from app.features.sessions.entity import UserSession
+
 
 class SessionService:
     @staticmethod
-    def list_own(db: Session, user_id):
-        return db.query(UserSession).filter_by(user_id=user_id).order_by(UserSession.created_at.desc()).all()
+    async def list_own(db: AsyncSession, user_id):  # <-- async def
+        result = await db.execute(  # <-- await + execute
+            select(UserSession)
+            .where(UserSession.user_id == user_id)
+            .order_by(UserSession.created_at.desc())
+        )
+        return result.scalars().all()
+
     @staticmethod
-    def revoke_own(db: Session, session_id, user_id):
-        session = db.get(UserSession, session_id)
+    async def revoke_own(db: AsyncSession, session_id, user_id):  # <-- async def
+        session = await db.get(UserSession, session_id)  # <-- await
         if session is None or session.user_id != user_id:
             raise HTTPException(404, "Session introuvable.")
         if session.revoked_at is None:
