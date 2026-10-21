@@ -119,8 +119,8 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 bg-[#f9f9fb] flex flex-col justify-between overflow-y-auto animate-in fade-in duration-300">
       {/* Top Header Bar */}
-      <div className="w-full bg-[#f9f9fb]/90 backdrop-blur-md px-4 pt-3 pb-2 border-b border-[#edeef0]">
-        <div className="flex items-center justify-between">
+      <div className="sticky top-0 z-10 w-full bg-[#f9f9fb]/90 backdrop-blur-md px-4 sm:px-6 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-2 border-b border-[#edeef0]">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
@@ -157,7 +157,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
       </div>
 
       {/* Main Vocal Content Area */}
-      <div className="flex-1 max-w-md w-full mx-auto px-4 py-4 flex flex-col justify-between gap-4">
+      <div className="flex-1 max-w-md sm:max-w-lg lg:max-w-xl w-full mx-auto px-4 sm:px-6 py-4 lg:py-8 flex flex-col justify-between gap-4">
         {/* Floating Session Context Controls */}
         <div className="flex items-center justify-between w-full">
           {/* Center Status: Live Timer Pill & Dialect selector */}
@@ -416,7 +416,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
         </div>
 
         {/* Floating Dock Action Controls */}
-        <div className="w-full pt-1 pb-4 flex items-center justify-between gap-2">
+        <div className="w-full pt-1 pb-[calc(1rem+env(safe-area-inset-bottom))] flex items-center justify-between gap-2">
           {/* Mute Mic Button */}
           <button
             onClick={toggleMute}

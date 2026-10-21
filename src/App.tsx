@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { BottomNav, TabKey } from './components/BottomNav';
+import { Sidebar } from './components/Sidebar';
 import { HomeTab } from './components/HomeTab';
 import { DiscussionsTab } from './components/DiscussionsTab';
 import { TraduireTab } from './components/TraduireTab';
@@ -9,6 +10,7 @@ import { VoiceSessionModal } from './components/VoiceSessionModal';
 import { ProfileModal, StoryModal, VocabularyModal } from './components/Modals';
 import { LoginPage } from './components/auth/LoginPage';
 import { RegisterPage } from './components/auth/RegisterPage';
+import { BRAND_ASSETS } from './data/mockData';
 import { Language } from './types';
 import { soundEngine } from './utils/audio';
 
@@ -73,8 +75,11 @@ export default function App() {
       window.scrollTo({ top: 0 });
     };
     return (
-      <div className="min-h-screen bg-[#f9f9fb] text-[#1a1c1d] flex flex-col items-center">
-        <div className="w-full max-w-md min-h-screen bg-[#f9f9fb] relative shadow-[0_0_50px_rgba(0,51,49,0.08)]">
+      <div className="min-h-screen bg-[#f9f9fb] text-[#1a1c1d] lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+        {/* Panneau de marque : visible uniquement sur grand écran */}
+        <AuthBrandPanel />
+
+        <div className="w-full max-w-md lg:max-w-lg mx-auto min-h-screen bg-[#f9f9fb] relative shadow-[0_0_50px_rgba(0,51,49,0.08)] lg:shadow-none">
           {authView === 'login' ? (
             <LoginPage onAuthenticated={handleAuthenticated} onGoToRegister={() => goTo('register')} />
           ) : (
@@ -103,9 +108,17 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9f9fb] text-[#1a1c1d] flex flex-col items-center">
-      {/* Container wrapper: mobile-first constraint on desktop with elegant shadow */}
-      <div className="w-full max-w-md min-h-screen bg-[#f9f9fb] flex flex-col relative shadow-[0_0_50px_rgba(0,51,49,0.08)]">
+    <div className="min-h-screen bg-[#f9f9fb] text-[#1a1c1d]">
+      {/* Desktop Side Navigation (lg+) */}
+      <Sidebar
+        currentTab={currentTab}
+        onTabChange={handleTabChange}
+        onStartVoiceSession={handleStartVoiceSession}
+        onOpenProfile={() => setIsProfileModalOpen(true)}
+      />
+
+      {/* Container wrapper: pleine largeur sur mobile, décalé de la barre latérale sur desktop */}
+      <div className="w-full min-h-screen bg-[#f9f9fb] flex flex-col relative lg:pl-64">
         {/* Top Header */}
         <Header
           title={getHeaderTitle()}
@@ -119,7 +132,7 @@ export default function App() {
 
         {/* Floating Notification Toast */}
         {notificationToast && (
-          <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-[#003331] text-white text-xs font-semibold shadow-xl flex items-center gap-2 border border-[#62fae3]/20 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="fixed top-20 lg:top-24 left-1/2 lg:left-[calc(50%+8rem)] -translate-x-1/2 z-50 max-w-[calc(100vw-2rem)] px-4 py-2 rounded-full bg-[#003331] text-white text-xs font-semibold shadow-xl flex items-center gap-2 border border-[#62fae3]/20 animate-in fade-in slide-in-from-top-2 duration-200">
             <span className="material-symbols-outlined text-[16px] text-[#62fae3]">
               notifications_active
             </span>
@@ -128,7 +141,7 @@ export default function App() {
         )}
 
         {/* Tab Content Stream */}
-        <main className="flex-1 w-full pt-22 pb-24 px-4">
+        <main className="flex-1 w-full max-w-2xl lg:max-w-6xl mx-auto pt-22 lg:pt-24 pb-28 lg:pb-10 px-4 sm:px-6 lg:px-8">
           {currentTab === 'accueil' && (
             <HomeTab
               currentLanguage={currentLanguage}
@@ -168,7 +181,7 @@ export default function App() {
           )}
         </main>
 
-        {/* Bottom Floating Navigation */}
+        {/* Bottom Floating Navigation (mobile & tablette uniquement) */}
         <BottomNav
           currentTab={currentTab}
           onTabChange={handleTabChange}
@@ -205,3 +218,52 @@ export default function App() {
     </div>
   );
 }
+
+/** Panneau gauche de l'écran d'authentification, affiché à partir de lg. */
+const AuthBrandPanel = () => (
+  <aside className="hidden lg:flex sticky top-0 h-screen flex-col justify-between overflow-hidden bg-gradient-to-br from-[#004b49] via-[#003331] to-[#002422] text-white p-10 xl:p-14">
+    {/* Motif géométrique traditionnel */}
+    <svg
+      className="absolute -right-24 -bottom-24 w-[28rem] h-[28rem] text-[#62fae3] opacity-10 pointer-events-none"
+      fill="currentColor"
+      viewBox="0 0 100 100"
+      aria-hidden="true"
+    >
+      <path d="M50 0 L100 50 L50 100 L0 50 Z M50 20 L80 50 L50 80 L20 50 Z" />
+      <circle cx="50" cy="50" r="12" />
+    </svg>
+
+    <div className="relative flex items-center gap-3">
+      <img src={BRAND_ASSETS.logo} alt="Logo IvoirAI" className="h-11 w-11 rounded-xl bg-white/10 p-1 object-contain" />
+      <span className="text-xl font-bold tracking-tight">IvoirAI</span>
+    </div>
+
+    <div className="relative max-w-md">
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#004c43]/80 text-[#62fae3] text-xs font-semibold border border-[#62fae3]/20">
+        <span className="material-symbols-outlined text-[14px]">graphic_eq</span>
+        Reconnaissance vocale ivoirienne
+      </span>
+      <h2 className="mt-5 text-4xl xl:text-5xl font-extrabold leading-tight">
+        Parlez, apprenez et traduisez en Baoulé & Dioula.
+      </h2>
+      <p className="mt-4 text-[#7ebab7] text-base leading-relaxed">
+        L'IA comprend vos dialectes, intonations et accents ivoiriens sans filtre.
+      </p>
+
+      <ul className="mt-8 flex flex-col gap-3 text-sm">
+        {[
+          { icon: 'mic', label: 'Conversations vocales en direct avec Aya' },
+          { icon: 'translate', label: 'Traduction contextuelle et culturelle' },
+          { icon: 'school', label: 'Apprentissage des tons et proverbes' },
+        ].map((f) => (
+          <li key={f.icon} className="flex items-center gap-3">
+            <span className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-[#62fae3]">
+              <span className="material-symbols-outlined text-[20px]">{f.icon}</span>
+            </span>
+            {f.label}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </aside>
+);

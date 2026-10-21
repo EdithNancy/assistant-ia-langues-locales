@@ -77,7 +77,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
           ✨ Akwaba nimbâ ! • Bon retour
         </span>
 
-        <h1 className="mt-4 text-[28px] font-bold text-[#003331] tracking-tight text-center">
+        <h1 className="mt-4 text-[24px] min-[380px]:text-[28px] font-bold text-[#003331] tracking-tight text-center">
           Connexion à votre espace
         </h1>
         <p className="mt-2 text-[17px] leading-relaxed text-[#3f4948] text-center">
@@ -104,7 +104,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
                   setMethod(tab.key);
                   setError(null);
                 }}
-                className={`h-12 rounded-full flex items-center justify-center gap-2 text-[15px] font-medium transition-all ${
+                className={`h-12 rounded-full flex items-center justify-center gap-1.5 sm:gap-2 text-[13px] min-[380px]:text-[15px] font-medium transition-all ${
                   method === tab.key ? 'bg-white text-[#1a1c1d] shadow-sm' : 'text-[#3f4948]'
                 }`}
               >

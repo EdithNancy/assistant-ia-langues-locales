@@ -18,10 +18,10 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, onBack }) => (
           <span className="material-symbols-outlined text-[24px]">arrow_back</span>
         </button>
         <img src={BRAND_ASSETS.logo} alt="Logo N'Zassa" className="h-9 w-9 rounded-xl object-contain" />
-        <span className="text-xl font-semibold text-[#1a1c1d] tracking-tight">N’Zassa</span>
+        <span className="hidden min-[360px]:inline text-xl font-semibold text-[#1a1c1d] tracking-tight">N’Zassa</span>
       </div>
 
-      <span className="text-[17px] font-medium text-[#3f4948]">{title}</span>
+      <span className="text-[15px] sm:text-[17px] font-medium text-[#3f4948]">{title}</span>
 
       <div className="w-10 h-10 rounded-full bg-[#003331] flex items-center justify-center text-white">
         <span className="material-symbols-outlined text-[20px]">person</span>

@@ -60,6 +60,12 @@
   }
 
   .material-symbols-outlined {
+    /* Taille fixe : évite que le nom de l'icône (texte brut) déborde
+       tant que la police n'est pas chargée (réseau mobile lent). */
+    display: inline-block;
+    width: 1em;
+    overflow: hidden;
+    white-space: nowrap;
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     user-select: none;
     vertical-align: middle;

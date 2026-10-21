@@ -184,20 +184,20 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full pb-10 space-y-4">
+    <div className="grid grid-cols-1 lg:grid-cols-2 w-full pb-10 gap-4 lg:gap-6">
       {/* Toast Notification */}
       {toast && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-[#003331] text-white text-xs font-semibold shadow-lg animate-in fade-in flex items-center gap-2">
+        <div className="fixed top-20 lg:top-24 left-1/2 lg:left-[calc(50%+8rem)] -translate-x-1/2 z-50 max-w-[calc(100vw-2rem)] px-4 py-2 rounded-full bg-[#003331] text-white text-xs font-semibold shadow-lg animate-in fade-in flex items-center gap-2">
           <span className="material-symbols-outlined text-[16px] text-[#62fae3]">check_circle</span>
           <span>{toast}</span>
         </div>
       )}
 
       {/* Screen Title & Header */}
-      <div className="flex items-center justify-between pt-1">
+      <div className="lg:col-span-2 flex items-center justify-between gap-2 pt-1">
         <div className="flex items-center gap-2">
           <div className="w-2.5 h-2.5 rounded-full bg-[#3cddc7] animate-pulse"></div>
-          <span className="text-base font-bold text-[#003331]">Traducteur Culturel</span>
+          <span className="text-base lg:text-lg font-bold text-[#003331]">Traducteur Culturel</span>
         </div>
         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#b1eeea] text-[#00201f] text-[11px] font-bold shadow-xs">
           <span className="material-symbols-outlined text-[14px]">psychology</span>
@@ -206,7 +206,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       </div>
 
       {/* Language Direction Toggle Pill */}
-      <div className="relative flex items-center justify-between bg-[#f3f3f5] p-1.5 rounded-full shadow-xs border border-[#edeef0]">
+      <div className="lg:col-span-2 relative flex items-center justify-between bg-[#f3f3f5] p-1.5 rounded-full shadow-xs border border-[#edeef0]">
         {/* Source Language Button */}
         <button
           onClick={() => {
@@ -269,7 +269,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       </div>
 
       {/* Source Input Box */}
-      <div className="bg-white rounded-3xl p-4 shadow-sm relative transition-all border border-[#edeef0] focus-within:ring-2 focus-within:ring-[#004b49]/20">
+      <div className="flex flex-col bg-white rounded-3xl p-4 lg:p-5 shadow-sm relative transition-all border border-[#edeef0] focus-within:ring-2 focus-within:ring-[#004b49]/20">
         <div className="flex justify-between items-center mb-2">
           <span className="text-[11px] font-bold text-[#707978] uppercase tracking-wider">
             Texte Source
@@ -288,7 +288,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
         <textarea
           value={sourceText}
           onChange={(e) => setSourceText(e.target.value)}
-          className="w-full bg-transparent resize-none text-sm text-[#1a1c1d] placeholder:text-[#bfc8c7] focus:outline-none leading-relaxed"
+          className="w-full flex-1 lg:min-h-40 bg-transparent resize-none text-sm lg:text-base text-[#1a1c1d] placeholder:text-[#bfc8c7] focus:outline-none leading-relaxed"
           rows={3}
           placeholder="Tapez ou dictez une phrase..."
         />
@@ -325,7 +325,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       </div>
 
       {/* Translation Result Card */}
-      <div className="bg-[#004b49] text-white rounded-3xl p-5 shadow-md relative overflow-hidden">
+      <div className="bg-[#004b49] text-white rounded-3xl p-5 lg:p-6 shadow-md relative overflow-hidden">
         <div className="absolute -right-10 -bottom-10 w-36 h-36 rounded-full bg-[#00c5b1]/20 pointer-events-none blur-2xl"></div>
 
         <div className="flex items-center justify-between mb-3">
@@ -366,7 +366,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center justify-between pt-1">
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
           <div className="flex items-center gap-2">
             <button
               onClick={handlePlayAudio}
@@ -429,7 +429,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       </div>
 
       {/* Key Expressions & Memorized List */}
-      <div className="pt-2 flex flex-col space-y-3">
+      <div className="lg:col-span-2 pt-2 flex flex-col space-y-3">
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-1.5">
             <span className="material-symbols-outlined text-[#9e4229] text-[20px]">
@@ -447,7 +447,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
           </button>
         </div>
 
-        <div className="flex flex-col space-y-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 lg:gap-3">
           {savedExpressions.map((item) => (
             <div
               key={item.id}
@@ -509,8 +509,8 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
       </div>
 
       {/* Mode Conversation Immédiate Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-[#edeef0] p-4 flex items-center justify-between shadow-xs border border-[#edeef0]">
-        <div className="flex items-center gap-3 z-10">
+      <div className="lg:col-span-2 relative overflow-hidden rounded-2xl bg-[#edeef0] p-4 lg:p-5 flex items-center justify-between gap-3 shadow-xs border border-[#edeef0]">
+        <div className="flex items-center gap-3 z-10 min-w-0">
           <div className="w-12 h-12 rounded-full bg-[#9e4229] flex items-center justify-center text-white shadow-md shrink-0">
             <span className="material-symbols-outlined text-[24px]">record_voice_over</span>
           </div>
@@ -538,7 +538,7 @@ export const TraduireTab: React.FC<TraduireTabProps> = ({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-200"
+            className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200"
           >
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">

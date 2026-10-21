@@ -14,11 +14,12 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenProfile,
 }) => {
   return (
-    <header className="fixed top-0 left-1/2 w-full max-w-md -translate-x-1/2 z-40 bg-[#f9f9fb]/90 backdrop-blur-xl border-b border-[#edeef0]/60 transition-all">
+    <header className="fixed top-0 inset-x-0 lg:left-64 z-30 bg-[#f9f9fb]/90 backdrop-blur-xl border-b border-[#edeef0]/60 transition-all pt-[env(safe-area-inset-top)]">
       {/* Main Top Bar */}
-      <div className="h-14 px-4 flex items-center justify-between">
+      <div className="h-14 lg:h-16 px-4 sm:px-6 lg:px-8 max-w-2xl lg:max-w-6xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="relative group cursor-pointer">
+          {/* Logo masqué sur desktop : déjà présent dans la barre latérale */}
+          <div className="relative group cursor-pointer lg:hidden">
             <img
               src={BRAND_ASSETS.logo}
               alt="IvoirAI Brand Logo"
@@ -30,7 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="text-[11px] font-bold text-[#004b49] uppercase tracking-wider leading-none">
               IvoirAI
             </span>
-            <h1 className="text-lg font-bold text-[#1a1c1d] tracking-tight leading-tight">
+            <h1 className="text-lg lg:text-xl font-bold text-[#1a1c1d] tracking-tight leading-tight">
               {title}
             </h1>
           </div>

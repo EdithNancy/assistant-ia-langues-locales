@@ -225,7 +225,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-200 border border-[#edeef0]"
+        className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-[#edeef0]"
       >
         <div className="flex justify-between items-center">
           <h3 className="text-base font-bold text-[#1a1c1d]">Mon Profil IvoirAI</h3>

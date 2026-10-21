@@ -54,29 +54,29 @@ export const HomeTab: React.FC<HomeTabProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full gap-5 pb-10">
+    <div className="grid grid-cols-1 lg:grid-cols-12 w-full gap-5 lg:gap-6 pb-10">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-[#003331] text-white text-xs font-semibold shadow-lg animate-in fade-in duration-200 flex items-center gap-2">
+        <div className="fixed top-20 lg:top-24 left-1/2 lg:left-[calc(50%+8rem)] -translate-x-1/2 z-50 max-w-[calc(100vw-2rem)] px-4 py-2 rounded-full bg-[#003331] text-white text-xs font-semibold shadow-lg animate-in fade-in duration-200 flex items-center gap-2">
           <span className="material-symbols-outlined text-[16px] text-[#62fae3]">check_circle</span>
           <span>{toastMessage}</span>
         </div>
       )}
 
       {/* Top User Profile & Welcome Bar */}
-      <section className="flex items-center justify-between bg-white p-4 rounded-3xl shadow-[0_4px_20px_-2px_rgba(0,75,73,0.05)] border border-[#edeef0]/60">
+      <section className="lg:col-span-7 flex items-center justify-between bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_20px_-2px_rgba(0,75,73,0.05)] border border-[#edeef0]/60">
         <div className="flex flex-col min-w-0">
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#3f4948]">
             Bienvenue
           </p>
-          <h2 className="text-2xl font-bold text-[#1a1c1d] truncate mt-1">
+          <h2 className="text-2xl lg:text-3xl font-bold text-[#1a1c1d] truncate mt-1">
             Akwaba, Edith
           </h2>
         </div>
       </section>
 
       {/* Interactive Language Toggle Pill */}
-      <section className="flex justify-center w-full">
+      <section className="lg:col-span-5 flex justify-center lg:justify-end items-center w-full">
         <div className="bg-[#edeef0] p-1 rounded-full flex items-center shadow-inner w-full max-w-sm">
           <button
             onClick={() => onLanguageChange('baoule')}
@@ -113,7 +113,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       </section>
 
       {/* Hero Voice Interactive Card */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#004b49] via-[#003331] to-[#002422] text-white p-6 shadow-[0_16px_36px_-6px_rgba(0,43,41,0.35)]">
+      <section className="lg:col-span-7 flex flex-col justify-center relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#004b49] via-[#003331] to-[#002422] text-white p-6 lg:p-10 shadow-[0_16px_36px_-6px_rgba(0,43,41,0.35)]">
         {/* Traditional Geometric Accent Watermark Pattern */}
         <svg
           className="absolute -right-8 -top-8 w-52 h-52 text-[#62fae3] opacity-10 pointer-events-none"
@@ -136,13 +136,13 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             <span>Reconnaissance vocale ivoirienne</span>
           </div>
 
-          <h3 className="text-xl font-bold text-white max-w-xs leading-snug">
+          <h3 className="text-xl lg:text-3xl font-bold text-white max-w-xs lg:max-w-md leading-snug">
             {currentLanguage === 'baoule'
               ? 'Parlez en Baoulé authentique'
               : 'Parlez en Dioula véhiculaire'}
           </h3>
 
-          <p className="text-xs text-[#7ebab7] mt-1.5 max-w-xs leading-relaxed">
+          <p className="text-xs lg:text-sm text-[#7ebab7] mt-1.5 max-w-xs lg:max-w-md leading-relaxed">
             L'IA comprend vos dialectes, intonations et accents ivoiriens sans filtre.
           </p>
 
@@ -177,11 +177,11 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       </section>
 
       {/* Daily Learning Card: Mot du Jour */}
-      <section className="bg-white p-5 rounded-3xl shadow-[0_6px_24px_-4px_rgba(0,75,73,0.06)] relative overflow-hidden border border-[#edeef0]/60">
+      <section className="lg:col-span-5 bg-white p-5 lg:p-6 rounded-3xl shadow-[0_6px_24px_-4px_rgba(0,75,73,0.06)] relative overflow-hidden border border-[#edeef0]/60">
         <div className="absolute top-0 left-0 w-2 h-full bg-[#9e4229]"></div>
 
-        <div className="flex items-start justify-between">
-          <div className="flex flex-col">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-[#9e4229] text-[18px]">lightbulb</span>
               <span className="text-[11px] uppercase tracking-wider text-[#9e4229] font-bold">
@@ -197,7 +197,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={handlePlayWord}
               aria-label="Écouter la prononciation"
@@ -234,7 +234,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
         {/* Meaning & Cultural Context */}
         <div className="mt-4 p-3.5 rounded-2xl bg-[#f3f3f5]">
-          <div className="flex items-baseline justify-between mb-1">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-2 mb-1">
             <span className="text-xs text-[#1a1c1d] font-bold">Traduction :</span>
             <span className="text-xs text-[#9e4229] font-bold">
               {currentLanguage === 'dioula'
@@ -275,9 +275,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       </section>
 
       {/* Quick Actions Grid */}
-      <section className="flex flex-col gap-2">
+      <section className="lg:col-span-12 flex flex-col gap-2">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-sm font-bold text-[#1a1c1d]">Pratique Rapide</h3>
+          <h3 className="text-sm lg:text-base font-bold text-[#1a1c1d]">Pratique Rapide</h3>
           <button
             disabled
             onClick={() => onNavigateTab('apprendre')}
@@ -287,11 +287,11 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-4">
           {/* Action 1: Traduire */}
           <button
             onClick={() => onNavigateTab('traduire')}
-            className="bg-white p-4 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-[#edeef0]/60"
+            className="bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-[#edeef0]/60"
           >
             <div className="w-12 h-12 rounded-2xl bg-[#b1eeea] text-[#00201f] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <span className="material-symbols-outlined text-[26px]">translate</span>
@@ -305,7 +305,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           {/* Action 2: Tuteur IA */}
           <button
             onClick={() => onNavigateTab('discussions')}
-            className="bg-white p-4 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-[#edeef0]/60"
+            className="bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-[#edeef0]/60"
           >
             <div className="w-12 h-12 rounded-2xl bg-[#ffdbd2] text-[#3c0800] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <span className="material-symbols-outlined text-[26px]">psychology</span>
@@ -319,7 +319,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           {/* Action 3: Vocabulaire */}
           <button
             onClick={onOpenVocabularyModal}
-            className="bg-white p-4 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-[#edeef0]/60"
+            className="bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-[#edeef0]/60"
           >
             <div className="w-12 h-12 rounded-2xl bg-[#004c43] text-[#62fae3] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <span className="material-symbols-outlined text-[26px]">storefront</span>
@@ -333,7 +333,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           {/* Action 4: Histoires */}
           <button
             onClick={onOpenStoryModal}
-            className="bg-white p-4 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-[#edeef0]/60"
+            className="bg-white p-4 lg:p-5 rounded-3xl shadow-[0_4px_16px_-2px_rgba(0,75,73,0.04)] hover:shadow-md transition-all flex flex-col justify-between text-left group active:scale-[0.98] border border-[#edeef0]/60"
           >
             <div className="w-12 h-12 rounded-2xl bg-[#edeef0] text-[#9e4229] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
               <span className="material-symbols-outlined text-[26px]">auto_stories</span>
@@ -372,9 +372,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       </section> */}
 
       {/* Recent Discussions Section */}
-      <section className="flex flex-col gap-2">
+      <section className="lg:col-span-12 flex flex-col gap-2">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-sm font-bold text-[#1a1c1d]">Discussions Récentes</h3>
+          <h3 className="text-sm lg:text-base font-bold text-[#1a1c1d]">Discussions Récentes</h3>
           <button
             onClick={() => onNavigateTab('discussions')}
             className="text-xs text-[#9e4229] font-bold hover:underline"
@@ -383,7 +383,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           </button>
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4">
           {/* Card 1 */}
           <div
             onClick={() =>
@@ -399,7 +399,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 <h4 className="text-sm text-[#1a1c1d] font-bold truncate">
                   Négociation au Marché de Treichville
                 </h4>
-                <div className="flex items-center gap-2 mt-1 text-xs text-[#707978]">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-xs text-[#707978]">
                   <span className="px-2 py-0.5 rounded-full bg-[#edeef0] text-[10px] text-[#1a1c1d] font-bold">
                     Dioula
                   </span>
@@ -436,7 +436,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 <h4 className="text-sm text-[#1a1c1d] font-bold truncate">
                   Salutations traditionnelles en pays Baoulé
                 </h4>
-                <div className="flex items-center gap-2 mt-1 text-xs text-[#707978]">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-xs text-[#707978]">
                   <span className="px-2 py-0.5 rounded-full bg-[#edeef0] text-[10px] text-[#1a1c1d] font-bold">
                     Baoulé
                   </span>

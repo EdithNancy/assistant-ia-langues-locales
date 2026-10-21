@@ -194,17 +194,17 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full relative pb-28">
+    <div className="flex flex-col w-full lg:max-w-4xl lg:mx-auto relative pb-28 lg:pb-32">
       {/* Toast */}
       {toast && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-[#003331] text-white text-xs font-semibold shadow-lg animate-in fade-in flex items-center gap-1.5">
+        <div className="fixed top-20 lg:top-24 left-1/2 lg:left-[calc(50%+8rem)] -translate-x-1/2 z-50 max-w-[calc(100vw-2rem)] px-4 py-2 rounded-full bg-[#003331] text-white text-xs font-semibold shadow-lg animate-in fade-in flex items-center gap-1.5">
           <span className="material-symbols-outlined text-[16px] text-[#62fae3]">info</span>
           <span>{toast}</span>
         </div>
       )}
 
       {/* In-Chat Top Navigation Subheader */}
-      <div className="sticky top-0 z-30 -mx-4 px-4 py-2 bg-[#f9f9fb]/95 backdrop-blur-md flex items-center justify-between border-b border-[#edeef0]">
+      <div className="sticky top-14 lg:top-16 z-20 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-4 py-2 bg-[#f9f9fb]/95 backdrop-blur-md flex items-center justify-between gap-2 border-b border-[#edeef0] lg:border lg:rounded-2xl lg:bg-white/95">
         <div className="flex items-center gap-2 min-w-0">
           <button
             onClick={onBackToHome}
@@ -283,7 +283,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
             return (
               <div
                 key={msg.id}
-                className="flex flex-col gap-1 max-w-[90%] ml-auto items-end animate-in fade-in"
+                className="flex flex-col gap-1 max-w-[90%] sm:max-w-[75%] lg:max-w-[65%] ml-auto items-end animate-in fade-in"
               >
                 <div className="flex items-center gap-1 text-[11px] text-[#3f4948]">
                   <span>{msg.timestamp}</span>
@@ -304,7 +304,7 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
           return (
             <div
               key={msg.id}
-              className="flex flex-col gap-1 max-w-[95%] mr-auto animate-in fade-in"
+              className="flex flex-col gap-1 max-w-[95%] sm:max-w-[85%] lg:max-w-[75%] mr-auto animate-in fade-in"
             >
               <div className="flex items-center gap-1.5 text-[11px]">
                 <span className="text-[#004b49] font-bold">Aya (IvoirAI)</span>
@@ -479,16 +479,16 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
       </div>
 
       {/* Sticky Bottom Composer Section */}
-      <div className="fixed bottom-16 left-0 right-0 z-30 bg-gradient-to-t from-[#f9f9fb] via-[#f9f9fb]/95 to-transparent pt-3 pb-2 px-4">
-        <div className="max-w-md mx-auto flex flex-col gap-2">
+      <div className="fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] lg:bottom-0 left-0 right-0 lg:left-64 z-30 bg-gradient-to-t from-[#f9f9fb] via-[#f9f9fb]/95 to-transparent pt-3 pb-2 lg:pb-6 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl lg:max-w-4xl mx-auto flex flex-col gap-2">
           {/* Special African Characters Toolbar */}
-          <div className="flex items-center justify-between px-3 py-1.5 rounded-full bg-white shadow-[0_2px_12px_rgba(0,75,73,0.08)] border border-[#edeef0]">
-            <div className="flex items-center gap-1.5">
+          <div className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-full bg-white shadow-[0_2px_12px_rgba(0,75,73,0.08)] border border-[#edeef0]">
+            <div className="flex items-center gap-1.5 min-w-0">
               <span className="text-[11px] text-[#3f4948] font-bold px-1 flex items-center gap-1">
                 <span className="material-symbols-outlined text-[14px] text-[#004b49]">
                   keyboard_alt
                 </span>
-                Touches :
+                <span className="hidden min-[400px]:inline">Touches :</span>
               </span>
               <div className="flex items-center gap-1">
                 {['ɛ', 'ɔ', 'ɲ', 'ŋ', 'ʼ'].map((char) => (
@@ -576,13 +576,13 @@ export const DiscussionsTab: React.FC<DiscussionsTabProps> = ({
       {isDialectModalOpen && (
         <div
           onClick={() => setIsDialectModalOpen(false)}
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/40 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md bg-white rounded-t-[32px] p-5 shadow-2xl flex flex-col gap-4 animate-in slide-in-from-bottom duration-300"
+            className="w-full max-w-md bg-white rounded-t-[32px] sm:rounded-[32px] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-5 shadow-2xl flex flex-col gap-4 animate-in slide-in-from-bottom duration-300"
           >
-            <div className="w-12 h-1.5 bg-[#bfc8c7]/60 rounded-full mx-auto"></div>
+            <div className="sm:hidden w-12 h-1.5 bg-[#bfc8c7]/60 rounded-full mx-auto"></div>
 
             <div className="flex justify-between items-center">
               <div>

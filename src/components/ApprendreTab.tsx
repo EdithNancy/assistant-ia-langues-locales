@@ -127,30 +127,30 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full pb-10 space-y-5">
+    <div className="grid grid-cols-1 lg:grid-cols-12 lg:items-start w-full pb-10 gap-5 lg:gap-6">
       {/* Toast Notification */}
       {toast && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-[#003331] text-white text-xs font-semibold shadow-lg animate-in fade-in flex items-center gap-2">
+        <div className="fixed top-20 lg:top-24 left-1/2 lg:left-[calc(50%+8rem)] -translate-x-1/2 z-50 max-w-[calc(100vw-2rem)] px-4 py-2 rounded-full bg-[#003331] text-white text-xs font-semibold shadow-lg animate-in fade-in flex items-center gap-2">
           <span className="material-symbols-outlined text-[16px] text-[#62fae3]">check_circle</span>
           <span>{toast}</span>
         </div>
       )}
 
       {/* Top Greeting & Streak Banner */}
-      <section className="flex flex-col space-y-3">
-        <div className="flex items-start justify-between">
+      <section className="lg:col-span-12 flex flex-col space-y-3 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-6 lg:items-center">
+        <div className="flex items-start justify-between gap-3">
           <div className="space-y-0.5">
             <span className="text-[11px] text-[#9e4229] font-bold uppercase tracking-wider">
               Tuteur Vocal & Culture
             </span>
-            <h2 className="text-xl text-[#1a1c1d] font-bold leading-tight">
+            <h2 className="text-xl lg:text-2xl text-[#1a1c1d] font-bold leading-tight">
               Atelier de Langues
             </h2>
             <p className="text-xs text-[#3f4948]">
               Pratiquez l'oral et enrichissez votre vocabulaire au quotidien.
             </p>
           </div>
-          <div className="p-2.5 bg-[#ffdbd2] text-[#3c0800] rounded-2xl shadow-xs flex items-center justify-center">
+          <div className="p-2.5 bg-[#ffdbd2] text-[#3c0800] rounded-2xl shadow-xs flex items-center justify-center shrink-0">
             <span className="material-symbols-outlined text-[24px]">school</span>
           </div>
         </div>
@@ -159,15 +159,15 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
         <div className="bg-gradient-to-r from-[#004b49] via-[#003331] to-[#084f4d] rounded-2xl p-4 text-white shadow-md relative overflow-hidden">
           <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-[#62fae3]/10 rounded-full blur-xl pointer-events-none"></div>
 
-          <div className="relative z-10 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+          <div className="relative z-10 flex items-center justify-between gap-2">
+            <div className="flex items-center space-x-3 min-w-0">
               <div className="w-12 h-12 rounded-xl bg-[#fe8b6d] text-[#75240e] flex items-center justify-center shadow-inner">
                 <span className="material-symbols-outlined text-[26px]">
                   local_fire_department
                 </span>
               </div>
               <div>
-                <div className="flex items-center space-x-1.5">
+                <div className="flex flex-wrap items-center gap-x-1.5">
                   <span className="text-sm font-bold text-[#62fae3]">
                     7 jours consécutifs
                   </span>
@@ -210,8 +210,8 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
       </section>
 
       {/* Segmented Language Control */}
-      <section className="w-full">
-        <div className="bg-[#edeef0] p-1 rounded-full flex relative shadow-inner">
+      <section className="lg:col-span-12 w-full">
+        <div className="bg-[#edeef0] p-1 rounded-full flex relative shadow-inner lg:max-w-md">
           <button
             onClick={() => onLanguageChange('baoule')}
             className={`flex-1 py-2 px-3 rounded-full text-xs font-bold transition-all duration-300 flex items-center justify-center space-x-1.5 ${
@@ -247,7 +247,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
       </section>
 
       {/* Pronunciation Trainer Hero Interactive Widget */}
-      <section className="bg-white rounded-3xl p-5 shadow-sm space-y-4 border border-[#edeef0]">
+      <section className="lg:col-span-7 lg:row-span-2 bg-white rounded-3xl p-5 lg:p-6 shadow-sm space-y-4 border border-[#edeef0]">
         {/* Card Header Tag & Progress */}
         <div className="flex items-center justify-between">
           <div className="inline-flex items-center space-x-1.5 px-3 py-1 bg-[#ffdbd2]/60 text-[#7e2b14] rounded-full">
@@ -416,7 +416,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
       </section>
 
       {/* Categorized Learning Modules */}
-      <section className="space-y-3">
+      <section className="lg:col-span-5 space-y-3">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <h3 className="text-sm font-bold text-[#1a1c1d]">Modules d'Immersion</h3>
@@ -434,7 +434,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
         </div>
 
         {/* Modules Grid */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-3">
           {LEARNING_MODULES.map((mod) => (
             <div
               key={mod.id}
@@ -500,8 +500,8 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
       </section>
 
       {/* Daily Audio Quiz Card */}
-      <section className="bg-gradient-to-br from-[#ffdbd2] via-[#f3f3f5] to-white rounded-3xl p-5 shadow-xs relative overflow-hidden border border-[#edeef0]">
-        <div className="flex items-start justify-between relative z-10">
+      <section className="lg:col-span-5 bg-gradient-to-br from-[#ffdbd2] via-[#f3f3f5] to-white rounded-3xl p-5 shadow-xs relative overflow-hidden border border-[#edeef0]">
+        <div className="flex items-start justify-between gap-3 relative z-10">
           <div className="space-y-2 max-w-[70%]">
             <div className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-[#9e4229] text-white text-[10px] font-bold">
               <span className="material-symbols-outlined text-[12px]">headphones</span>
@@ -527,7 +527,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
             </div>
           </div>
 
-          <div className="w-20 h-20 rounded-2xl bg-[#fe8b6d]/30 flex items-center justify-center text-[#9e4229] shadow-xs">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-2xl bg-[#fe8b6d]/30 flex items-center justify-center text-[#9e4229] shadow-xs">
             <span className="material-symbols-outlined text-[42px]">hearing</span>
           </div>
         </div>
@@ -614,7 +614,7 @@ export const ApprendreTab: React.FC<ApprendreTabProps> = ({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-200"
+            className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200"
           >
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-1.5">
