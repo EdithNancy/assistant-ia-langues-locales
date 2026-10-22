@@ -1,11 +1,13 @@
 import asyncio
 import uuid
 from datetime import datetime, timedelta, timezone
+from unittest.mock import AsyncMock, patch
 
 import pytest
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from limits.storage import MemoryStorage
@@ -22,7 +24,7 @@ from app.features.roles.entity import Role
 from app.features.sessions.entity import UserSession
 from app.features.users.entity import User
 from app.features.users.routes import router as users_router
-from app.features.users.schemas import UserUpdate
+from app.features.users.schemas import UserRegister, UserUpdate
 from app.features.users.service import UserService
 
 
@@ -184,6 +186,94 @@ def test_login_rejects_invalid_credentials(api_client: TestClient) -> None:
     )
 
     assert response.status_code == 401
+
+
+def test_register_reports_duplicate_email_explicitly() -> None:
+    async def exercise() -> None:
+        from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+        from app.features.users.schemas import UserRegister
+
+        engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+        async with engine.begin() as connection:
+            await connection.run_sync(Base.metadata.create_all)
+        session_factory = async_sessionmaker(engine, expire_on_commit=False)
+        email = f"{uuid.uuid4()}@example.com"
+        data = UserRegister(
+            full_name="Test Utilisateur",
+            email=email,
+            phone_number="+2250102030405",
+            password="MotDePasse-Secure-123",
+        )
+
+        async with session_factory() as db:
+            db.add(Role(code="USER", name="Utilisateur"))
+            await db.commit()
+
+            await UserService.register(db, data)
+            with pytest.raises(HTTPException) as error:
+                await UserService.register(db, data)
+
+            assert error.value.status_code == 409
+            assert error.value.detail == "Cette adresse e-mail est déjà utilisée."
+
+        await engine.dispose()
+
+    asyncio.run(exercise())
+
+
+def test_register_logs_integrity_diagnostic_without_sensitive_values(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    class DriverIntegrityError(Exception):
+        sqlstate = "23505"
+        constraint_name = "signup_unique_constraint"
+
+    class FailedSignupSession:
+        def add(self, item: object) -> None:
+            self.added_item = item
+
+        async def scalar(self, statement):
+            self.scalar_statement = statement
+            return Role(code="USER", name="Utilisateur")
+
+        async def flush(self) -> None:
+            raise IntegrityError(
+                "INSERT statement with sensitive values",
+                {"email": "private@example.com", "password": "private-secret"},
+                DriverIntegrityError("database error with private values"),
+            )
+
+        async def rollback(self) -> None:
+            return None
+
+    db = FailedSignupSession()
+    with patch(
+        "app.features.users.service.UserRepository.get_by_email",
+        new=AsyncMock(side_effect=[None, None]),
+    ):
+        with pytest.raises(HTTPException) as error:
+            asyncio.run(
+                UserService.register(
+                    db,
+                    UserRegister(
+                        full_name="Test Utilisateur",
+                        email="private@example.com",
+                        phone_number="+2250102030405",
+                        password="private-secret",
+                    ),
+                )
+            )
+
+    assert error.value.status_code == 409
+    assert isinstance(db.added_item, User)
+    assert db.scalar_statement is not None
+    assert "stage=insert_user" in caplog.text
+    assert "sqlstate=23505" in caplog.text
+    assert "constraint=signup_unique_constraint" in caplog.text
+    assert "private@example.com" not in caplog.text
+    assert "private-secret" not in caplog.text
+    assert "database error with private values" not in caplog.text
 
 
 def test_logout_all_does_not_block_a_later_login(api_client: TestClient) -> None:

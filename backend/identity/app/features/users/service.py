@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timezone
 
 from fastapi import HTTPException
@@ -13,6 +14,24 @@ from app.features.tokens.entity import TokenTransaction, TokenWallet
 from app.features.users.entity import User
 from app.features.users.repository import UserRepository
 from app.features.users.schemas import UserRegister, UserUpdate
+
+logger = logging.getLogger(__name__)
+
+
+def _integrity_error_diagnostics(exc: IntegrityError) -> tuple[str | None, str | None]:
+    original = exc.orig
+    cause = original.__cause__
+    sqlstate = (
+        getattr(original, "sqlstate", None)
+        or getattr(original, "pgcode", None)
+        or getattr(cause, "sqlstate", None)
+        or getattr(cause, "pgcode", None)
+    )
+    constraint = (
+        getattr(original, "constraint_name", None)
+        or getattr(cause, "constraint_name", None)
+    )
+    return sqlstate, constraint
 
 
 class UserService:
@@ -35,6 +54,7 @@ class UserService:
                         data.password),
                     roles=[role])
         db.add(user)
+        stage = "insert_user"
         try:
             await db.flush()  # <-- await
             wallet = TokenWallet(
@@ -50,11 +70,31 @@ class UserService:
                 amount=settings.FREE_TOKEN_GRANT,
                 reason="signup_grant",
             ))
+            stage = "commit_signup_resources"
             await db.commit()  # <-- await
+            stage = "refresh_user"
             await db.refresh(user)  # <-- await
-        except IntegrityError:
+        except IntegrityError as exc:
             await db.rollback()  # <-- await
-            raise HTTPException(409, "Impossible de créer ce compte.")
+            if await UserRepository.get_by_email(db, email):
+                raise HTTPException(
+                    409, "Cette adresse e-mail est déjà utilisée."
+                ) from exc
+            sqlstate, constraint = _integrity_error_diagnostics(exc)
+            logger.warning(
+                "Signup integrity conflict stage=%s sqlstate=%s "
+                "constraint=%s error_type=%s",
+                stage,
+                sqlstate or "unknown",
+                constraint or "unknown",
+                type(exc.orig).__name__,
+            )
+            raise HTTPException(
+                409,
+                "Le compte n'a pas pu être créé car une donnée entre en "
+                "conflit avec les données enregistrées. Vérifiez l'adresse "
+                "e-mail et réessayez.",
+            ) from exc
         return user
 
     @staticmethod

@@ -163,6 +163,16 @@ async def forward(client: httpx.AsyncClient, request: Request, url: str,
                 and request.url.path.rstrip("/").endswith("/auth/login")
             ):
                 detail = "Adresse e-mail ou mot de passe incorrect."
+            elif (
+                resp.status_code == 409
+                and request.method == "POST"
+                and request.url.path.rstrip("/").endswith("/auth/register")
+            ):
+                detail = (
+                    "Le compte n'a pas pu être créé car une donnée entre en "
+                    "conflit avec les données enregistrées. Vérifiez l'adresse "
+                    "e-mail et réessayez."
+                )
             return JSONResponse(
                 error_payload(resp.status_code, detail),
                 status_code=resp.status_code,

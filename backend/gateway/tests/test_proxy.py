@@ -235,11 +235,11 @@ def test_forward_preserves_upstream_error_status_when_json_is_not_utf8(
             )
 
         client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
-        request = make_request("POST", "/api/auth/register")
+        request = make_request("POST", "/api/users")
         response = await forward(
             client,
             request,
-            "http://identity:8001/api/v1/auth/register",
+            "http://identity:8001/api/v1/users",
             None,
             "request-789",
         )
@@ -279,6 +279,39 @@ def test_login_401_explains_invalid_credentials_when_upstream_error_is_unreadabl
     assert status_code == 401
     assert body["code"] == 401
     assert body["message"] == "Adresse e-mail ou mot de passe incorrect."
+    assert body["hasError"] is True
+
+
+def test_register_409_explains_possible_existing_account_when_upstream_error_is_unreadable() -> None:
+    async def exercise() -> tuple[int, dict[str, object]]:
+        async def handler(_request: httpx.Request) -> httpx.Response:
+            return httpx.Response(
+                409,
+                headers={"content-type": "application/json"},
+                content=b"\xff",
+            )
+
+        client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+        request = make_request("POST", "/api/auth/register")
+        response = await forward(
+            client,
+            request,
+            "http://identity:8001/api/v1/auth/register",
+            None,
+            "rid",
+        )
+        body = json.loads(response.body)
+        await client.aclose()
+        return response.status_code, body
+
+    status_code, body = asyncio.run(exercise())
+
+    assert status_code == 409
+    assert body["code"] == 409
+    assert body["message"] == (
+        "Le compte n'a pas pu être créé car une donnée entre en conflit avec "
+        "les données enregistrées. Vérifiez l'adresse e-mail et réessayez."
+    )
     assert body["hasError"] is True
 
 
