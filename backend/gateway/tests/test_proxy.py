@@ -2,6 +2,7 @@ import asyncio
 import json
 
 import httpx
+import pytest
 from starlette.requests import Request
 
 from app.auth import User
@@ -162,6 +163,35 @@ def test_forward_adds_http_code_to_existing_api_envelope() -> None:
         "message": "Succès",
         "hasError": False,
     }
+
+
+def test_forward_logs_upstream_transport_failure_without_exposing_details(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    async def exercise() -> tuple[int, dict[str, object]]:
+        async def handler(_request: httpx.Request) -> httpx.Response:
+            raise httpx.ConnectError("connection refused")
+
+        client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+        request = make_request("POST", "/api/auth/register")
+        response = await forward(
+            client,
+            request,
+            "http://identity:8001/api/v1/auth/register",
+            None,
+            "request-456",
+        )
+        body = json.loads(response.body)
+        await client.aclose()
+        return response.status_code, body
+
+    status_code, body = asyncio.run(exercise())
+
+    assert status_code == 502
+    assert body["code"] == 502
+    assert body["hasError"] is True
+    assert "rid=request-456 error_type=ConnectError" in caplog.text
+    assert "connection refused" not in caplog.text
 
 
 def test_forward_normalizes_upstream_validation_errors_without_echoing_input() -> None:

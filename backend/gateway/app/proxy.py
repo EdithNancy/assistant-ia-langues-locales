@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 import httpx
 import websockets
@@ -8,6 +9,8 @@ from starlette.background import BackgroundTask
 
 from .auth import User
 from .api_response import error_payload, success_payload
+
+log = logging.getLogger("gateway.proxy")
 
 HOP_BY_HOP = {
     "connection", "keep-alive", "proxy-authenticate", "proxy-authorization",
@@ -57,13 +60,23 @@ async def forward(client: httpx.AsyncClient, request: Request, url: str,
             headers=headers, content=await request.body(),
         )
         resp = await client.send(req, stream=True)
-    except httpx.TimeoutException:
+    except httpx.TimeoutException as exc:
+        log.warning(
+            "Upstream request timed out rid=%s error_type=%s",
+            request_id,
+            type(exc).__name__,
+        )
         return JSONResponse(
             error_payload(504, "Service en aval trop lent"),
             status_code=504,
             headers={"X-Request-ID": request_id},
         )
-    except httpx.HTTPError:
+    except httpx.HTTPError as exc:
+        log.warning(
+            "Upstream transport failed rid=%s error_type=%s",
+            request_id,
+            type(exc).__name__,
+        )
         return JSONResponse(
             error_payload(502, "Service en aval indisponible"),
             status_code=502,
@@ -85,14 +98,24 @@ async def forward(client: httpx.AsyncClient, request: Request, url: str,
     if is_json or resp.status_code >= 400:
         try:
             await resp.aread()
-        except httpx.TimeoutException:
+        except httpx.TimeoutException as exc:
+            log.warning(
+                "Upstream response timed out rid=%s error_type=%s",
+                request_id,
+                type(exc).__name__,
+            )
             await resp.aclose()
             return JSONResponse(
                 error_payload(504),
                 status_code=504,
                 headers={"X-Request-ID": request_id},
             )
-        except httpx.HTTPError:
+        except httpx.HTTPError as exc:
+            log.warning(
+                "Upstream response read failed rid=%s error_type=%s",
+                request_id,
+                type(exc).__name__,
+            )
             await resp.aclose()
             return JSONResponse(
                 error_payload(502),
@@ -104,7 +127,12 @@ async def forward(client: httpx.AsyncClient, request: Request, url: str,
         if is_json:
             try:
                 payload = resp.json()
-            except ValueError:
+            except ValueError as exc:
+                log.warning(
+                    "Upstream returned invalid JSON rid=%s error_type=%s",
+                    request_id,
+                    type(exc).__name__,
+                )
                 await resp.aclose()
                 return JSONResponse(
                     error_payload(502),
