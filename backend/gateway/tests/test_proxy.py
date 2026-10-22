@@ -256,6 +256,32 @@ def test_forward_preserves_upstream_error_status_when_json_is_not_utf8(
     assert "rid=request-789 error_type=UnicodeDecodeError" in caplog.text
 
 
+def test_login_401_explains_invalid_credentials_when_upstream_error_is_unreadable() -> None:
+    async def exercise() -> tuple[int, dict[str, object]]:
+        async def handler(_request: httpx.Request) -> httpx.Response:
+            return httpx.Response(
+                401,
+                headers={"content-type": "application/json"},
+                content=b"\xff",
+            )
+
+        client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+        request = make_request("POST", "/api/auth/login")
+        response = await forward(
+            client, request, "http://identity:8001/api/v1/auth/login", None, "rid"
+        )
+        body = json.loads(response.body)
+        await client.aclose()
+        return response.status_code, body
+
+    status_code, body = asyncio.run(exercise())
+
+    assert status_code == 401
+    assert body["code"] == 401
+    assert body["message"] == "Adresse e-mail ou mot de passe incorrect."
+    assert body["hasError"] is True
+
+
 def test_forward_normalizes_upstream_validation_errors_without_echoing_input() -> None:
     async def exercise() -> tuple[int, dict[str, object]]:
         async def handler(_request: httpx.Request) -> httpx.Response:

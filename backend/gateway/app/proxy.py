@@ -157,6 +157,12 @@ async def forward(client: httpx.AsyncClient, request: Request, url: str,
             if isinstance(payload, dict):
                 detail = payload.get("detail", payload.get(
                     "message", payload.get("error")))
+            if (
+                resp.status_code == 401
+                and request.method == "POST"
+                and request.url.path.rstrip("/").endswith("/auth/login")
+            ):
+                detail = "Adresse e-mail ou mot de passe incorrect."
             return JSONResponse(
                 error_payload(resp.status_code, detail),
                 status_code=resp.status_code,
