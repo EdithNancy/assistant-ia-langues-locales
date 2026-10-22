@@ -133,12 +133,14 @@ async def forward(client: httpx.AsyncClient, request: Request, url: str,
                     request_id,
                     type(exc).__name__,
                 )
-                await resp.aclose()
-                return JSONResponse(
-                    error_payload(502),
-                    status_code=502,
-                    headers={"X-Request-ID": request_id},
-                )
+                if resp.status_code < 400:
+                    await resp.aclose()
+                    return JSONResponse(
+                        error_payload(502),
+                        status_code=502,
+                        headers={"X-Request-ID": request_id},
+                    )
+                payload = None
 
         headers = {
             key: value
