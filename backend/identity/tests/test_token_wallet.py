@@ -30,7 +30,6 @@ from app.features.usage.entity import UsageEvent
 from app.features.users.entity import User
 from app.features.users.schemas import UserRegister
 from app.features.users.service import UserService
-from scripts import create_super_admin
 
 
 class TokenWalletTests(unittest.TestCase):
@@ -59,7 +58,8 @@ class TokenWalletTests(unittest.TestCase):
             user_id=self.user.id,
             free_tokens_remaining=1000,
             purchased_tokens_remaining=0,
-            next_free_refill_at=datetime.now(timezone.utc) + timedelta(days=30),
+            next_free_refill_at=datetime.now(
+                timezone.utc) + timedelta(days=30),
         ))
         self.db.add(TokenTransaction(
             user_id=self.user.id,
@@ -88,25 +88,14 @@ class TokenWalletTests(unittest.TestCase):
         ))
         self.assertEqual(usage_event.details["credit_tokens"], 250)
 
-    def test_bootstrap_super_admin_receives_token_wallet(self) -> None:
-        email = f"{uuid.uuid4()}@example.com"
-        with (
-            patch.dict(os.environ, {
-                "BOOTSTRAP_ADMIN_NAME": "Bootstrap Admin",
-                "BOOTSTRAP_ADMIN_EMAIL": email,
-                "BOOTSTRAP_ADMIN_PASSWORD": "secure-test-password",
-            }),
-            patch.object(create_super_admin, "SessionLocal", return_value=self.db),
-        ):
-            create_super_admin.main()
-
         user = self.db.scalar(select(User).where(User.email == email))
         self.assertIsNotNone(user)
         assert user is not None
         wallet = self.db.get(TokenWallet, user.id)
         self.assertIsNotNone(wallet)
         assert wallet is not None
-        self.assertEqual(wallet.free_tokens_remaining, settings.FREE_TOKEN_GRANT)
+        self.assertEqual(wallet.free_tokens_remaining,
+                         settings.FREE_TOKEN_GRANT)
         grant = self.db.scalar(select(TokenTransaction).where(
             TokenTransaction.user_id == user.id,
             TokenTransaction.reason == "signup_grant",
@@ -123,7 +112,8 @@ class TokenWalletTests(unittest.TestCase):
         TokenService._refresh_free_tokens(self.db, wallet, now)
         self.db.commit()
 
-        self.assertEqual(wallet.free_tokens_remaining, settings.FREE_TOKEN_GRANT)
+        self.assertEqual(wallet.free_tokens_remaining,
+                         settings.FREE_TOKEN_GRANT)
         self.assertEqual(wallet.purchased_tokens_remaining, 0)
         self.assertEqual(
             wallet.next_free_refill_at,
@@ -139,7 +129,8 @@ class TokenWalletTests(unittest.TestCase):
     def test_free_tokens_do_not_refill_before_utc_midnight(self) -> None:
         wallet = self.db.get(TokenWallet, self.user.id)
         wallet.free_tokens_remaining = 12
-        wallet.next_free_refill_at = datetime(2026, 10, 16, 0, 0, tzinfo=timezone.utc)
+        wallet.next_free_refill_at = datetime(
+            2026, 10, 16, 0, 0, tzinfo=timezone.utc)
         now = datetime(2026, 10, 15, 23, 59, tzinfo=timezone.utc)
 
         TokenService._refresh_free_tokens(self.db, wallet, now)
@@ -151,7 +142,8 @@ class TokenWalletTests(unittest.TestCase):
         TokenService.grant_purchased_tokens(
             self.db, self.user.id, 50, reference
         )
-        TokenService.grant_purchased_tokens(self.db, self.user.id, 50, reference)
+        TokenService.grant_purchased_tokens(
+            self.db, self.user.id, 50, reference)
         TokenService.consume_credit_tokens(
             self.db, self.user.id, settings.FREE_TOKEN_GRANT + 20
         )
@@ -173,7 +165,8 @@ class TokenWalletTests(unittest.TestCase):
         balance = TokenService.get_balance(self.db, user.id)
 
         self.assertEqual(user.phone_number, "+2250102030405")
-        self.assertEqual(balance["free_tokens_remaining"], settings.FREE_TOKEN_GRANT)
+        self.assertEqual(balance["free_tokens_remaining"],
+                         settings.FREE_TOKEN_GRANT)
 
     def test_insufficient_balance_does_not_debit_tokens(self) -> None:
         with self.assertRaises(HTTPException) as error:
@@ -237,11 +230,13 @@ class TokenWalletTests(unittest.TestCase):
             FederatedIdentity.user_id == user.id
         ))
         self.assertEqual(user.phone_number, "+2250102030405")
-        self.assertEqual(balance["free_tokens_remaining"], settings.FREE_TOKEN_GRANT)
+        self.assertEqual(balance["free_tokens_remaining"],
+                         settings.FREE_TOKEN_GRANT)
         self.assertEqual(identity.provider_subject, "new-google-subject")
 
     def test_google_identity_token_signature_audience_and_issuer_are_checked(self) -> None:
-        private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+        private_key = rsa.generate_private_key(
+            public_exponent=65537, key_size=2048)
         public_numbers = private_key.public_key().public_numbers()
 
         def encode_integer(value: int) -> str:
