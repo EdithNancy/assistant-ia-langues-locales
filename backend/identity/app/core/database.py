@@ -25,7 +25,7 @@ engine = create_async_engine(
 def set_search_path(dbapi_connection, connection_record):
     # On exécute le SET manuellement sur la connexion DBAPI
     cursor = dbapi_connection.cursor()
-    cursor.execute("SET search_path TO identity, public;")
+    cursor.execute("SET search_path TO identity")
     cursor.close()
 
 
