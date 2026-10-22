@@ -16,6 +16,10 @@ from app.features.usage.entity import UsageEvent
 logger = logging.getLogger(__name__)
 USAGE_EVENTS_STREAM = "app:usage:events"
 USAGE_EVENTS_GROUP = "usage-database-writers"
+USAGE_EVENTS_DEAD_LETTER_STREAM = f"{USAGE_EVENTS_STREAM}:dead-letter"
+USAGE_EVENTS_RETRY_PREFIX = f"{USAGE_EVENTS_STREAM}:retry"
+MAX_USAGE_EVENT_ATTEMPTS = 5
+USAGE_EVENT_RETRY_TTL_SECONDS = 7 * 24 * 60 * 60
 
 
 class UsageStream(Protocol):
@@ -118,6 +122,7 @@ async def run_usage_log_worker(redis: Redis, stop_event: asyncio.Event) -> None:
     from app.core.database import SessionLocal
 
     consumer = f"usage-writer-{uuid.uuid4()}"
+    redis_retry_delay = 1
     while not stop_event.is_set():
         try:
             claimed = await redis.xautoclaim(
@@ -141,20 +146,59 @@ async def run_usage_log_worker(redis: Redis, stop_event: asyncio.Event) -> None:
 
             for message_id, fields in messages:
                 try:
-                    # --- MODIFIÉ : Appel direct sans to_thread ---
                     await _persist_usage_event(SessionLocal, fields)
-                except (SQLAlchemyError, ValueError, KeyError, TypeError):
-                    logger.exception(
-                        "Failed to persist usage event %s; it remains queued for retry.",
-                        message_id,
-                    )
-                    break
+                except (SQLAlchemyError, ValueError, KeyError, TypeError) as exc:
+                    retry_key = f"{USAGE_EVENTS_RETRY_PREFIX}:{message_id}"
+                    attempts = await redis.incr(retry_key)
+                    await redis.expire(retry_key, USAGE_EVENT_RETRY_TTL_SECONDS)
+                    if attempts >= MAX_USAGE_EVENT_ATTEMPTS:
+                        await redis.xadd(
+                            USAGE_EVENTS_DEAD_LETTER_STREAM,
+                            {
+                                "source_message_id": str(message_id),
+                                "attempts": str(attempts),
+                                "error_type": type(exc).__name__,
+                                "event": json.dumps(
+                                    {_decode(key): _decode(value) for key, value in fields.items()},
+                                    separators=(",", ":"),
+                                ),
+                            },
+                        )
+                        await redis.xack(
+                            USAGE_EVENTS_STREAM, USAGE_EVENTS_GROUP, message_id
+                        )
+                        await redis.xdel(USAGE_EVENTS_STREAM, message_id)
+                        await redis.delete(retry_key)
+                        logger.error(
+                            "Usage event %s moved to %s after %s failed attempts (%s).",
+                            message_id,
+                            USAGE_EVENTS_DEAD_LETTER_STREAM,
+                            attempts,
+                            type(exc).__name__,
+                        )
+                    else:
+                        logger.exception(
+                            "Failed to persist usage event %s (attempt %s/%s); "
+                            "it remains queued for retry.",
+                            message_id,
+                            attempts,
+                            MAX_USAGE_EVENT_ATTEMPTS,
+                        )
+                    continue
                 await redis.xack(USAGE_EVENTS_STREAM, USAGE_EVENTS_GROUP, message_id)
                 await redis.xdel(USAGE_EVENTS_STREAM, message_id)
+                await redis.delete(f"{USAGE_EVENTS_RETRY_PREFIX}:{message_id}")
+            redis_retry_delay = 1
         except RedisError:
             logger.exception(
-                "Usage-log Redis worker failed; retrying shortly.")
-            await asyncio.sleep(2)
+                "Usage-log Redis worker failed; retrying in %s seconds.",
+                redis_retry_delay,
+            )
+            try:
+                await asyncio.wait_for(stop_event.wait(), timeout=redis_retry_delay)
+            except TimeoutError:
+                pass
+            redis_retry_delay = min(redis_retry_delay * 2, 30)
 
 
 # --- MODIFIÉ : Devient asynchrone et utilise AsyncSession ---

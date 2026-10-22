@@ -32,8 +32,15 @@ def test_crud_and_isolation(client):
     r = client.post("/", json={"title": "Sommeil"}, headers=owner)
     assert r.status_code == 201
     cid = r.json()["id"]
-    assert [c["id"] for c in client.get("/", headers=owner).json()] == [cid]
-    assert client.get("/", headers=other).json() == []
+    conversations = client.get("/", headers=owner).json()
+    assert [c["id"] for c in conversations["items"]] == [cid]
+    assert conversations["pagination"] == {
+        "offset": 0,
+        "limit": 50,
+        "total": 1,
+        "hasMore": False,
+    }
+    assert client.get("/", headers=other).json()["items"] == []
     assert client.get(f"/{cid}", headers=other).status_code == 404
     assert client.delete(f"/{cid}", headers=owner).status_code == 204
     assert client.get(f"/{cid}", headers=owner).status_code == 404
@@ -61,14 +68,15 @@ def test_text_chat(client, monkeypatch):
     assert charges == [3]
     assert r.headers["X-Credit-Tokens-Charged"] == "3"
     assert r.headers["X-Model-Token-Usage-Estimated"] == "true"
-    msgs = client.get(f"/{cid}", headers=ALICE).json()["messages"]
+    detail = client.get(f"/{cid}", headers=ALICE).json()
+    msgs = detail["messages"]["items"]
     assert [m["role"] for m in msgs] == ["user", "assistant"]
     assert {m["conversation_id"] for m in msgs} == {cid}
 
     response = client.get(f"/{cid}/messages", headers=ALICE)
     assert response.status_code == 200
-    assert [message["role"] for message in response.json()] == ["user", "assistant"]
-    assert {message["conversation_id"] for message in response.json()} == {cid}
+    assert [message["role"] for message in response.json()["items"]] == ["user", "assistant"]
+    assert {message["conversation_id"] for message in response.json()["items"]} == {cid}
     assert client.get(f"/{cid}/messages", headers=BOB).status_code == 404
 
 

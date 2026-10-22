@@ -1,8 +1,10 @@
+import asyncio
 import unittest
 import uuid
 
 from fastapi import HTTPException
 from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import Session
 
 from app.core.database import Base
@@ -63,7 +65,58 @@ class LanguageDataTests(unittest.TestCase):
         )
         self.assertEqual(entry.source_text, "i ni ce")
         self.assertEqual(entry.source_language.code, "dyu")
-        self.assertEqual([row.id for row in result], [entry.id])
+        self.assertEqual([row.id for row in result[0]], [entry.id])
+        self.assertEqual(result[1], 1)
+
+    def test_list_entries_returns_filtered_page_and_total(self) -> None:
+        async def exercise() -> None:
+            engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+            async with engine.begin() as connection:
+                await connection.run_sync(Base.metadata.create_all)
+            session_factory = async_sessionmaker(engine, expire_on_commit=False)
+            async with session_factory() as db:
+                source = Language(code="dyu-page", name="Dioula")
+                target = Language(code="fr-page", name="Français")
+                db.add_all([source, target])
+                await db.flush()
+                db.add_all(
+                    VocabularyEntry(
+                        source_language_id=source.id,
+                        target_language_id=target.id,
+                        source_text=f"mot {index}",
+                        target_text=f"word {index}",
+                        kind="word",
+                    )
+                    for index in range(3)
+                )
+                await db.commit()
+
+                items, total = await DataService.list_entries(
+                    db, "dyu-page", "fr-page", "mot 1", None, 0, 1
+                )
+                self.assertEqual(total, 1)
+                self.assertEqual([item.source_text for item in items], ["mot 1"])
+
+                sorted_items, filtered_total = await DataService.list_entries(
+                    db,
+                    "dyu-page",
+                    "fr-page",
+                    "mot",
+                    None,
+                    0,
+                    2,
+                    "source_text",
+                    "desc",
+                )
+                self.assertEqual(filtered_total, 3)
+                self.assertEqual(
+                    [item.source_text for item in sorted_items],
+                    ["mot 2", "mot 1"],
+                )
+
+            await engine.dispose()
+
+        asyncio.run(exercise())
 
     def test_create_language_normalizes_code_and_rejects_duplicate(self) -> None:
         created = DataService.create_language(

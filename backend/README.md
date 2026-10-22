@@ -29,6 +29,104 @@ Identity, Conversation, Learning, les bases de données et Redis ne publient pas
 de port sur l'hôte dans Compose. Les en-têtes `X-User-*` ne sont jamais repris
 du client : la Gateway les supprime puis transmet l'identité du JWT vérifié.
 
+### Contrat JSON de la Gateway
+
+Les réponses JSON des routes `/api/*` utilisent cette enveloppe :
+
+```json
+{
+  "item": {"id": "…"},
+  "message": "Requête traitée avec succès.",
+  "hasError": false
+}
+```
+
+Une erreur conserve le statut HTTP et fournit la même enveloppe :
+
+```json
+{
+  "item": null,
+  "message": "Les données envoyées ne sont pas valides.",
+  "hasError": true
+}
+```
+
+`item` contient la réponse métier (objet, liste ou `null`). `pagination`
+n'apparaît que pour les réponses de listes paginées et contient `offset`,
+`limit`, `total` et `hasMore`. En cas d'erreur, `item` vaut `null` et
+`hasError` vaut `true`; le statut HTTP identifie la catégorie de l'erreur. Les
+messages de validation ne répercutent pas les valeurs reçues (notamment les
+mots de passe), et les détails internes des erreurs `5xx` ne sont pas exposés.
+
+Les corps JSON des routes sont définis par des modèles Pydantic propres à
+chaque opération; les champs inconnus sont refusés et renvoient `422`. Les
+corps multipart/audio et le protocole WebSocket gardent leur format spécifique.
+Les listes de conversations, messages, scénarios, tentatives, sessions,
+utilisateurs, rôles, permissions, langues, entrées de vocabulaire et événements
+d'usage sont paginées via `offset` et `limit`, avec des plafonds par route.
+
+Exemple de liste paginée :
+
+```json
+{
+  "item": [{"id": "…"}],
+  "message": "Requête traitée avec succès.",
+  "hasError": false,
+  "pagination": {
+    "offset": 0,
+    "limit": 20,
+    "total": 47,
+    "hasMore": true
+  }
+}
+```
+
+La page suivante se demande avec `?offset=20&limit=20`. Tous les critères de
+liste sont des paramètres d'URL sur les requêtes `GET` (jamais un body JSON).
+Le contrat commun est :
+
+| Paramètre | Rôle | Valeurs |
+| --- | --- | --- |
+| `offset` | Nombre d'éléments ignorés | Entier `>= 0`, défaut `0` |
+| `limit` | Taille de page | Entier `1..100` (jusqu'à `500` pour `/api/data/*`), défaut `50` (données linguistiques : `100`) |
+| `search` | Recherche textuelle propre à la ressource | Texte de 1 à 200 caractères |
+| `sort_by` | Champ de tri | Uniquement les champs autorisés pour la route |
+| `sort_order` | Sens du tri | `asc` ou `desc`; le sens historique de la route est utilisé par défaut |
+
+Exemple combinant pagination, recherche et tri :
+
+```http
+GET /api/conversations?offset=0&limit=20&search=prononciation&sort_by=created_at&sort_order=desc
+```
+
+Les filtres métier sont également des paramètres de query string et peuvent
+être combinés avec ces critères :
+
+| Liste | Filtres | Champs `sort_by` | Recherche `search` |
+| --- | --- | --- | --- |
+| `/api/data/languages` | `active_only` | `name`, `code`, `created_at` | nom et code |
+| `/api/data/entries` | `source_language`, `target_language`, `kind` | `created_at`, `source_text`, `target_text`, `kind` | textes source et cible (`q` reste accepté pour compatibilité) |
+| `/api/users` | `is_active` | `created_at`, `full_name`, `email` | nom et email |
+| `/api/sessions` | `revoked` | `created_at`, `expires_at`, `last_used_at` | agent utilisateur |
+| `/api/roles`, `/api/permissions` | aucun | `code`, `name` | code et nom |
+| `/api/usage/events` | `user_id`, `event_type` | `created_at`, `event_type`, `status_code`, `duration_ms` | route, méthode et type d'événement |
+| `/api/conversations` | aucun | `created_at`, `title` | titre |
+| `/api/conversations/{id}/messages` | aucun | `created_at`, `role` | contenu du message |
+| `/api/learning/scenarios` | `level` | `created_at`, `title`, `level` | titre et description |
+| `/api/learning/attempts` | `scenario_id`, `status` | `started_at`, `completed_at`, `status`, `score` | titre du scénario |
+
+Un `sort_by` non autorisé, un filtre inconnu ou une valeur hors format est
+rejeté avec `422`; aucune valeur fournie pour le tri n'est injectée dans une
+requête SQL. Les totaux de pagination sont calculés après application de tous
+les filtres et de la recherche. Pour une conversation, ces mêmes paramètres
+s'appliquent aux messages imbriqués de la route détail et à la route dédiée
+`/messages`.
+Les réponses non JSON, WebSocket, santé et `204` ne sont pas enveloppées; la
+réponse JSON de l'endpoint audio reste, elle, enveloppée. Ce changement concerne
+le contrat client de la Gateway. Les services internes renvoient les éléments
+et les métadonnées nécessaires; la Gateway les expose dans le format uniforme
+documenté ci-dessus.
+
 Les services STT, Dialogue et TTS restent des prototypes/mockups dans
 `ml/prototypes/` et Conversation. Billing et Feedback ne sont pas encore des
 services : la Gateway ne leur déclare donc pas de routes actives.
@@ -97,7 +195,7 @@ curl -i http://localhost:8000/api/auth/login \
   -d '{"email":"test@example.com","password":"UnMotDePasseTresSolide123"}'
 ```
 
-Copiez `access_token` de la réponse de connexion, puis testez une route
+Copiez `item.access_token` de la réponse de connexion, puis testez une route
 protégée :
 
 ```bash
@@ -106,7 +204,7 @@ curl -i http://localhost:8000/api/conversations/ \
 ```
 
 Chaque échange doit cibler une conversation créée au préalable. Conservez son
-`id` comme conversation active et réutilisez-le pour le texte ou le vocal :
+`item.id` comme conversation active et réutilisez-le pour le texte ou le vocal :
 
 ```bash
 curl -i http://localhost:8000/api/conversations/ \
@@ -150,8 +248,8 @@ curl -i http://localhost:8000/api/conversations/<conversation_id>/messages/audio
   -F 'audio=@./question.wav'
 ```
 
-La réponse JSON contient la transcription, le texte de réponse et
-`audio_output_base64`, à décoder côté client. Ne définissez pas manuellement
+La réponse JSON contient ces champs dans `item` : transcription, texte de réponse
+et `audio_output_base64`, à décoder côté client. Ne définissez pas manuellement
 `Content-Type`, car la boundary multipart doit être ajoutée par le client.
 Cette route partage la limite de 50 tours vocaux quotidiens du WebSocket.
 Les implémentations STT/TTS actuelles sont des mocks; pour obtenir une sortie
@@ -176,9 +274,16 @@ pour le texte); les tours WebSocket reçoivent un événement `error` de statut
 
 La Gateway retourne `401` pour un jeton absent/invalide, `403` pour un rôle
 non autorisé, `429` lorsque la limite est dépassée, `502` si l'upstream est
-indisponible et `504` sur expiration du délai. Un `X-Request-ID` est retourné
+indisponible et `504` sur expiration du délai. Les erreurs API JSON suivent
+l'enveloppe documentée ci-dessus. Un `X-Request-ID` est retourné
 pour chaque réponse et peut être transmis à l'avance par un client si sa valeur
 est sûre et fait au plus 64 caractères.
+
+Le worker des événements d'usage retente chaque événement au plus cinq fois.
+Les événements toujours invalides ou impossibles à persister sont déplacés
+vers le stream Redis `app:usage:events:dead-letter` plutôt que de bloquer
+indéfiniment le traitement; les erreurs Redis utilisent un backoff interruptible
+plafonné à 30 secondes.
 
 `GET /health` vérifie la vie du processus. `GET /ready` vérifie aussi la
 disponibilité de Redis pour le limiteur. Les services vérifient leurs

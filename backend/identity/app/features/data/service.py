@@ -1,10 +1,11 @@
 from uuid import UUID
 
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession  # <-- Modifié
 from sqlalchemy.orm import aliased, joinedload
 
+from app.core.pagination import apply_sort
 from app.features.data.entity import Language, VocabularyEntry
 from app.features.data.schemas import (
     LanguageCreate,
@@ -37,16 +38,43 @@ class DataService:
 
     @staticmethod
     async def list_languages(  # <-- async def
-        db: AsyncSession, active_only: bool = True, offset: int = 0, limit: int = 100
-    ) -> list[Language]:
-        query = select(Language).order_by(
-            Language.name).offset(offset).limit(limit)
+        db: AsyncSession,
+        active_only: bool = True,
+        offset: int = 0,
+        limit: int = 100,
+        search: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> tuple[list[Language], int]:
+        query = select(Language)
+        count_query = select(func.count()).select_from(Language)
         if active_only:
             query = query.where(Language.is_active.is_(True))
+            count_query = count_query.where(Language.is_active.is_(True))
+        if search:
+            pattern = f"%{search}%"
+            condition = Language.name.ilike(pattern) | Language.code.ilike(pattern)
+            query = query.where(condition)
+            count_query = count_query.where(condition)
 
-        # Utilisation de execute au lieu de scalars
-        result = await db.execute(query)  # <-- await + execute
-        return list(result.scalars().all())
+        total = await db.scalar(count_query)
+        query = apply_sort(
+            query,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            columns={
+                "name": Language.name,
+                "code": Language.code,
+                "created_at": Language.created_at,
+            },
+            default="name",
+            unique_column=Language.id,
+            default_order="asc",
+        )
+        result = await db.execute(
+            query.offset(offset).limit(limit)
+        )
+        return list(result.scalars().all()), total or 0
 
     @staticmethod
     async def get_language(db: AsyncSession, language_id: UUID) -> Language:  # <-- async def
@@ -102,7 +130,9 @@ class DataService:
         kind: str | None = None,
         offset: int = 0,
         limit: int = 100,
-    ) -> list[VocabularyEntry]:
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> tuple[list[VocabularyEntry], int]:
         query = (
             select(VocabularyEntry)
             .join(
@@ -113,29 +143,56 @@ class DataService:
                 joinedload(VocabularyEntry.source_language),
                 joinedload(VocabularyEntry.target_language),
             )
-            .order_by(VocabularyEntry.created_at.desc())
-            .offset(offset)
-            .limit(limit)
         )
+        conditions = []
         if source_code:
-            query = query.where(Language.code == source_code.strip().lower())
+            conditions.append(Language.code == source_code.strip().lower())
         if target_code:
             target_language = aliased(Language)
             query = query.join(
                 target_language,
                 VocabularyEntry.target_language_id == target_language.id,
-            ).where(target_language.code == target_code.strip().lower())
+            )
+            conditions.append(target_language.code == target_code.strip().lower())
         if search:
             pattern = f"%{search.strip()}%"
-            query = query.where(
+            conditions.append(
                 VocabularyEntry.source_text.ilike(pattern)
                 | VocabularyEntry.target_text.ilike(pattern)
             )
         if kind:
-            query = query.where(VocabularyEntry.kind == kind)
+            conditions.append(VocabularyEntry.kind == kind)
 
-        result = await db.execute(query)  # <-- await + execute
-        return list(result.scalars().unique().all())
+        query = query.where(*conditions)
+        count_query = (
+            select(func.count(VocabularyEntry.id))
+            .select_from(VocabularyEntry)
+            .join(Language, VocabularyEntry.source_language_id == Language.id)
+        )
+        if target_code:
+            count_query = count_query.join(
+                target_language,
+                VocabularyEntry.target_language_id == target_language.id,
+            )
+        count_query = count_query.where(*conditions)
+        total = await db.scalar(count_query)
+        query = apply_sort(
+            query,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            columns={
+                "created_at": VocabularyEntry.created_at,
+                "source_text": VocabularyEntry.source_text,
+                "target_text": VocabularyEntry.target_text,
+                "kind": VocabularyEntry.kind,
+            },
+            default="created_at",
+            unique_column=VocabularyEntry.id,
+        )
+        result = await db.execute(
+            query.offset(offset).limit(limit)
+        )
+        return list(result.scalars().unique().all()), total or 0
 
     @staticmethod
     async def update_entry(  # <-- async def

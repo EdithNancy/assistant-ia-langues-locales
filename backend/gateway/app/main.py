@@ -10,11 +10,14 @@ import httpx
 from fastapi import FastAPI, HTTPException, Request, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from redis.exceptions import RedisError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.requests import HTTPConnection
 
 from backend_observability import instrument_app
 
+from .api_response import error_payload
 from .auth import User, bearer, decode_token
 from .config import settings
 from .proxy import forward, proxy_websocket
@@ -43,6 +46,47 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="API Gateway", lifespan=lifespan)
 observability = instrument_app(app, "gateway")
+
+
+@app.exception_handler(StarletteHTTPException)
+async def http_error_handler(request: Request, exc: StarletteHTTPException):
+    body = error_payload(exc.status_code, exc.detail)
+    headers = dict(exc.headers or {})
+    request_id = getattr(request.state, "request_id", None)
+    if request_id:
+        headers["X-Request-ID"] = request_id
+    return JSONResponse(body, status_code=exc.status_code, headers=headers)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error_handler(request: Request, exc: RequestValidationError):
+    errors = exc.errors()
+    messages = []
+    for error in errors:
+        location = ".".join(str(part) for part in error.get("loc", ()))
+        message = error.get("msg", "Valeur invalide.")
+        messages.append(f"{location}: {message}" if location else str(message))
+    detail = " ; ".join(messages)[:500] or "Les données envoyées ne sont pas valides."
+    body = error_payload(422, detail)
+    request_id = getattr(request.state, "request_id", None)
+    headers = {"X-Request-ID": request_id} if request_id else None
+    return JSONResponse(body, status_code=422, headers=headers)
+
+
+@app.exception_handler(Exception)
+async def unexpected_error_handler(request: Request, exc: Exception):
+    request_id = getattr(request.state, "request_id", "unknown")
+    log.error(
+        "Unhandled gateway exception rid=%s",
+        request_id,
+        exc_info=(type(exc), exc, exc.__traceback__),
+    )
+    return JSONResponse(
+        error_payload(500),
+        status_code=500,
+        headers={"X-Request-ID": request_id},
+    )
+
 
 if settings.cors_origins:
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins,
@@ -194,7 +238,7 @@ async def gateway(service: str, request: Request, path: str = ""):
 
     if not allowed:
         return JSONResponse(
-            {"detail": "Trop de requêtes"},
+            error_payload(429, "Trop de requêtes"),
             status_code=429,
             headers={"Retry-After": str(retry)},
         )

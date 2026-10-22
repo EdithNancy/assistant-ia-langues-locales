@@ -1,8 +1,10 @@
 import uuid
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from app.core.request_model import RequestModel
 
-class UserRegister(BaseModel):
+
+class UserRegister(RequestModel):
     full_name: str = Field(min_length=2, max_length=150)
     email: EmailStr
     phone_number: str = Field(min_length=7, max_length=32, pattern=r"^\+?[0-9][0-9\s().-]*$")
@@ -18,7 +20,7 @@ class UserRegister(BaseModel):
             raise ValueError("Le numéro doit contenir entre 7 et 15 chiffres.")
         return normalized
 
-class UserUpdate(BaseModel):
+class UserUpdate(RequestModel):
     full_name: str | None = Field(default=None, min_length=2, max_length=150)
     phone_number: str | None = Field(default=None, min_length=7, max_length=32,
                                      pattern=r"^\+?[0-9][0-9\s().-]*$")

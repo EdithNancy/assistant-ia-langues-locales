@@ -87,7 +87,9 @@ def test_gateway_rejects_a_revoked_session(monkeypatch) -> None:
         )
 
     assert response.status_code == 401
-    assert response.json()["detail"] == "Session révoquée"
+    assert response.json()["message"] == "Session révoquée"
+    assert response.json()["hasError"] is True
+    assert "errorCode" not in response.json()
 
 
 def test_same_super_admin_bearer_authenticates_conversation_get_and_post(
@@ -160,7 +162,7 @@ def test_gateway_rejects_message_request_without_conversation_id(monkeypatch) ->
         )
 
     assert response.status_code == 400
-    assert response.json()["detail"] == (
+    assert response.json()["message"] == (
         "Identifiant de conversation manquant. Créez ou sélectionnez "
         "une conversation avant d'envoyer un message."
     )

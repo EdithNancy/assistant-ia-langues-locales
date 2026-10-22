@@ -2,9 +2,10 @@ import uuid
 from datetime import datetime
 
 from pydantic import BaseModel, Field
+from app.core.request_model import RequestModel
 
 
-class TokenConsumptionRequest(BaseModel):
+class TokenConsumptionRequest(RequestModel):
     credit_tokens: int = Field(
         ge=1,
         description="Crédits de conversation à débiter; ce nombre n'est pas le JWT Bearer.",

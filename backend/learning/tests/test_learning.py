@@ -23,9 +23,9 @@ def test_access_rules(client):
 
 
 def test_catalog_seeded_and_filter(client):
-    assert len(client.get("/scenarios", headers=PRO).json()) == 2
+    assert len(client.get("/scenarios", headers=PRO).json()["items"]) == 2
     only = client.get("/scenarios?level=debutant", headers=PRO).json()
-    assert [s["level"] for s in only] == ["debutant"]
+    assert [s["level"] for s in only["items"]] == ["debutant"]
 
 
 def test_only_admin_creates_scenario(client):
@@ -35,7 +35,7 @@ def test_only_admin_creates_scenario(client):
 
 
 def test_attempt_flow_and_progress(client):
-    sid = client.get("/scenarios?level=debutant", headers=PRO).json()[0]["id"]
+    sid = client.get("/scenarios?level=debutant", headers=PRO).json()["items"][0]["id"]
     a = client.post("/attempts", json={"scenario_id": sid}, headers=PRO).json()
     assert a["status"] == "in_progress"
     done = client.post(f"/attempts/{a['id']}/complete", json={"score": 80}, headers=PRO)

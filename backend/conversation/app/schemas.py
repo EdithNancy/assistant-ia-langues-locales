@@ -2,12 +2,15 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from .pagination import PaginatedResponse
+from .request_model import RequestModel
 
-class ConversationCreate(BaseModel):
+
+class ConversationCreate(RequestModel):
     title: str = Field(default="Nouvelle conversation", max_length=200)
 
 
-class MessageIn(BaseModel):
+class MessageIn(RequestModel):
     content: str = Field(min_length=1, max_length=4000)
 
 
@@ -38,4 +41,4 @@ class ConversationOut(BaseModel):
 
 
 class ConversationDetail(ConversationOut):
-    messages: list[MessageOut]
+    messages: PaginatedResponse[MessageOut]

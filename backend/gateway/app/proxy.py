@@ -3,10 +3,11 @@ import asyncio
 import httpx
 import websockets
 from fastapi import Request, WebSocket
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, Response, StreamingResponse
 from starlette.background import BackgroundTask
 
 from .auth import User
+from .api_response import error_payload, success_payload
 
 HOP_BY_HOP = {
     "connection", "keep-alive", "proxy-authenticate", "proxy-authorization",
@@ -57,13 +58,81 @@ async def forward(client: httpx.AsyncClient, request: Request, url: str,
         )
         resp = await client.send(req, stream=True)
     except httpx.TimeoutException:
-        return JSONResponse({"detail": "Service en aval trop lent"}, 504)
+        return JSONResponse(
+            error_payload(504, "Service en aval trop lent"),
+            status_code=504,
+            headers={"X-Request-ID": request_id},
+        )
     except httpx.HTTPError:
-        return JSONResponse({"detail": "Service en aval indisponible"}, 502)
+        return JSONResponse(
+            error_payload(502, "Service en aval indisponible"),
+            status_code=502,
+            headers={"X-Request-ID": request_id},
+        )
 
     out_headers = {k: v for k, v in resp.headers.items()
                    if k.lower() not in _excluded_headers(resp.headers) | {"content-length"}}
     out_headers["X-Request-ID"] = request_id
+
+    if resp.status_code in {204, 304}:
+        await resp.aclose()
+        return Response(status_code=resp.status_code, headers=out_headers)
+
+    content_type = resp.headers.get("content-type", "").split(";", 1)[0].lower()
+    is_json = content_type == "application/json" or content_type.endswith("+json")
+    if is_json or resp.status_code >= 400:
+        try:
+            await resp.aread()
+        except httpx.TimeoutException:
+            await resp.aclose()
+            return JSONResponse(
+                error_payload(504),
+                status_code=504,
+                headers={"X-Request-ID": request_id},
+            )
+        except httpx.HTTPError:
+            await resp.aclose()
+            return JSONResponse(
+                error_payload(502),
+                status_code=502,
+                headers={"X-Request-ID": request_id},
+            )
+
+        payload = None
+        if is_json:
+            try:
+                payload = resp.json()
+            except ValueError:
+                await resp.aclose()
+                return JSONResponse(
+                    error_payload(502),
+                    status_code=502,
+                    headers={"X-Request-ID": request_id},
+                )
+
+        headers = {
+            key: value
+            for key, value in out_headers.items()
+            if key.lower() not in {"content-type", "content-encoding"}
+        }
+        await resp.aclose()
+
+        if resp.status_code >= 400:
+            detail = payload
+            if isinstance(payload, dict):
+                detail = payload.get("detail", payload.get("message", payload.get("error")))
+            return JSONResponse(
+                error_payload(resp.status_code, detail),
+                status_code=resp.status_code,
+                headers=headers,
+            )
+
+        return JSONResponse(
+            success_payload(payload, resp.status_code),
+            status_code=resp.status_code,
+            headers=headers,
+        )
+
     return StreamingResponse(resp.aiter_raw(), status_code=resp.status_code,
                              headers=out_headers, background=BackgroundTask(resp.aclose))
 

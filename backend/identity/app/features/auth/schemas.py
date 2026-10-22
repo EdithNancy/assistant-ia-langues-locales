@@ -1,11 +1,13 @@
 from typing import Literal
 from pydantic import BaseModel, EmailStr, Field, field_validator
+from app.core.request_model import RequestModel
 
-class LoginRequest(BaseModel):
+
+class LoginRequest(RequestModel):
     email: EmailStr
     password: str = Field(min_length=1, max_length=128)
 
-class RefreshRequest(BaseModel):
+class RefreshRequest(RequestModel):
     refresh_token: str
 
 class TokenResponse(BaseModel):
@@ -14,14 +16,14 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
     expires_in: int
 
-class SocialNonceRequest(BaseModel):
+class SocialNonceRequest(RequestModel):
     provider: Literal["google", "apple"]
 
 class SocialNonceResponse(BaseModel):
     nonce: str
     expires_in: int
 
-class SocialLoginRequest(BaseModel):
+class SocialLoginRequest(RequestModel):
     provider: Literal["google", "apple"]
     id_token: str = Field(min_length=1, max_length=8192)
     nonce: str = Field(min_length=32, max_length=128)

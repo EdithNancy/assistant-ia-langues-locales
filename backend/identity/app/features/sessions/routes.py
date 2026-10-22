@@ -1,10 +1,16 @@
 import uuid
 from datetime import datetime
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Query, Request
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession  # <-- Modifié
 from app.core.database import get_db
 from app.core.dependencies import get_current_user
+from app.core.pagination import (
+    ListRequest,
+    PaginatedResponse,
+    get_list_request,
+    validate_list_query,
+)
 from app.core.revocation import revoke_access_sessions
 from app.features.sessions.service import SessionService
 from app.features.users.entity import User
@@ -24,12 +30,25 @@ class SessionResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-@router.get("", response_model=list[SessionResponse])
+@router.get("", response_model=PaginatedResponse[SessionResponse])
 async def list_sessions(  # <-- async def
+    http_request: Request,
+    request: ListRequest = Depends(get_list_request),
+    revoked: bool | None = Query(default=None),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)  # <-- AsyncSession
 ):
-    return await SessionService.list_own(db, user.id)  # <-- await
+    validate_list_query(http_request, allowed_filters=frozenset({"revoked"}))
+    return await SessionService.list_own(
+        db,
+        user.id,
+        request.offset,
+        request.limit,
+        request.search,
+        request.sort_by,
+        request.sort_order,
+        revoked,
+    )
 
 
 @router.delete("/{session_id}", response_model=SessionResponse)

@@ -3,6 +3,13 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession  # <-- Modifié
 from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_permission
+from app.core.pagination import (
+    ListRequest,
+    PaginatedResponse,
+    get_list_request,
+    paginated_response,
+    validate_list_query,
+)
 from app.features.users.entity import User
 from app.features.users.repository import UserRepository
 from app.features.users.schemas import UserAdminResponse, UserResponse, UserUpdate
@@ -47,14 +54,29 @@ async def consume_token_balance(  # <-- async def
     return await TokenService.consume_credit_tokens(db, user.id, data.credit_tokens)
 
 
-@router.get("", response_model=list[UserAdminResponse])
+@router.get("", response_model=PaginatedResponse[UserAdminResponse])
 async def list_users(  # <-- async def
-    offset: int = Query(0, ge=0),
-    limit: int = Query(50, ge=1, le=100),
+    http_request: Request,
+    request: ListRequest = Depends(get_list_request),
+    is_active: bool | None = Query(default=None),
     db: AsyncSession = Depends(get_db),  # <-- AsyncSession
     _: User = Depends(require_permission("users.read"))
 ):
-    return await UserRepository.list_users(db, offset, limit)  # <-- await
+    validate_list_query(
+        http_request, allowed_filters=frozenset({"is_active"})
+    )
+    items, total = await UserRepository.list_users(
+        db,
+        request.offset,
+        request.limit,
+        request.search,
+        request.sort_by,
+        request.sort_order,
+        is_active,
+    )
+    return paginated_response(
+        items, total, request.offset, request.limit
+    )
 
 
 @router.get("/{user_id}", response_model=UserAdminResponse)

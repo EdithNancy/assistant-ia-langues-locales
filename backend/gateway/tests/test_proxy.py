@@ -1,4 +1,5 @@
 import asyncio
+import json
 
 import httpx
 from starlette.requests import Request
@@ -13,6 +14,28 @@ class ResponseStream(httpx.AsyncByteStream):
 
     async def aclose(self) -> None:
         return None
+
+
+def make_request(method: str, path: str) -> Request:
+    async def receive() -> dict[str, object]:
+        return {"type": "http.request", "body": b"", "more_body": False}
+
+    return Request(
+        {
+            "type": "http",
+            "asgi": {"version": "3.0"},
+            "http_version": "1.1",
+            "method": method,
+            "scheme": "http",
+            "path": path,
+            "raw_path": path.encode(),
+            "query_string": b"",
+            "headers": [],
+            "client": ("192.0.2.15", 54321),
+            "server": ("gateway", 8000),
+        },
+        receive,
+    )
 
 
 def test_forward_replaces_identity_and_forwarding_headers() -> None:
@@ -79,3 +102,145 @@ def test_forward_replaces_identity_and_forwarding_headers() -> None:
     assert headers["x-user-id"] == "actual-user"
     assert headers["x-forwarded-for"] == "192.0.2.15"
     assert "x-private" not in headers
+
+
+def test_forward_wraps_json_success_with_api_envelope() -> None:
+    async def exercise() -> tuple[int, dict[str, object], str]:
+        async def handler(_request: httpx.Request) -> httpx.Response:
+            return httpx.Response(201, json={"id": "scenario-1"})
+
+        client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+        request = make_request("POST", "/api/learning/scenarios")
+        response = await forward(
+            client, request, "http://learning:8003/scenarios", None, "request-123"
+        )
+        body = json.loads(response.body)
+        await client.aclose()
+        return response.status_code, body, response.headers["X-Request-ID"]
+
+    status_code, body, request_id = asyncio.run(exercise())
+
+    assert status_code == 201
+    assert body == {
+        "item": {"id": "scenario-1"},
+        "message": "Ressource créée avec succès.",
+        "hasError": False,
+    }
+    assert "pagination" not in body
+    assert "errorCode" not in body
+    assert request_id == "request-123"
+
+
+def test_forward_normalizes_upstream_validation_errors_without_echoing_input() -> None:
+    async def exercise() -> tuple[int, dict[str, object]]:
+        async def handler(_request: httpx.Request) -> httpx.Response:
+            return httpx.Response(
+                422,
+                json={
+                    "detail": [
+                        {
+                            "loc": ["body", "password"],
+                            "msg": "String should have at least 10 characters",
+                            "input": "secret-value",
+                        }
+                    ]
+                },
+            )
+
+        client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+        request = make_request("POST", "/api/auth/register")
+        response = await forward(
+            client, request, "http://identity:8001/api/v1/auth/register", None, "rid"
+        )
+        body = json.loads(response.body)
+        await client.aclose()
+        return response.status_code, body
+
+    status_code, body = asyncio.run(exercise())
+
+    assert status_code == 422
+    assert body["hasError"] is True
+    assert body["message"] == "String should have at least 10 characters"
+    assert "pagination" not in body
+    assert "errorCode" not in body
+    assert "secret-value" not in json.dumps(body)
+
+
+def test_forward_sanitizes_upstream_server_errors() -> None:
+    async def exercise() -> tuple[int, dict[str, object]]:
+        async def handler(_request: httpx.Request) -> httpx.Response:
+            return httpx.Response(500, json={"detail": "database password leaked"})
+
+        client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+        request = make_request("GET", "/api/users/me")
+        response = await forward(
+            client, request, "http://identity:8001/api/v1/users/me", None, "rid"
+        )
+        body = json.loads(response.body)
+        await client.aclose()
+        return response.status_code, body
+
+    status_code, body = asyncio.run(exercise())
+
+    assert status_code == 500
+    assert body["hasError"] is True
+    assert body["message"] == "Une erreur interne est survenue."
+    assert "pagination" not in body
+    assert "errorCode" not in body
+    assert "database password leaked" not in json.dumps(body)
+
+
+def test_forward_includes_pagination_only_for_paginated_lists() -> None:
+    async def exercise() -> dict[str, object]:
+        async def handler(_request: httpx.Request) -> httpx.Response:
+            return httpx.Response(
+                200,
+                json={
+                    "items": [{"id": "user-1"}],
+                    "pagination": {
+                        "offset": 10,
+                        "limit": 10,
+                        "total": 11,
+                        "hasMore": True,
+                    },
+                },
+            )
+
+        client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+        request = make_request("GET", "/api/users?offset=10&limit=10")
+        response = await forward(
+            client, request, "http://identity:8001/api/v1/users", None, "rid"
+        )
+        body = json.loads(response.body)
+        await client.aclose()
+        return body
+
+    body = asyncio.run(exercise())
+
+    assert body["item"] == [{"id": "user-1"}]
+    assert body["pagination"] == {
+        "offset": 10,
+        "limit": 10,
+        "total": 11,
+        "hasMore": True,
+    }
+
+
+def test_forward_preserves_no_content_responses() -> None:
+    async def exercise() -> tuple[int, bytes]:
+        async def handler(_request: httpx.Request) -> httpx.Response:
+            return httpx.Response(204)
+
+        client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+        request = make_request("DELETE", "/api/conversations/c-1")
+        response = await forward(
+            client, request, "http://conversation:8002/c-1", None, "rid"
+        )
+        body = response.body
+        await client.aclose()
+        return response.status_code, body
+
+    status_code, body = asyncio.run(exercise())
+
+    assert status_code == 204
+    assert body == b""

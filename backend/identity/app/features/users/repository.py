@@ -1,5 +1,6 @@
-from sqlalchemy import select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession  # <-- Modifié
+from app.core.pagination import apply_sort
 from app.features.users.entity import User
 
 
@@ -15,9 +16,41 @@ class UserRepository:
         )
 
     @staticmethod
-    async def list_users(db: AsyncSession, offset=0, limit=50):
-        result = await db.scalars(  # <-- await
-            select(User).order_by(User.created_at.desc()
-                                  ).offset(offset).limit(limit)
+    async def list_users(
+        db: AsyncSession,
+        offset=0,
+        limit=50,
+        search: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        is_active: bool | None = None,
+    ):
+        statement = select(User)
+        count_statement = select(func.count()).select_from(User)
+        conditions = []
+        if search:
+            pattern = f"%{search}%"
+            conditions.append(
+                or_(User.full_name.ilike(pattern), User.email.ilike(pattern))
+            )
+        if is_active is not None:
+            conditions.append(User.is_active.is_(is_active))
+        statement = statement.where(*conditions)
+        count_statement = count_statement.where(*conditions)
+        total = await db.scalar(count_statement)
+        statement = apply_sort(
+            statement,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            columns={
+                "full_name": User.full_name,
+                "email": User.email,
+                "created_at": User.created_at,
+            },
+            default="created_at",
+            unique_column=User.id,
         )
-        return list(result.all())
+        result = await db.scalars(  # <-- await
+            statement.offset(offset).limit(limit)
+        )
+        return list(result.all()), total or 0

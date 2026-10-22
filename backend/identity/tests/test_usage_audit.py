@@ -1,7 +1,9 @@
 import json
 import unittest
 import uuid
+import asyncio
 from datetime import datetime, timezone
+from unittest.mock import patch
 
 from sqlalchemy import create_engine, func, select
 from sqlalchemy.orm import Session
@@ -15,9 +17,15 @@ from app.features.sessions.entity import UserSession
 from app.features.tokens.entity import TokenTransaction, TokenWallet
 from app.features.usage.entity import UsageEvent
 from app.features.usage.service import (
+    MAX_USAGE_EVENT_ATTEMPTS,
+    USAGE_EVENTS_DEAD_LETTER_STREAM,
+    USAGE_EVENTS_GROUP,
+    USAGE_EVENTS_RETRY_PREFIX,
+    USAGE_EVENTS_STREAM,
     enqueue_usage_event,
     event_type_for,
     persist_usage_event,
+    run_usage_log_worker,
 )
 from app.features.users.entity import User
 
@@ -109,6 +117,70 @@ class UsageAuditTests(unittest.TestCase):
             event_type_for("DELETE", "/api/v1/data/entries/{entry_id}", 204),
             "data.entry.delete",
         )
+
+    def test_usage_worker_dead_letters_an_event_after_bounded_retries(self) -> None:
+        class RedisStub:
+            def __init__(self) -> None:
+                self.attempts = 0
+                self.dead_letter = None
+                self.acknowledged = []
+                self.deleted = []
+                self.removed_keys = []
+                self.stop_event = None
+
+            async def xautoclaim(self, *_args, **_kwargs):
+                if self.deleted:
+                    return "0-0", []
+                return "0-0", [("1-0", {"id": "bad-event"})]
+
+            async def xreadgroup(self, *_args, **_kwargs):
+                raise AssertionError("The worker should finish after dead-lettering.")
+
+            async def incr(self, _key):
+                self.attempts += 1
+                return self.attempts
+
+            async def expire(self, *_args):
+                return True
+
+            async def xadd(self, stream, fields):
+                self.dead_letter = (stream, fields)
+
+            async def xack(self, stream, group, message_id):
+                self.acknowledged.append((stream, group, message_id))
+
+            async def xdel(self, stream, message_id):
+                self.deleted.append((stream, message_id))
+                self.stop_event.set()
+
+            async def delete(self, key):
+                self.removed_keys.append(key)
+
+        async def fail_to_persist(*_args):
+            raise ValueError("invalid event")
+
+        async def exercise() -> RedisStub:
+            redis = RedisStub()
+            stop_event = asyncio.Event()
+            redis.stop_event = stop_event
+            with patch(
+                "app.features.usage.service._persist_usage_event",
+                side_effect=fail_to_persist,
+            ):
+                await run_usage_log_worker(redis, stop_event)
+            return redis
+
+        redis = asyncio.run(exercise())
+
+        assert redis.attempts == MAX_USAGE_EVENT_ATTEMPTS
+        assert redis.dead_letter is not None
+        assert redis.dead_letter[0] == USAGE_EVENTS_DEAD_LETTER_STREAM
+        assert json.loads(redis.dead_letter[1]["event"]) == {"id": "bad-event"}
+        assert redis.acknowledged == [
+            (USAGE_EVENTS_STREAM, USAGE_EVENTS_GROUP, "1-0")
+        ]
+        assert redis.deleted == [(USAGE_EVENTS_STREAM, "1-0")]
+        assert redis.removed_keys == [f"{USAGE_EVENTS_RETRY_PREFIX}:1-0"]
 
 
 if __name__ == "__main__":

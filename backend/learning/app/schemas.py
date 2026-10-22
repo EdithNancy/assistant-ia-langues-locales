@@ -3,14 +3,16 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from .request_model import RequestModel
+
 Level = Literal["debutant", "intermediaire", "avance"]
 
 
-class ScenarioCreate(BaseModel):
+class ScenarioCreate(RequestModel):
     title: str = Field(min_length=1, max_length=200)
     description: str = ""
     level: Level
-    objectives: list[str] = []
+    objectives: list[str] = Field(default_factory=list)
     published: bool = True
 
 
@@ -19,11 +21,11 @@ class ScenarioOut(ScenarioCreate):
     id: str
 
 
-class AttemptStart(BaseModel):
+class AttemptStart(RequestModel):
     scenario_id: str
 
 
-class AttemptComplete(BaseModel):
+class AttemptComplete(RequestModel):
     score: int = Field(ge=0, le=100)
 
 

@@ -4,8 +4,10 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from app.core.request_model import RequestModel
 
-class LanguageCreate(BaseModel):
+
+class LanguageCreate(RequestModel):
     code: str = Field(min_length=2, max_length=16)
     name: str = Field(min_length=1, max_length=100)
     native_name: str | None = Field(default=None, max_length=100)
@@ -31,7 +33,7 @@ class LanguageOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class VocabularyEntryCreate(BaseModel):
+class VocabularyEntryCreate(RequestModel):
     source_language_id: uuid.UUID
     target_language_id: uuid.UUID
     source_text: str = Field(min_length=1, max_length=500)
@@ -53,7 +55,7 @@ class VocabularyEntryCreate(BaseModel):
         return self
 
 
-class VocabularyEntryUpdate(BaseModel):
+class VocabularyEntryUpdate(RequestModel):
     source_language_id: uuid.UUID | None = None
     target_language_id: uuid.UUID | None = None
     source_text: str | None = Field(default=None, min_length=1, max_length=500)

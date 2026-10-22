@@ -1,10 +1,17 @@
 import uuid
 
-from fastapi import APIRouter, Depends, Query, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from sqlalchemy.ext.asyncio import AsyncSession  # <-- Modifié
 
 from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_permission
+from app.core.pagination import (
+    ListRequest,
+    PaginatedResponse,
+    get_data_list_request,
+    paginated_response,
+    validate_list_query,
+)
 from app.features.data.schemas import (
     LanguageCreate,
     LanguageOut,
@@ -18,16 +25,28 @@ from app.features.users.entity import User
 router = APIRouter(prefix="/data", tags=["Language and vocabulary data"])
 
 
-@router.get("/languages", response_model=list[LanguageOut])
+@router.get("/languages", response_model=PaginatedResponse[LanguageOut])
 async def list_languages(  # <-- async def
+    http_request: Request,
     active_only: bool = True,
-    offset: int = Query(default=0, ge=0),
-    limit: int = Query(default=100, ge=1, le=500),
+    request: ListRequest = Depends(get_data_list_request),
     db: AsyncSession = Depends(get_db),  # <-- AsyncSession
     _: User = Depends(get_current_user),
 ):
+    validate_list_query(
+        http_request, allowed_filters=frozenset({"active_only"})
+    )
     # <-- await
-    return await DataService.list_languages(db, active_only, offset, limit)
+    items, total = await DataService.list_languages(
+        db,
+        active_only,
+        request.offset,
+        request.limit,
+        request.search,
+        request.sort_by,
+        request.sort_order,
+    )
+    return paginated_response(items, total, request.offset, request.limit)
 
 
 @router.post("/languages", response_model=LanguageOut, status_code=201)
@@ -39,8 +58,9 @@ async def create_language(  # <-- async def
     return await DataService.create_language(db, data)  # <-- await
 
 
-@router.get("/entries", response_model=list[VocabularyEntryOut])
+@router.get("/entries", response_model=PaginatedResponse[VocabularyEntryOut])
 async def list_entries(  # <-- async def
+    http_request: Request,
     source_language: str | None = Query(
         default=None, min_length=2, max_length=16),
     target_language: str | None = Query(
@@ -48,14 +68,34 @@ async def list_entries(  # <-- async def
     q: str | None = Query(default=None, min_length=1, max_length=200),
     kind: str | None = Query(
         default=None, pattern="^(word|expression|sentence)$"),
-    offset: int = Query(default=0, ge=0),
-    limit: int = Query(default=100, ge=1, le=500),
+    request: ListRequest = Depends(get_data_list_request),
     db: AsyncSession = Depends(get_db),  # <-- AsyncSession
     _: User = Depends(get_current_user),
 ):
-    return await DataService.list_entries(  # <-- await
-        db, source_language, target_language, q, kind, offset, limit
+    validate_list_query(
+        http_request,
+        allowed_filters=frozenset(
+            {"source_language", "target_language", "q", "kind"}
+        ),
     )
+    legacy_search = q.strip() if q and q.strip() else None
+    if legacy_search is not None and request.search is not None:
+        raise HTTPException(
+            status_code=422,
+            detail="Utilisez soit le paramètre « search », soit l'ancien « q », pas les deux.",
+        )
+    items, total = await DataService.list_entries(  # <-- await
+        db,
+        source_language,
+        target_language,
+        request.search or legacy_search,
+        kind,
+        request.offset,
+        request.limit,
+        request.sort_by,
+        request.sort_order,
+    )
+    return paginated_response(items, total, request.offset, request.limit)
 
 
 @router.post("/entries", response_model=VocabularyEntryOut, status_code=201)

@@ -16,6 +16,7 @@ from app.core.database import Base, get_db
 from app.core.rate_limit import limiter
 from app.core.security import decode_token
 from app.features.auth.routes import router as auth_router
+from app.features.auth.schemas import LoginRequest
 from app.features.permissions.entity import Permission
 from app.features.roles.entity import Role
 from app.features.sessions.entity import UserSession
@@ -359,3 +360,14 @@ def test_token_balance_requires_bearer_authentication(api_client: TestClient) ->
     response = api_client.get("/api/v1/users/me/tokens")
 
     assert response.status_code == 401
+
+
+def test_login_request_rejects_unknown_fields() -> None:
+    with pytest.raises(ValueError, match="Extra inputs are not permitted"):
+        LoginRequest.model_validate(
+            {
+                "email": "user@example.com",
+                "password": "safe-password",
+                "unexpected": "value",
+            }
+        )
