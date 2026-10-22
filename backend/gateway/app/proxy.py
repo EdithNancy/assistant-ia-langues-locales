@@ -126,6 +126,18 @@ async def forward(client: httpx.AsyncClient, request: Request, url: str,
 
         payload = None
         if is_json:
+            log.info(
+                "Upstream JSON diagnostic rid=%s status=%s "
+                "content_type=%r encoding=%r content_encoding=%r "
+                "body_length=%s body_prefix_hex=%s",
+                request_id,
+                resp.status_code,
+                resp.headers.get("content-type"),
+                resp.encoding,
+                resp.headers.get("content-encoding"),
+                len(resp.content),
+                resp.content[:24].hex(),
+            )
             try:
                 payload = json.loads(
                     resp.content.decode(resp.encoding or "utf-8")
