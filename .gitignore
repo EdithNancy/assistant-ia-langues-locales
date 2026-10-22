@@ -1,4 +1,4 @@
-data/
+/data/
 models/*.bin
 models/*.pt
 *.onnx

@@ -213,12 +213,15 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
               </div>
             ) : (
               <div className="flex gap-2">
-                <div className="h-13 shrink-0 rounded-2xl bg-surface-container-low flex items-center gap-2 px-4">
+                <div className="h-13 shrink-0 rounded-2xl bg-surface-container-low flex items-center gap-1.5 px-3 min-[400px]:gap-2 min-[400px]:px-4">
                   <Flag country="ci" className="w-6" labelled />
                   <span className="text-[15px] font-medium text-on-surface">+225</span>
-                  <span className="material-symbols-outlined text-[18px] text-on-surface-variant">expand_more</span>
+                  {/* Wrapper : la feuille Google des icônes impose display:inline-block sur l'icône elle-même */}
+                  <span className="flex max-[359px]:hidden">
+                    <span className="material-symbols-outlined text-[18px] text-on-surface-variant">expand_more</span>
+                  </span>
                 </div>
-                <div className="h-13 flex-1 min-w-0 rounded-2xl bg-surface-container-low flex items-center gap-2 px-4 focus-within:ring-2 focus-within:ring-primary-container/30 transition-all">
+                <div className="h-13 flex-1 min-w-0 rounded-2xl bg-surface-container-low flex items-center gap-1.5 px-3 focus-within:ring-2 focus-within:ring-primary-container/30 transition-all">
                   <input
                     id="register-contact"
                     type="tel"
@@ -227,9 +230,14 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
                     value={phone}
                     onChange={(e) => setPhone(formatIvorianPhone(e.target.value))}
                     placeholder="05 84 92 10 33"
-                    className="flex-1 min-w-0 bg-transparent outline-none text-[16px] tracking-wide text-on-surface placeholder:text-outline-variant"
+                    className="flex-1 min-w-0 bg-transparent outline-none text-[16px] text-on-surface placeholder:text-outline-variant"
                   />
-                  {isContactValid && <span className="material-symbols-outlined text-[22px] text-on-surface">check_circle</span>}
+                  {/* Coche masquée sur très petit écran : elle couperait le numéro */}
+                  {isContactValid && (
+                    <span className="flex max-[369px]:hidden">
+                      <span className="material-symbols-outlined text-[22px] text-on-surface">check_circle</span>
+                    </span>
+                  )}
                 </div>
               </div>
             )}
