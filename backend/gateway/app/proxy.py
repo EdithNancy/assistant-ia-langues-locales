@@ -130,12 +130,13 @@ async def forward(client: httpx.AsyncClient, request: Request, url: str,
                 payload = json.loads(
                     resp.content.decode(resp.encoding or "utf-8")
                 )
-            except ValueError as exc:
+            except (ValueError, UnicodeError) as exc:
                 log.warning(
                     "Upstream returned invalid JSON rid=%s error_type=%s",
                     request_id,
                     type(exc).__name__,
                 )
+
                 if resp.status_code < 400:
                     await resp.aclose()
                     return JSONResponse(
@@ -143,6 +144,7 @@ async def forward(client: httpx.AsyncClient, request: Request, url: str,
                         status_code=502,
                         headers={"X-Request-ID": request_id},
                     )
+
                 payload = None
 
         headers = {
@@ -155,14 +157,32 @@ async def forward(client: httpx.AsyncClient, request: Request, url: str,
         if resp.status_code >= 400:
             detail = payload
             if isinstance(payload, dict):
-                detail = payload.get("detail", payload.get(
-                    "message", payload.get("error")))
+                detail = payload.get(
+                    "detail",
+                    payload.get("message", payload.get("error")),
+                )
+
+            request_path = request.url.path.rstrip("/")
+
             if (
                 resp.status_code == 401
                 and request.method == "POST"
-                and request.url.path.rstrip("/").endswith("/auth/login")
+                and request_path.endswith("/auth/login")
             ):
                 detail = "Identifiant ou mot de passe incorrect."
+
+            elif (
+                resp.status_code == 409
+                and request.method == "POST"
+                and request_path.endswith("/auth/register")
+                and payload is None
+            ):
+                detail = (
+                    "Le compte n'a pas pu être créé car une donnée "
+                    "entre en conflit avec les données enregistrées. "
+                    "Vérifiez l'adresse e-mail et réessayez."
+                )
+
             return JSONResponse(
                 error_payload(resp.status_code, detail),
                 status_code=resp.status_code,
