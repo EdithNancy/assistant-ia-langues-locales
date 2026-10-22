@@ -16,6 +16,14 @@ class UserRepository:
         )
 
     @staticmethod
+    async def get_by_phone_number(db: AsyncSession, phone_number: str):
+        result = await db.scalars(
+            select(User).where(User.phone_number == phone_number).limit(2)
+        )
+        users = result.all()
+        return users[0] if len(users) == 1 else None
+
+    @staticmethod
     async def list_users(
         db: AsyncSession,
         offset=0,

@@ -123,6 +123,13 @@ def test_authentication_and_token_balance_work_over_http(api_client: TestClient)
     assert tokens["refresh_token"]
     assert decode_token(tokens["access_token"])["roles"] == ["user"]
 
+    phone_login_response = api_client.post(
+        "/api/v1/auth/login",
+        json={"phone_number": "+225 01 02 03 04 05", "password": password},
+    )
+    assert phone_login_response.status_code == 200
+    assert phone_login_response.json()["access_token"]
+
     authorization = {"Authorization": f"Bearer {tokens['access_token']}"}
     me_response = api_client.get("/api/v1/users/me", headers=authorization)
     assert me_response.status_code == 200
@@ -186,6 +193,90 @@ def test_login_rejects_invalid_credentials(api_client: TestClient) -> None:
     )
 
     assert response.status_code == 401
+
+
+def test_login_route_accepts_normalized_phone_number(api_client: TestClient) -> None:
+    tokens = {
+        "access_token": "access-token",
+        "refresh_token": "refresh-token",
+        "token_type": "bearer",
+        "expires_in": 3600,
+    }
+    with patch(
+        "app.features.auth.routes.AuthService.login",
+        new=AsyncMock(return_value=tokens),
+    ) as login:
+        response = api_client.post(
+            "/api/v1/auth/login",
+            json={
+                "phone_number": "+225 01 02 03 04 05",
+                "password": "MotDePasse-Secure-123",
+            },
+        )
+
+    assert response.status_code == 200
+    assert response.json() == tokens
+    assert login.await_args.kwargs["phone_number"] == "+2250102030405"
+    assert login.await_args.kwargs["email"] is None
+
+
+def test_login_with_phone_after_registration() -> None:
+    async def exercise() -> None:
+        from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+        from app.features.auth.service import AuthService
+
+        engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+        async with engine.begin() as connection:
+            await connection.run_sync(Base.metadata.create_all)
+        session_factory = async_sessionmaker(engine, expire_on_commit=False)
+        email = f"{uuid.uuid4()}@example.com"
+        password = "MotDePasse-Secure-123"
+
+        async with session_factory() as db:
+            db.add(Role(code="USER", name="Utilisateur"))
+            await db.commit()
+            await UserService.register(
+                db,
+                UserRegister(
+                    full_name="Test Utilisateur",
+                    email=email,
+                    phone_number="+2250102030405",
+                    password=password,
+                ),
+            )
+
+            tokens = await AuthService.login(
+                db,
+                phone_number="+2250102030405",
+                password=password,
+            )
+
+            assert tokens["access_token"]
+            assert decode_token(tokens["access_token"])["roles"] == ["user"]
+
+        await engine.dispose()
+
+    asyncio.run(exercise())
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"password": "MotDePasse-Secure-123"},
+        {
+            "email": "test@example.com",
+            "phone_number": "+2250102030405",
+            "password": "MotDePasse-Secure-123",
+        },
+    ],
+)
+def test_login_requires_exactly_one_identifier(
+    api_client: TestClient, payload: dict[str, str]
+) -> None:
+    response = api_client.post("/api/v1/auth/login", json=payload)
+
+    assert response.status_code == 422
 
 
 def test_register_reports_duplicate_email_explicitly() -> None:

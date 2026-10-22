@@ -11,11 +11,23 @@ from app.features.users.repository import UserRepository
 
 class AuthService:
     @staticmethod
-    async def login(db: AsyncSession, email: str, password: str, user_agent=None, ip_address=None):
-        user = await UserRepository.get_by_email(db, email)  # <-- await
+    async def login(
+        db: AsyncSession,
+        password: str,
+        email: str | None = None,
+        phone_number: str | None = None,
+        user_agent=None,
+        ip_address=None,
+    ):
+        if email is not None:
+            user = await UserRepository.get_by_email(db, email)
+        elif phone_number is not None:
+            user = await UserRepository.get_by_phone_number(db, phone_number)
+        else:
+            user = None
         if (user is None or user.password_hash is None
                 or not verify_password(password, user.password_hash)):
-            raise HTTPException(401, "E-mail ou mot de passe incorrect.")
+            raise HTTPException(401, "Identifiant ou mot de passe incorrect.")
         if not user.is_active:
             raise HTTPException(403, "Ce compte est désactivé.")
         # <-- await

@@ -278,7 +278,7 @@ def test_login_401_explains_invalid_credentials_when_upstream_error_is_unreadabl
 
     assert status_code == 401
     assert body["code"] == 401
-    assert body["message"] == "Adresse e-mail ou mot de passe incorrect."
+    assert body["message"] == "Identifiant ou mot de passe incorrect."
     assert body["hasError"] is True
 
 

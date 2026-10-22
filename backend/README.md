@@ -198,7 +198,16 @@ curl -i http://localhost:8000/api/auth/register \
 curl -i http://localhost:8000/api/auth/login \
   -H 'Content-Type: application/json' \
   -d '{"email":"test@example.com","password":"UnMotDePasseTresSolide123"}'
+
+# Le téléphone peut remplacer l'e-mail comme identifiant :
+curl -i http://localhost:8000/api/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"phone_number":"+2250102030405","password":"UnMotDePasseTresSolide123"}'
 ```
+
+Pour la connexion, fournissez exactement un des champs `email` ou
+`phone_number`, ainsi que `password`. Le numéro est normalisé au même format
+que lors de l'inscription avant la recherche du compte.
 
 Copiez `item.access_token` de la réponse de connexion, puis testez une route
 protégée :

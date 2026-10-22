@@ -46,9 +46,12 @@ async def login(  # <-- async def
     db: AsyncSession = Depends(get_db),  # <-- AsyncSession
 ):
     return await AuthService.login(  # <-- await
-        db, str(data.email).lower().strip(), data.password,
-        request.headers.get("user-agent"),
-        request.client.host if request.client else None
+        db,
+        password=data.password,
+        email=str(data.email).lower().strip() if data.email is not None else None,
+        phone_number=data.phone_number,
+        user_agent=request.headers.get("user-agent"),
+        ip_address=request.client.host if request.client else None,
     )
 
 
