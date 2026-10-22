@@ -11,6 +11,7 @@ class Pagination(BaseModel):
 
 
 class ApiResponse(BaseModel):
+    code: int
     item: Any = None
     message: str
     has_error: bool = Field(alias="hasError")
@@ -34,6 +35,7 @@ def success_payload(
 ) -> dict[str, Any]:
     if isinstance(item, dict) and {"item", "message", "hasError"}.issubset(item):
         response = {
+            "code": status_code,
             "item": item["item"],
             "message": item["message"],
             "hasError": item["hasError"],
@@ -47,6 +49,7 @@ def success_payload(
         item = item["items"]
 
     response = ApiResponse(
+        code=status_code,
         item=item,
         message=success_message(status_code),
         has_error=False,
@@ -104,6 +107,7 @@ def error_payload(
     detail: Any = None,
 ) -> dict[str, Any]:
     response = ApiResponse(
+        code=status_code,
         message=error_message(detail, status_code),
         has_error=True,
     ).model_dump(mode="json", by_alias=True, exclude_none=True)

@@ -122,6 +122,7 @@ def test_forward_wraps_json_success_with_api_envelope() -> None:
 
     assert status_code == 201
     assert body == {
+        "code": 201,
         "item": {"id": "scenario-1"},
         "message": "Ressource créée avec succès.",
         "hasError": False,
@@ -129,6 +130,38 @@ def test_forward_wraps_json_success_with_api_envelope() -> None:
     assert "pagination" not in body
     assert "errorCode" not in body
     assert request_id == "request-123"
+
+
+def test_forward_adds_http_code_to_existing_api_envelope() -> None:
+    async def exercise() -> dict[str, object]:
+        async def handler(_request: httpx.Request) -> httpx.Response:
+            return httpx.Response(
+                201,
+                json={
+                    "code": 200,
+                    "item": {"id": "user-1"},
+                    "message": "Succès",
+                    "hasError": False,
+                },
+            )
+
+        client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+        request = make_request("POST", "/api/users")
+        response = await forward(
+            client, request, "http://identity:8001/api/v1/users", None, "rid"
+        )
+        body = json.loads(response.body)
+        await client.aclose()
+        return body
+
+    body = asyncio.run(exercise())
+
+    assert body == {
+        "code": 201,
+        "item": {"id": "user-1"},
+        "message": "Succès",
+        "hasError": False,
+    }
 
 
 def test_forward_normalizes_upstream_validation_errors_without_echoing_input() -> None:
@@ -159,6 +192,7 @@ def test_forward_normalizes_upstream_validation_errors_without_echoing_input() -
     status_code, body = asyncio.run(exercise())
 
     assert status_code == 422
+    assert body["code"] == 422
     assert body["hasError"] is True
     assert body["message"] == "String should have at least 10 characters"
     assert "pagination" not in body
@@ -183,6 +217,7 @@ def test_forward_sanitizes_upstream_server_errors() -> None:
     status_code, body = asyncio.run(exercise())
 
     assert status_code == 500
+    assert body["code"] == 500
     assert body["hasError"] is True
     assert body["message"] == "Une erreur interne est survenue."
     assert "pagination" not in body
@@ -218,6 +253,7 @@ def test_forward_includes_pagination_only_for_paginated_lists() -> None:
     body = asyncio.run(exercise())
 
     assert body["item"] == [{"id": "user-1"}]
+    assert body["code"] == 200
     assert body["pagination"] == {
         "offset": 10,
         "limit": 10,

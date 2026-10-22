@@ -78,8 +78,10 @@ async def forward(client: httpx.AsyncClient, request: Request, url: str,
         await resp.aclose()
         return Response(status_code=resp.status_code, headers=out_headers)
 
-    content_type = resp.headers.get("content-type", "").split(";", 1)[0].lower()
-    is_json = content_type == "application/json" or content_type.endswith("+json")
+    content_type = resp.headers.get(
+        "content-type", "").split(";", 1)[0].lower()
+    is_json = content_type == "application/json" or content_type.endswith(
+        "+json")
     if is_json or resp.status_code >= 400:
         try:
             await resp.aread()
@@ -120,7 +122,8 @@ async def forward(client: httpx.AsyncClient, request: Request, url: str,
         if resp.status_code >= 400:
             detail = payload
             if isinstance(payload, dict):
-                detail = payload.get("detail", payload.get("message", payload.get("error")))
+                detail = payload.get("detail", payload.get(
+                    "message", payload.get("error")))
             return JSONResponse(
                 error_payload(resp.status_code, detail),
                 status_code=resp.status_code,

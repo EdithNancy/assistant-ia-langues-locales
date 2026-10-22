@@ -35,8 +35,9 @@ Les réponses JSON des routes `/api/*` utilisent cette enveloppe :
 
 ```json
 {
+  "code": 201,
   "item": {"id": "…"},
-  "message": "Requête traitée avec succès.",
+  "message": "Ressource créée avec succès.",
   "hasError": false
 }
 ```
@@ -45,13 +46,16 @@ Une erreur conserve le statut HTTP et fournit la même enveloppe :
 
 ```json
 {
+  "code": 422,
   "item": null,
   "message": "Les données envoyées ne sont pas valides.",
   "hasError": true
 }
 ```
 
-`item` contient la réponse métier (objet, liste ou `null`). `pagination`
+`code` reprend le statut HTTP de la réponse (`201`, `422`, etc.) et reste
+identique au statut de la réponse HTTP. `item` contient la réponse métier
+(objet, liste ou `null`). `pagination`
 n'apparaît que pour les réponses de listes paginées et contient `offset`,
 `limit`, `total` et `hasMore`. En cas d'erreur, `item` vaut `null` et
 `hasError` vaut `true`; le statut HTTP identifie la catégorie de l'erreur. Les
@@ -69,6 +73,7 @@ Exemple de liste paginée :
 
 ```json
 {
+  "code": 200,
   "item": [{"id": "…"}],
   "message": "Requête traitée avec succès.",
   "hasError": false,
