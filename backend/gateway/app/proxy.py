@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 
 import httpx
@@ -126,7 +127,9 @@ async def forward(client: httpx.AsyncClient, request: Request, url: str,
         payload = None
         if is_json:
             try:
-                payload = resp.json()
+                payload = json.loads(
+                    resp.content.decode(resp.encoding or "utf-8")
+                )
             except ValueError as exc:
                 log.warning(
                     "Upstream returned invalid JSON rid=%s error_type=%s",

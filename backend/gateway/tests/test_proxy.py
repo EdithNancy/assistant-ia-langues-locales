@@ -133,6 +133,35 @@ def test_forward_wraps_json_success_with_api_envelope() -> None:
     assert request_id == "request-123"
 
 
+def test_forward_decodes_json_using_upstream_declared_charset() -> None:
+    async def exercise() -> dict[str, object]:
+        async def handler(_request: httpx.Request) -> httpx.Response:
+            body = json.dumps(
+                {"name": "André"},
+                ensure_ascii=False,
+            ).encode("iso-8859-1")
+            return httpx.Response(
+                201,
+                headers={"content-type": "application/json; charset=iso-8859-1"},
+                content=body,
+            )
+
+        client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+        request = make_request("POST", "/api/auth/register")
+        response = await forward(
+            client, request, "http://identity:8001/api/v1/auth/register", None, "rid"
+        )
+        body = json.loads(response.body)
+        await client.aclose()
+        return body
+
+    body = asyncio.run(exercise())
+
+    assert body["code"] == 201
+    assert body["item"] == {"name": "André"}
+    assert body["hasError"] is False
+
+
 def test_forward_adds_http_code_to_existing_api_envelope() -> None:
     async def exercise() -> dict[str, object]:
         async def handler(_request: httpx.Request) -> httpx.Response:
