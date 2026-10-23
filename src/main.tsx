@@ -2,13 +2,16 @@ import {createRoot} from 'react-dom/client';
 import {BrowserRouter} from 'react-router';
 import App from './App.tsx';
 import {VoiceConsentProvider} from './components/VoiceConsent';
+import {UserProfileProvider} from './components/UserProfile';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
-    <VoiceConsentProvider>
-      <App />
-    </VoiceConsentProvider>
+    <UserProfileProvider>
+      <VoiceConsentProvider>
+        <App />
+      </VoiceConsentProvider>
+    </UserProfileProvider>
   </BrowserRouter>
 );
 

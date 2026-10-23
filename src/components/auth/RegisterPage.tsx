@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { Flag } from '../Flag';
+import { useUserProfile } from '../UserProfile';
 import { Language } from '../../types';
 import {
   AppleIcon,
   AuthHeader,
   ComingSoonBadge,
+  formatIvorianPhone,
   FormError,
   GoogleIcon,
   OrDivider,
   PasswordField,
-  formatIvorianPhone,
+  passwordScore,
   phoneDigits,
+  STRENGTH_LABELS,
 } from './AuthShared';
 
 interface RegisterPageProps {
@@ -40,12 +43,6 @@ const LANGUAGE_CHOICES = [
   },
 ];
 
-/** 0–3 score: length >= 8, contains a digit, contains a symbol. */
-const passwordScore = (pwd: string) =>
-  [pwd.length >= 8, /\d/.test(pwd), /[^A-Za-z0-9]/.test(pwd)].filter(Boolean).length;
-
-const STRENGTH_LABELS = ['Faible', 'Faible', 'Moyenne', 'Robuste'];
-
 export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onGoToLogin, onBack }) => {
   const [language, setLanguage] = useState<Language>('baoule');
   const [fullName, setFullName] = useState('');
@@ -57,6 +54,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const { updateProfile } = useUserProfile();
   const score = passwordScore(password);
   const isContactValid = useEmail
     ? /^\S+@\S+\.\S+$/.test(email)
@@ -71,7 +69,13 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
     if (!acceptedTerms) return setError('Veuillez accepter les conditions d’utilisation.');
     setError(null);
     setIsLoading(true);
-    // TODO: brancher sur l'API d'inscription réelle
+    // TODO: brancher sur l'API d'inscription réelle (le mot de passe n'est pas conservé ici)
+    updateProfile({
+      fullName: fullName.trim(),
+      email: useEmail ? email.trim() : '',
+      phone: useEmail ? '' : phoneDigits(phone),
+      photo: null,
+    });
     setTimeout(() => onAuthenticated(language), 900);
   };
 

@@ -10,6 +10,7 @@ import {
   formatIvorianPhone,
   phoneDigits,
 } from './AuthShared';
+import { useUserProfile } from '../UserProfile';
 
 interface LoginPageProps {
   onAuthenticated: (language: Language) => void;
@@ -46,6 +47,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
   const [language, setLanguage] = useState<Language>('baoule');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { updateProfile } = useUserProfile();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,7 +65,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
     }
     setError(null);
     setIsLoading(true);
-    // TODO: brancher sur l'API d'authentification réelle
+    // TODO: brancher sur l'API d'authentification réelle (elle renverra le profil complet)
+    updateProfile(method === 'phone' ? { phone: phoneDigits(phone) } : { email: email.trim() });
     setTimeout(() => onAuthenticated(language), 900);
   };
 

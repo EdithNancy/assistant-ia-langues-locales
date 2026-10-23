@@ -36,11 +36,18 @@ export const formatIvorianPhone = (raw: string) =>
 
 export const phoneDigits = (formatted: string) => formatted.replace(/\D/g, '');
 
+/** 0–3 score: length >= 8, contains a digit, contains a symbol. */
+export const passwordScore = (pwd: string) =>
+  [pwd.length >= 8, /\d/.test(pwd), /[^A-Za-z0-9]/.test(pwd)].filter(Boolean).length;
+
+export const STRENGTH_LABELS = ['Faible', 'Faible', 'Moyenne', 'Robuste'];
+
 interface PasswordFieldProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   autoComplete?: string;
+  id?: string;
 }
 
 export const PasswordField: React.FC<PasswordFieldProps> = ({
@@ -48,12 +55,14 @@ export const PasswordField: React.FC<PasswordFieldProps> = ({
   onChange,
   placeholder = '••••••••••••',
   autoComplete = 'current-password',
+  id,
 }) => {
   const [visible, setVisible] = useState(false);
   return (
     <div className="h-14 rounded-2xl bg-surface-container-low flex items-center gap-3 px-4 focus-within:ring-2 focus-within:ring-primary-container/30 transition-all">
       <span className="material-symbols-outlined text-[22px] text-on-surface-variant">lock</span>
       <input
+        id={id}
         type={visible ? 'text' : 'password'}
         value={value}
         onChange={(e) => onChange(e.target.value)}

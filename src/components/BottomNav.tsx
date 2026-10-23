@@ -21,7 +21,8 @@ export const NAV_ITEMS: readonly NavItem[] = [
 ];
 
 interface BottomNavProps {
-  currentTab: TabKey;
+  /** Onglet actif ; absent sur les pages hors menu (Réglages). */
+  currentTab?: TabKey;
   onTabChange: (tab: TabKey) => void;
   onStartVoiceSession: () => void;
 }

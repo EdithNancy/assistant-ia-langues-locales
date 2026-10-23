@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useEscapeKey } from '../hooks/useEscapeKey';
 import { BRAND_ASSETS } from '../data/mockData';
+import { UserAvatar } from './UserProfile';
 import { Language } from '../types';
 import { soundEngine } from '../utils/audio';
 import { voicePlayer } from '../utils/voicePlayer';
@@ -151,11 +152,7 @@ export const VoiceSessionModal: React.FC<VoiceSessionModalProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <img
-              src={BRAND_ASSETS.edithProfile}
-              alt="Edith"
-              className="w-7 h-7 rounded-full object-cover ring-1 ring-primary-container/20"
-            />
+            <UserAvatar className="w-7 h-7 ring-1 ring-primary-container/20" textClassName="text-[10px]" />
           </div>
         </div>
       </div>

@@ -1,10 +1,13 @@
 import React from 'react';
 import { BRAND_ASSETS } from '../data/mockData';
 import { IconButton } from './ui/IconButton';
+import { UserAvatar } from './UserProfile';
 
 interface HeaderProps {
   title: string;
   onOpenNotifications: () => void;
+  /** Nombre de notifications non lues (pastille sur la cloche). */
+  unreadCount: number;
   onOpenProfile: () => void;
   isDark: boolean;
   onToggleTheme: () => void;
@@ -14,6 +17,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   title,
   onOpenNotifications,
+  unreadCount,
   onOpenProfile,
   isDark,
   onToggleTheme,
@@ -56,11 +60,15 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={onOpenNotifications}
-            aria-label="Notifications"
+            aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} non lue${unreadCount > 1 ? 's' : ''}` : 'Notifications'}
             className="relative w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all"
           >
             <span className="material-symbols-outlined text-[22px]">notifications</span>
-            <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-secondary shadow-soft"></span>
+            {unreadCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 min-w-4 h-4 px-1 rounded-full bg-secondary text-white text-[10px] font-bold leading-4 text-center ring-2 ring-surface">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
           </button>
 
           <button
@@ -68,11 +76,7 @@ export const Header: React.FC<HeaderProps> = ({
             aria-label="Profil utilisateur"
             className="w-10 h-10 flex items-center justify-center rounded-full relative group active:scale-95 transition-all"
           >
-            <img
-              src={BRAND_ASSETS.edithProfile}
-              alt="Profil Edith"
-              className="w-8 h-8 rounded-full object-cover ring-2 ring-primary-container/20 group-hover:ring-primary-container transition-all"
-            />
+            <UserAvatar className="w-8 h-8 ring-2 ring-primary-container/20 group-hover:ring-primary-container transition-all" />
           </button>
         </div>
       </div>

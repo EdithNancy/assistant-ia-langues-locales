@@ -13,6 +13,9 @@ import { TraduireTab } from './components/TraduireTab';
 import { ApprendreTab } from './components/ApprendreTab';
 import { VoiceSessionModal } from './components/VoiceSessionModal';
 import { ProfileModal, StoryModal, VocabularyModal } from './components/Modals';
+import { NotificationsModal } from './components/NotificationsModal';
+import { SettingsPage } from './components/SettingsPage';
+import { useNotifications } from './hooks/useNotifications';
 import { LoginPage } from './components/auth/LoginPage';
 import { RegisterPage } from './components/auth/RegisterPage';
 import { BRAND_ASSETS } from './data/mockData';
@@ -31,6 +34,9 @@ const TAB_PATHS: Record<NavTabKey, string> = {
 
 const AUTH_PATHS = { login: '/connexion', register: '/inscription' } as const;
 
+/** Page hors menu principal, ouverte depuis la barre latérale ou le profil. */
+const SETTINGS_PATH = '/reglages';
+
 const tabFromPath = (pathname: string): NavTabKey | null =>
   (Object.keys(TAB_PATHS) as NavTabKey[]).find((tab) => TAB_PATHS[tab] === pathname) ?? null;
 
@@ -44,12 +50,16 @@ export default function App() {
   const [voiceFirst, setVoiceFirst] = useState(() => loadPreferences().voiceFirst);
   const isOnline = useOnlineStatus();
   const { theme, setTheme, toggleTheme } = useTheme();
-  const currentTab: NavTabKey = tabFromPath(pathname) ?? 'accueil';
+  const activeTab = tabFromPath(pathname);
+  const isSettings = pathname === SETTINGS_PATH;
+  const currentTab: NavTabKey = activeTab ?? 'accueil';
   const setCurrentTab = (tab: NavTabKey) => navigate(TAB_PATHS[tab], { viewTransition: true });
   const [isVoiceSessionOpen, setIsVoiceSessionOpen] = useState(false);
   const [isStoryModalOpen, setIsStoryModalOpen] = useState(false);
   const [isVocabularyModalOpen, setIsVocabularyModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const notifications = useNotifications();
   const { toast: notificationToast, showToast } = useToast(3000);
 
   const showNotification = (msg: string) => {
@@ -90,6 +100,12 @@ export default function App() {
     setVoiceFirst(next);
     savePreferences({ voiceFirst: next });
     showNotification(next ? 'Mode voix d’abord activé' : 'Mode voix d’abord désactivé');
+  };
+
+  const handleOpenSettings = () => {
+    setIsProfileModalOpen(false);
+    navigate(SETTINGS_PATH, { viewTransition: true });
+    window.scrollTo({ top: 0 });
   };
 
   const handleStartVoiceSession = () => {
@@ -142,11 +158,12 @@ export default function App() {
   }
 
   // Connecté : les pages d'auth et les URL inconnues renvoient vers l'accueil
-  if (tabFromPath(pathname) === null) {
+  if (activeTab === null && !isSettings) {
     return <Navigate to={TAB_PATHS.accueil} replace />;
   }
 
   const getHeaderTitle = () => {
+    if (isSettings) return 'Réglages';
     switch (currentTab) {
       case 'discussions':
         return 'Discussions';
@@ -163,7 +180,9 @@ export default function App() {
     <div className={`min-h-screen bg-surface text-on-surface ${voiceFirst ? 'voice-first' : ''}`}>
       {/* Desktop Side Navigation (lg+) */}
       <Sidebar
-        currentTab={currentTab}
+        currentTab={activeTab ?? undefined}
+        isSettingsActive={isSettings}
+        onOpenSettings={handleOpenSettings}
         onTabChange={handleTabChange}
         onStartVoiceSession={handleStartVoiceSession}
         onOpenProfile={() => setIsProfileModalOpen(true)}
@@ -174,11 +193,8 @@ export default function App() {
         {/* Top Header */}
         <Header
           title={getHeaderTitle()}
-          onOpenNotifications={() =>
-            showNotification(
-              'Aya : Nouveau proverbe du jour disponible en audio !'
-            )
-          }
+          onOpenNotifications={() => setIsNotificationsOpen(true)}
+          unreadCount={notifications.unreadCount}
           onOpenProfile={() => setIsProfileModalOpen(true)}
           isDark={theme === 'dark'}
           onToggleTheme={toggleTheme}
@@ -208,7 +224,15 @@ export default function App() {
             isOnline ? 'pt-22 lg:pt-24' : 'pt-32 lg:pt-32' // place pour le bandeau hors connexion
           }`}
         >
-          {currentTab === 'accueil' && (
+          {isSettings && (
+            <SettingsPage
+              currentLanguage={currentLanguage}
+              onLanguageChange={handleLanguageChange}
+              onLogout={handleLogout}
+            />
+          )}
+
+          {activeTab === 'accueil' && (
             <HomeTab
               currentLanguage={currentLanguage}
               onLanguageChange={handleLanguageChange}
@@ -222,7 +246,7 @@ export default function App() {
             />
           )}
 
-          {currentTab === 'discussions' && (
+          {activeTab === 'discussions' && (
             <DiscussionsTab
               currentLanguage={currentLanguage}
               onLanguageChange={handleLanguageChange}
@@ -232,7 +256,7 @@ export default function App() {
             />
           )}
 
-          {currentTab === 'traduire' && (
+          {activeTab === 'traduire' && (
             <TraduireTab
               currentLanguage={currentLanguage}
               onLanguageChange={handleLanguageChange}
@@ -240,7 +264,7 @@ export default function App() {
             />
           )}
 
-          {currentTab === 'apprendre' && (
+          {activeTab === 'apprendre' && (
             <ApprendreTab
               currentLanguage={currentLanguage}
               onLanguageChange={handleLanguageChange}
@@ -251,7 +275,7 @@ export default function App() {
 
         {/* Bottom Floating Navigation (mobile & tablette uniquement) */}
         <BottomNav
-          currentTab={currentTab}
+          currentTab={activeTab ?? undefined}
           onTabChange={handleTabChange}
           onStartVoiceSession={handleStartVoiceSession}
         />
@@ -261,6 +285,18 @@ export default function App() {
           isOpen={isVoiceSessionOpen}
           onClose={() => setIsVoiceSessionOpen(false)}
           initialLanguage={currentLanguage}
+        />
+
+        {/* Notifications */}
+        <NotificationsModal
+          isOpen={isNotificationsOpen}
+          onClose={() => setIsNotificationsOpen(false)}
+          notifications={notifications.notifications}
+          unreadCount={notifications.unreadCount}
+          onRemove={notifications.remove}
+          onRead={notifications.markRead}
+          onMarkAllRead={notifications.markAllRead}
+          onClearAll={notifications.clearAll}
         />
 
         {/* Story Modal */}
@@ -280,8 +316,10 @@ export default function App() {
           isOpen={isProfileModalOpen}
           onClose={() => setIsProfileModalOpen(false)}
           currentLanguage={currentLanguage}
+          onLanguageChange={handleLanguageChange}
           voiceFirst={voiceFirst}
           onToggleVoiceFirst={handleToggleVoiceFirst}
+          onOpenSettings={handleOpenSettings}
           theme={theme}
           onThemeChange={setTheme}
           onLogout={handleLogout}

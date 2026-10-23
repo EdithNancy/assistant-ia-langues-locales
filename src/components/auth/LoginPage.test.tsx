@@ -2,10 +2,16 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { LoginPage } from './LoginPage';
+import { UserProfileProvider } from '../UserProfile';
+import { loadProfile } from '../../utils/profile';
 
 const renderLogin = () => {
   const onAuthenticated = vi.fn();
-  render(<LoginPage onAuthenticated={onAuthenticated} onGoToRegister={vi.fn()} />);
+  render(
+    <UserProfileProvider>
+      <LoginPage onAuthenticated={onAuthenticated} onGoToRegister={vi.fn()} />
+    </UserProfileProvider>
+  );
   return { onAuthenticated, user: userEvent.setup() };
 };
 
@@ -26,6 +32,7 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: /se connecter/i }));
 
     await vi.waitFor(() => expect(onAuthenticated).toHaveBeenCalledWith('baoule'), { timeout: 2000 });
+    expect(loadProfile()?.phone).toBe('0701234567');
   });
 
   it('affiche Google et l’empreinte comme bientôt disponibles', () => {

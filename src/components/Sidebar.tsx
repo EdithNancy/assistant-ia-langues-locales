@@ -1,12 +1,17 @@
 import React from 'react';
 import { BRAND_ASSETS } from '../data/mockData';
 import { NAV_ITEMS, TabKey } from './BottomNav';
+import { UserAvatar, useUserProfile } from './UserProfile';
+import { firstName } from '../utils/profile';
 
 interface SidebarProps {
-  currentTab: TabKey;
+  /** Onglet actif ; absent sur les pages hors menu (Réglages). */
+  currentTab?: TabKey;
   onTabChange: (tab: TabKey) => void;
   onStartVoiceSession: () => void;
   onOpenProfile: () => void;
+  isSettingsActive: boolean;
+  onOpenSettings: () => void;
 }
 
 /** Navigation latérale affichée uniquement sur grand écran (lg+). Remplace la BottomNav. */
@@ -15,7 +20,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onTabChange,
   onStartVoiceSession,
   onOpenProfile,
+  isSettingsActive,
+  onOpenSettings,
 }) => {
+  const { profile } = useUserProfile();
   return (
     <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-64 flex-col bg-surface-container-lowest border-r border-surface-container shadow-soft">
       {/* Brand */}
@@ -70,6 +78,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           );
         })}
+
+        <span className="mt-4 px-3 pb-1 text-xs font-bold uppercase tracking-wider text-outline">
+          Compte
+        </span>
+        <button
+          onClick={onOpenSettings}
+          aria-current={isSettingsActive ? 'page' : undefined}
+          className={`h-11 px-3 rounded-xl flex items-center gap-3 text-sm transition-all ${
+            isSettingsActive
+              ? 'bg-primary-fixed/50 text-primary-container font-bold'
+              : 'text-on-surface-variant font-medium hover:bg-surface-container-low hover:text-on-surface'
+          }`}
+        >
+          <span className={`material-symbols-outlined text-[22px] ${isSettingsActive ? 'fill' : ''}`}>settings</span>
+          Réglages
+        </button>
       </nav>
 
       {/* Profile */}
@@ -77,13 +101,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         onClick={onOpenProfile}
         className="m-3 p-3 rounded-2xl flex items-center gap-3 bg-surface-container-low hover:bg-surface-container transition-colors text-left"
       >
-        <img
-          src={BRAND_ASSETS.edithProfile}
-          alt="Profil Edith"
-          className="w-9 h-9 rounded-full object-cover ring-2 ring-primary-container/20"
-        />
+        <UserAvatar className="w-9 h-9 shrink-0 ring-2 ring-primary-container/20" />
         <div className="flex flex-col min-w-0">
-          <span className="text-sm font-bold text-on-surface truncate">Edith</span>
+          <span className="text-sm font-bold text-on-surface truncate">{firstName(profile.fullName) || 'Mon compte'}</span>
           <span className="text-xs text-on-surface-variant">Voir mon profil</span>
         </div>
       </button>

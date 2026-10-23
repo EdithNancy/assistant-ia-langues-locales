@@ -39,7 +39,11 @@ export const Button: React.FC<ButtonProps> = ({
     } rounded-full font-bold inline-flex items-center justify-center active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed ${className}`}
     {...rest}
   >
-    {icon && <span className="material-symbols-outlined text-[1.25em]">{icon}</span>}
+    {icon && (
+      <span className="material-symbols-outlined text-[1.25em]" aria-hidden="true">
+        {icon}
+      </span>
+    )}
     {children}
   </button>
 );

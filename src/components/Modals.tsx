@@ -3,12 +3,13 @@ import { ThemePreference } from '../utils/preferences';
 import { Button } from './ui/Button';
 import { IconButton } from './ui/IconButton';
 import { Modal } from './ui/Modal';
-import { LANGUAGE_LABEL } from '../data/languages';
-import { BRAND_ASSETS, CULTURAL_STORIES, VOCABULARY_LIST } from '../data/mockData';
+import { CULTURAL_STORIES, VOCABULARY_LIST } from '../data/mockData';
 import { Language } from '../types';
 import { soundEngine } from '../utils/audio';
 import { voicePlayer } from '../utils/voicePlayer';
 import { useVoiceConsent } from './VoiceConsent';
+import { UserAvatar, usePhotoPicker, useUserProfile } from './UserProfile';
+import { LanguageToggle } from './LanguageToggle';
 
 interface StoryModalProps {
   isOpen: boolean;
@@ -183,10 +184,12 @@ interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentLanguage: Language;
+  onLanguageChange: (lang: Language) => void;
   voiceFirst: boolean;
   onToggleVoiceFirst: () => void;
   theme: ThemePreference;
   onThemeChange: (theme: ThemePreference) => void;
+  onOpenSettings: () => void;
   onLogout: () => void;
 }
 
@@ -194,17 +197,21 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   isOpen,
   onClose,
   currentLanguage,
+  onLanguageChange,
   voiceFirst,
   onToggleVoiceFirst,
   theme,
   onThemeChange,
+  onOpenSettings,
   onLogout,
 }) => {
   const { consent, withdraw } = useVoiceConsent();
+  const { profile } = useUserProfile();
+  const photoPicker = usePhotoPicker();
   if (!isOpen) return null;
 
   return (
-    <Modal onClose={onClose} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-sm bg-surface-container-lowest rounded-3xl p-5 shadow-overlay flex flex-col gap-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 border border-surface-container">
+    <Modal onClose={onClose} overlayClassName="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in" className="w-full max-w-sm bg-surface-container-lowest rounded-3xl p-5 shadow-overlay flex flex-col gap-4 max-h-[90vh] overflow-y-auto *:shrink-0 animate-in zoom-in-95 duration-200 border border-surface-container">
         <div className="flex justify-between items-center">
           <h3 className="text-base font-bold text-on-surface">Mon profil IvoirAI</h3>
           <IconButton aria-label="Fermer" onClick={onClose} icon="close" size="sm" iconClassName="text-[18px]" className="bg-surface-container text-on-surface-variant" />
@@ -212,17 +219,29 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
         <div className="flex flex-col items-center text-center gap-2">
           <div className="relative">
-            <img
-              src={BRAND_ASSETS.edithProfile}
-              alt="Portrait Edith"
-              className="w-20 h-20 rounded-full object-cover shadow-soft ring-4 ring-primary-container/20"
-            />
-            <span className="absolute bottom-0 right-1 w-4 h-4 bg-tertiary-fixed rounded-full ring-2 ring-white"></span>
+            <button
+              onClick={photoPicker.pick}
+              aria-label="Changer ma photo de profil"
+              title="Changer ma photo"
+              className="group relative block rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-container"
+            >
+              <UserAvatar className="w-20 h-20 shadow-soft ring-4 ring-primary-container/20" textClassName="text-2xl" />
+              <span className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                <span className="material-symbols-outlined text-[24px]">photo_camera</span>
+              </span>
+              <span className="absolute -bottom-0.5 -right-0.5 w-7 h-7 rounded-full bg-primary-container text-white ring-2 ring-surface-container-lowest flex items-center justify-center shadow-soft">
+                <span className="material-symbols-outlined text-[16px]">photo_camera</span>
+              </span>
+            </button>
+            {photoPicker.input}
           </div>
+          {photoPicker.error && <p className="text-xs font-medium text-error">{photoPicker.error}</p>}
 
-          <div>
-            <h4 className="text-base font-bold text-on-surface">Edith Kouadio</h4>
-            <span className="text-xs text-on-surface-variant">kouadioedith440@gmail.com</span>
+          <div className="min-w-0 max-w-full">
+            <h4 className="text-base font-bold text-on-surface truncate">{profile.fullName || 'Mon compte'}</h4>
+            <span className="block text-xs text-on-surface-variant truncate">
+              {profile.email || (profile.phone ? `+225 ${profile.phone.replace(/(\d{2})(?=\d)/g, '$1 ')}` : '')}
+            </span>
           </div>
 
           <div className="flex items-center gap-2 mt-1">
@@ -241,11 +260,17 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             <span className="text-xs text-primary-container font-bold">Aya d'Abidjan</span>
           </div>
 
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low">
+          <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-surface-container-low">
             <span className="text-xs text-on-surface font-semibold">Langue favorite</span>
-            <span className="text-xs text-primary-container font-bold">
-              {LANGUAGE_LABEL[currentLanguage]}
-            </span>
+            <LanguageToggle
+              value={currentLanguage}
+              onChange={onLanguageChange}
+              className="w-48 shrink-0"
+              options={[
+                { key: 'baoule', label: 'Baoulé' },
+                { key: 'dioula', label: 'Dioula' },
+              ]}
+            />
           </div>
 
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low">
@@ -300,7 +325,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           </div>
         </div>
 
-        <Button onClick={onClose} size="sm" fullWidth>
+        <Button onClick={onOpenSettings} variant="secondary" size="sm" icon="settings" fullWidth>
+          Réglages du compte
+        </Button>
+        <Button onClick={onClose} size="sm" fullWidth className="-mt-2">
           Retour à l'application
         </Button>
         <button

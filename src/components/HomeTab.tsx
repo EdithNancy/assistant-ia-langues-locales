@@ -8,6 +8,8 @@ import { Toast } from './Toast';
 import { Language } from '../types';
 import { soundEngine } from '../utils/audio';
 import { voicePlayer } from '../utils/voicePlayer';
+import { firstName } from '../utils/profile';
+import { useUserProfile } from './UserProfile';
 
 interface HomeTabProps {
   currentLanguage: Language;
@@ -43,6 +45,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
   const [isPlayingWord, setIsPlayingWord] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const { toast: toastMessage, showToast } = useToast(2500);
+  const greetingName = firstName(useUserProfile().profile.fullName);
 
   const handlePlayWord = () => {
     if (isPlayingWord) return;
@@ -77,7 +80,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             Bienvenue
           </p>
           <h2 className="text-2xl lg:text-3xl font-bold text-on-surface truncate mt-1">
-            Akwaba, Edith
+            Akwaba{greetingName ? `, ${greetingName}` : ' !'}
           </h2>
         </div>
 
