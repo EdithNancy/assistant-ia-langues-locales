@@ -1,0 +1,21 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: gateway
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["gateway:8000"]
+  - job_name: identity
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["identity:8001"]
+  - job_name: conversation
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["conversation:8002"]
+  - job_name: learning
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["learning:8003"]

@@ -1,0 +1,75 @@
+services:
+  # 1. Gateway (point d'entrée public)
+  - type: web
+    name: gateway
+    region: virginia
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/gateway/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /ready
+    envVars:
+      - key: IDENTITY_URL
+        sync: false
+      - key: CONVERSATION_URL
+        sync: false
+      - key: LEARNING_URL
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: djorssi-express-redis
+          property: connectionString
+      - key: CORS_ORIGINS
+        value: https://ton-frontend.vercel.app,http://localhost:3000
+      - key: OTEL_SDK_DISABLED
+        value: "true"
+      - key: JWT_SECRET_KEY
+        sync: false
+
+  # 2. Identity
+  - type: web
+    name: identity
+    region: virginia
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/identity/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /ready
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: OTEL_SDK_DISABLED
+        value: "true"
+
+  # 3. Conversation
+  - type: web
+    name: conversation
+    region: virginia
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/conversation/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: IDENTITY_URL
+        sync: false
+      - key: OTEL_SDK_DISABLED
+        value: "true"
+
+  # 4. Learning
+  - type: web
+    name: learning
+    region: virginia
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/learning/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: OTEL_SDK_DISABLED
+        value: "true"

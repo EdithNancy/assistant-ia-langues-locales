@@ -1,0 +1,307 @@
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    ports:
+      - "${GATEWAY_HOST_BIND:-127.0.0.1}:8000:8000"
+    environment:
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      JWT_KEY: ${JWT_SECRET_KEY:?Définir JWT_SECRET_KEY dans le fichier .env}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-}
+      IDENTITY_URL: http://identity:8001
+      CONVERSATION_URL: http://conversation:8002
+      LEARNING_URL: http://learning:8003
+      REDIS_URL: redis://:${REDIS_PASSWORD:?Définir REDIS_PASSWORD dans le fichier .env}@redis:6379/0
+      RATE_LIMIT: ${RATE_LIMIT:-120}
+      RATE_WINDOW: ${RATE_WINDOW:-60}
+      CORS_ORIGINS: ${GATEWAY_CORS_ORIGINS:-http://localhost:5173}
+      UPSTREAM_TIMEOUT: ${UPSTREAM_TIMEOUT:-30}
+      FORWARDED_ALLOW_IPS: ${GATEWAY_TRUSTED_PROXIES:-127.0.0.1}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_SERVICE_NAME: gateway
+      
+    depends_on:
+      identity:
+        condition: service_healthy
+      conversation:
+        condition: service_healthy
+      learning:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/ready', timeout=2)"
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - backend
+      - observability
+
+  identity:
+    build:
+      context: .
+      dockerfile: identity/Dockerfile
+    environment:
+      APP_NAME: IA Langues Locales CI
+      DEBUG: "false"
+      DATABASE_URL: postgresql+asyncpg://${IDENTITY_DB_USER:-app}:${IDENTITY_DB_PASSWORD:?Définir IDENTITY_DB_PASSWORD dans le fichier .env}@identity-db:5432/identity
+      REDIS_URL: redis://:${REDIS_PASSWORD:?Définir REDIS_PASSWORD dans le fichier .env}@redis:6379/0
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?Définir JWT_SECRET_KEY dans le fichier .env}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-}
+      CORS_ORIGINS: ${IDENTITY_CORS_ORIGINS:-["http://localhost:5173"]}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_SERVICE_NAME: identity
+      BOOTSTRAP_ADMIN_NAME: ${BOOTSTRAP_ADMIN_NAME}
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD}
+    depends_on:
+      identity-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/ready', timeout=2)"
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - backend
+      - observability
+
+  conversation:
+    build:
+      context: .
+      dockerfile: conversation/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${CONVERSATION_DB_USER:-app}:${CONVERSATION_DB_PASSWORD:?Définir CONVERSATION_DB_PASSWORD dans le fichier .env}@conversation-db:5432/conversation
+      IDENTITY_URL: http://identity:8001
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_SERVICE_NAME: conversation
+    depends_on:
+      conversation-db:
+        condition: service_healthy
+      identity:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/ready', timeout=2)"
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - backend
+      - observability
+
+  learning:
+    build:
+      context: .
+      dockerfile: learning/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${LEARNING_DB_USER:-app}:${LEARNING_DB_PASSWORD:?Définir LEARNING_DB_PASSWORD dans le fichier .env}@learning-db:5432/learning
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_SERVICE_NAME: learning
+    depends_on:
+      learning-db:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8003/ready', timeout=2)"
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - backend
+      - observability
+
+  identity-db:
+    image: postgres:16.6
+    environment:
+      POSTGRES_USER: ${IDENTITY_DB_USER:-app}
+      POSTGRES_PASSWORD: ${IDENTITY_DB_PASSWORD:?Définir IDENTITY_DB_PASSWORD dans le fichier .env}
+      POSTGRES_DB: identity
+    volumes:
+      - identity-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    networks: [backend]
+
+  conversation-db:
+    image: postgres:16.6
+    environment:
+      POSTGRES_USER: ${CONVERSATION_DB_USER:-app}
+      POSTGRES_PASSWORD: ${CONVERSATION_DB_PASSWORD:?Définir CONVERSATION_DB_PASSWORD dans le fichier .env}
+      POSTGRES_DB: conversation
+    volumes:
+      - conversation-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    networks: [backend]
+
+  learning-db:
+    image: postgres:16.6
+    environment:
+      POSTGRES_USER: ${LEARNING_DB_USER:-app}
+      POSTGRES_PASSWORD: ${LEARNING_DB_PASSWORD:?Définir LEARNING_DB_PASSWORD dans le fichier .env}
+      POSTGRES_DB: learning
+    volumes:
+      - learning-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    networks: [backend]
+
+  redis:
+    image: redis:7.4.2-alpine
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --requirepass
+      - ${REDIS_PASSWORD:?Définir REDIS_PASSWORD dans le fichier .env}
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:?Définir REDIS_PASSWORD dans le fichier .env}", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    networks: [backend]
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.117.0
+    command: ["--config=/etc/otel-collector/config.yml"]
+    volumes:
+      - ./observability/otel-collector.yml:/etc/otel-collector/config.yml:ro
+    depends_on:
+      - loki
+      - tempo
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - observability
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=15d
+      - --web.enable-lifecycle
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks: [observability]
+
+  loki:
+    image: grafana/loki:3.3.2
+    command: ["-config.file=/etc/loki/config.yml"]
+    volumes:
+      - ./observability/loki.yml:/etc/loki/config.yml:ro
+      - loki-data:/loki
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks: [observability]
+
+  tempo:
+    image: grafana/tempo:2.7.2
+    command: ["-config.file=/etc/tempo/config.yml"]
+    volumes:
+      - ./observability/tempo.yml:/etc/tempo/config.yml:ro
+      - tempo-data:/var/tempo
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks: [observability]
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    ports:
+      - "127.0.0.1:${GRAFANA_PORT:-3000}:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?Définir GRAFANA_ADMIN_PASSWORD dans le fichier .env}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./observability/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+    depends_on:
+      - prometheus
+      - loki
+      - tempo
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks: [observability]
+
+volumes:
+  identity-data:
+  conversation-data:
+  learning-data:
+  redis-data:
+  prometheus-data:
+  loki-data:
+  tempo-data:
+  grafana-data:
+
+networks:
+  backend:
+  observability:
+    internal: true
