@@ -22,7 +22,13 @@ class DialogueReply:
 
 
 class STT(Protocol):
-    async def transcribe(self, audio: bytes) -> str: ...
+    async def transcribe(
+        self, audio: bytes, language: str | None = None
+    ) -> str: ...
+
+
+class OrthographyNormalizer(Protocol):
+    async def normalize(self, text: str, language: str) -> str: ...
 
 
 class Dialogue(Protocol):
@@ -30,12 +36,27 @@ class Dialogue(Protocol):
 
 
 class TTS(Protocol):
-    def synthesize(self, text: str) -> AsyncIterator[bytes]: ...
+    def synthesize(
+        self, text: str, language: str | None = None
+    ) -> AsyncIterator[bytes]: ...
 
 
 class MockSTT:
-    async def transcribe(self, audio: bytes) -> str:
+    async def transcribe(
+        self, audio: bytes, language: str | None = None
+    ) -> str:
         return f"[audio de {len(audio)} octets]"
+
+
+class PassThroughNormalizer:
+    """Pluggable seam for language-specific orthography normalization.
+
+    Keep the transcript unchanged until a language's spelling conventions and
+    validated correction data are available; guessing corrections is unsafe.
+    """
+
+    async def normalize(self, text: str, language: str) -> str:
+        return text
 
 
 class MockDialogue:
@@ -58,12 +79,15 @@ def _estimate_tokens(text: str) -> int:
 
 
 class MockTTS:
-    async def synthesize(self, text: str) -> AsyncIterator[bytes]:
+    async def synthesize(
+        self, text: str, language: str | None = None
+    ) -> AsyncIterator[bytes]:
         data = text.encode()
         for i in range(0, len(data), 16):     # simule un flux audio par morceaux
             yield data[i:i + 16]
 
 
 stt: STT = MockSTT()
+orthography: OrthographyNormalizer = PassThroughNormalizer()
 dialogue: Dialogue = MockDialogue()
 tts: TTS = MockTTS()

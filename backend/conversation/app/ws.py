@@ -27,8 +27,18 @@ router = APIRouter()
 MAX_AUDIO_BYTES = 10_000_000
 
 
-async def run_turn(ws: WebSocket, session, cid: str, audio: bytes) -> None:
-    text = await ml.stt.transcribe(audio)
+async def run_turn(
+    ws: WebSocket,
+    session,
+    cid: str,
+    audio: bytes,
+    language: str | None = None,
+) -> None:
+    text = (
+        await ml.stt.transcribe(audio, language)
+        if language
+        else await ml.stt.transcribe(audio)
+    )
     await ws.send_json({
         "type": "transcript",
         "conversation_id": cid,
@@ -41,6 +51,7 @@ async def run_turn(ws: WebSocket, session, cid: str, audio: bytes) -> None:
         text,
         ws.app.state.identity_http,
         ws.headers.get("authorization"),
+        language,
     )
     await ws.send_json({
         "type": "reply",
@@ -50,7 +61,12 @@ async def run_turn(ws: WebSocket, session, cid: str, audio: bytes) -> None:
         "model_token_usage_estimated": reply.estimated_usage,
     })
 
-    async for chunk in ml.tts.synthesize(reply.content):
+    audio_chunks = (
+        ml.tts.synthesize(reply.content, language)
+        if language
+        else ml.tts.synthesize(reply.content)
+    )
+    async for chunk in audio_chunks:
         await ws.send_bytes(chunk)
     await ws.send_json({"type": "done"})
 
@@ -126,7 +142,13 @@ async def audio_socket(ws: WebSocket):
                     audio = bytes(buffer)
                     buffer.clear()
                     try:
-                        await run_turn(ws, session, conv.id, audio)
+                        await run_turn(
+                            ws,
+                            session,
+                            conv.id,
+                            audio,
+                            ws.query_params.get("language"),
+                        )
                     except HTTPException as exc:
                         await ws.send_json({
                             "type": "error",

@@ -4,6 +4,7 @@ from fastapi import (
     APIRouter,
     Depends,
     File,
+    Form,
     HTTPException,
     Request,
     Response,
@@ -171,6 +172,7 @@ async def send_audio(
     cid: str,
     request: Request,
     audio: UploadFile = File(...),
+    language: str | None = Form(default=None),
     user: CurrentUser = Depends(current_user),
     session: AsyncSession = Depends(get_session),
 ):
@@ -188,21 +190,33 @@ async def send_audio(
     await billing.require_available_token(
         request.app.state.identity_http, request.headers.get("authorization")
     )
-   # if user.is_free:
-   #     await reserve_daily_request(
-   #         session, user.id, "voice", FREE_DAILY_VOICE_LIMIT
-   #    )
+    if user.is_free:
+        await reserve_daily_request(
+            session, user.id, "voice", FREE_DAILY_VOICE_LIMIT
+        )
 
-    transcript = await ml.stt.transcribe(data)
+    transcript = (
+        await ml.stt.transcribe(data, language)
+        if language
+        else await ml.stt.transcribe(data)
+    )
     reply = await reply_to_transcript(
         session,
         cid,
         transcript,
         request.app.state.identity_http,
         request.headers.get("authorization"),
+        language,
     )
     audio_output = b"".join(
-        [chunk async for chunk in ml.tts.synthesize(reply.content)]
+        [
+            chunk
+            async for chunk in (
+                ml.tts.synthesize(reply.content, language)
+                if language
+                else ml.tts.synthesize(reply.content)
+            )
+        ]
     )
     return VoiceMessageOut(
         conversation_id=cid,
