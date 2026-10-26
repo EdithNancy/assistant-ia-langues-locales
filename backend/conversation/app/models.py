@@ -31,6 +31,16 @@ class Message(Base):
     conversation_id: Mapped[str] = mapped_column(ForeignKey("conversations.id", ondelete="CASCADE"), index=True)
     role: Mapped[str] = mapped_column(String(16))          # "user" | "assistant"
     content: Mapped[str] = mapped_column(Text)
+    # Enrichissements optionnels : nullable pour préserver les messages déjà stockés.
+    original_content: Mapped[str | None] = mapped_column(Text, nullable=True)
+    transcript: Mapped[str | None] = mapped_column(Text, nullable=True)
+    reformulated_content: Mapped[str | None] = mapped_column(Text, nullable=True)
+    understood_as: Mapped[str | None] = mapped_column(Text, nullable=True)
+    modality: Mapped[str] = mapped_column(String(16), default="text", nullable=False)
+    status: Mapped[str] = mapped_column(String(16), default="completed", nullable=False)
+    input_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    output_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    estimated_usage: Mapped[bool | None] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
     conversation: Mapped[Conversation] = relationship(back_populates="messages")
 

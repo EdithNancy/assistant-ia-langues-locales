@@ -39,13 +39,7 @@ async def run_turn(
         if language
         else await ml.stt.transcribe(audio)
     )
-    await ws.send_json({
-        "type": "transcript",
-        "conversation_id": cid,
-        "text": text,
-    })
-
-    reply = await reply_to_transcript(
+    user_message, assistant_message, reply = await reply_to_transcript(
         session,
         cid,
         text,
@@ -54,9 +48,19 @@ async def run_turn(
         language,
     )
     await ws.send_json({
+        "type": "transcript",
+        "conversation_id": cid,
+        "text": text,
+        "user_message_id": user_message.id,
+        "original_message": user_message.original_content,
+        "reformulated_message": reply.reformulated_content,
+        "understood_as": reply.understood_as,
+    })
+    await ws.send_json({
         "type": "reply",
         "conversation_id": cid,
         "text": reply.content,
+        "assistant_message_id": assistant_message.id,
         "credit_tokens_charged": reply.total_tokens,
         "model_token_usage_estimated": reply.estimated_usage,
     })

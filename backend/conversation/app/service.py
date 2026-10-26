@@ -22,8 +22,14 @@ async def get_owned(
     return (await session.execute(q)).scalar_one_or_none()
 
 
-async def add_message(session: AsyncSession, cid: str, role: str, content: str) -> Message:
-    msg = Message(conversation_id=cid, role=role, content=content)
+async def add_message(
+    session: AsyncSession,
+    cid: str,
+    role: str,
+    content: str,
+    **details,
+) -> Message:
+    msg = Message(conversation_id=cid, role=role, content=content, **details)
     session.add(msg)
     await session.commit()
     return msg

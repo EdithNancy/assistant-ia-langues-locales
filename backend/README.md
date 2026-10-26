@@ -239,6 +239,14 @@ Le `GET` liste, dans l'ordre chronologique, les messages de l'utilisateur et
 les réponses de l'IA. Il renvoie `404` si la conversation n'existe pas ou
 n'appartient pas à l'utilisateur.
 
+Chaque tour texte renvoie aussi `user_message` (le texte exact soumis et ses
+champs d'interprétation éventuels) et `usage` (jetons d'entrée/sortie et
+indication d'estimation). L'historique ajoute `original_content`, `transcript`,
+`reformulated_content`, `understood_as`, `modality`, `status` et les métriques
+de jetons. Les champs d'interprétation restent `null` tant que le moteur de
+dialogue n'en fournit pas; la transcription audio est conservée séparément du
+texte normalisé envoyé au modèle.
+
 L'utilisateur peut faire une requête soit en écrivant, soit en parlant. Le
 parcours vocal est prioritaire : le client transmet l'audio de l'utilisateur,
 Conversation le transcrit et le traite comme une requête, puis renvoie la

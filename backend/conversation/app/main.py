@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 import httpx
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 from sqlalchemy.exc import SQLAlchemyError
 
 from . import api, ws
@@ -25,6 +25,7 @@ async def lifespan(app: FastAPI):
             await conn.execute(text("CREATE SCHEMA IF NOT EXISTS conversation"))
             # 2. Créer les tables
             await conn.run_sync(Base.metadata.create_all)
+            await conn.run_sync(_upgrade_message_columns)
         yield
     finally:
         await app.state.identity_http.aclose()
@@ -53,3 +54,23 @@ async def readiness():
 
 app.include_router(ws.router)
 app.include_router(api.router)
+
+
+def _upgrade_message_columns(connection):
+    columns = {column["name"] for column in inspect(connection).get_columns("messages")}
+    additions = {
+        "original_content": "TEXT",
+        "transcript": "TEXT",
+        "reformulated_content": "TEXT",
+        "understood_as": "TEXT",
+        "modality": "VARCHAR(16) NOT NULL DEFAULT 'text'",
+        "status": "VARCHAR(16) NOT NULL DEFAULT 'completed'",
+        "input_tokens": "INTEGER",
+        "output_tokens": "INTEGER",
+        "estimated_usage": "BOOLEAN",
+    }
+    for name, definition in additions.items():
+        if name not in columns:
+            connection.execute(
+                text(f"ALTER TABLE messages ADD COLUMN {name} {definition}")
+            )

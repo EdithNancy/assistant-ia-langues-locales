@@ -15,6 +15,8 @@ class DialogueReply:
     input_tokens: int
     output_tokens: int
     estimated_usage: bool = False
+    reformulated_content: str | None = None
+    understood_as: str | None = None
 
     @property
     def total_tokens(self) -> int:
