@@ -5,6 +5,12 @@ from pathlib import Path
 from dotenv import dotenv_values
 
 
+REQUIRED_CORS_ORIGINS = (
+    "http://localhost:3000",
+    "http://192.168.252.23:3000",
+)
+
+
 _BACKEND_ENV_PATH = Path(__file__).resolve().parents[2] / ".env"
 _IDENTITY_ENV_PATH = Path(__file__).resolve().parents[2] / "identity" / ".env"
 
@@ -47,9 +53,12 @@ class Settings:
     rate_window: int = int(_env("RATE_WINDOW", "60"))
     cors_origins: list[str] = field(
         default_factory=lambda: [
-            origin.strip()
-            for origin in _env("CORS_ORIGINS", "").split(",")
-            if origin.strip()
+            *REQUIRED_CORS_ORIGINS,
+            *(
+                origin.strip()
+                for origin in _env("CORS_ORIGINS", "").split(",")
+                if origin.strip()
+            ),
         ]
     )
     upstream_timeout: float = float(_env("UPSTREAM_TIMEOUT", "30"))
