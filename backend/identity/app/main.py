@@ -1,0 +1,169 @@
+import asyncio
+import logging
+import time
+import uuid
+from contextlib import asynccontextmanager
+from collections.abc import AsyncIterator
+
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from jose import JWTError
+from redis.asyncio import Redis
+from redis.exceptions import RedisError, ResponseError
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+
+from app.config import settings
+from app.core.database import Base, engine  # Base et engine importés ensemble
+from app.core.rate_limit import limiter
+from app.core.security import decode_token
+
+# --- Import explicite de tous les modèles pour peupler Base.metadata ---
+from app.features.users.entity import User  # noqa: F401
+from app.features.sessions.entity import UserSession  # noqa: F401
+from app.features.roles.entity import Role  # noqa: F401
+from app.features.permissions.entity import Permission  # noqa: F401
+from app.features.auth.social import FederatedIdentity, SocialAuthNonce  # noqa: F401
+from app.features.tokens.entity import TokenTransaction, TokenWallet  # noqa: F401
+from app.features.data.entity import Language, VocabularyEntry  # noqa: F401
+from app.features.usage.entity import UsageEvent  # noqa: F401
+# -----------------------------------------------------------------------
+
+from app.features.auth.routes import router as auth_router
+from app.features.users.routes import router as users_router
+from app.features.roles.routes import router as roles_router
+from app.features.permissions.routes import router as permissions_router
+from app.features.sessions.routes import router as sessions_router
+from app.features.usage.routes import router as usage_router
+from app.features.data.routes import router as data_router
+from backend_observability import instrument_app
+from app.features.usage.service import (
+    USAGE_EVENTS_GROUP,
+    USAGE_EVENTS_STREAM,
+    enqueue_request_usage,
+    run_usage_log_worker,
+)
+
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    # 1. Création du schéma identity et des tables
+    async with engine.begin() as conn:
+        await conn.execute(text("CREATE SCHEMA IF NOT EXISTS identity"))
+        await conn.run_sync(Base.metadata.create_all)
+
+    # 2. Connexion Redis
+    redis = Redis.from_url(settings.REDIS_URL, decode_responses=True)
+    await redis.ping()
+    try:
+        await redis.xgroup_create(
+            USAGE_EVENTS_STREAM,
+            USAGE_EVENTS_GROUP,
+            id="0",
+            mkstream=True,
+        )
+    except ResponseError as exc:
+        if "BUSYGROUP" not in str(exc):
+            raise
+    app.state.redis = redis
+    stop_worker = asyncio.Event()
+    worker = asyncio.create_task(run_usage_log_worker(redis, stop_worker))
+    try:
+        yield
+    finally:
+        stop_worker.set()
+        try:
+            await worker
+        finally:
+            await redis.aclose()
+            observability.shutdown()
+
+
+app = FastAPI(
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
+    debug=settings.DEBUG,
+    lifespan=lifespan,
+)
+
+observability = instrument_app(app, "identity", engine=engine)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+for router in (
+    auth_router,
+    users_router,
+    roles_router,
+    permissions_router,
+    sessions_router,
+    usage_router,
+    data_router,
+):
+    app.include_router(router, prefix=settings.API_V1_PREFIX)
+
+
+@app.middleware("http")
+async def log_usage(request: Request, call_next):
+    started_at = time.perf_counter()
+    response = await call_next(request)
+    route = request.scope.get("route")
+    route_path = getattr(route, "path", request.url.path)
+    user_id = None
+    authorization = request.headers.get("authorization", "")
+    scheme, _, token = authorization.partition(" ")
+    if scheme.lower() == "bearer" and token:
+        try:
+            payload = decode_token(token)
+            user_id = uuid.UUID(payload["sub"])
+        except (JWTError, ValueError, KeyError, TypeError):
+            pass
+
+    try:
+        await enqueue_request_usage(
+            request.app.state.redis,
+            method=request.method,
+            route=route_path,
+            status_code=response.status_code,
+            duration_ms=round((time.perf_counter() - started_at) * 1000),
+            user_id=user_id,
+        )
+    except RedisError:
+        logger.exception(
+            "Could not enqueue usage event for %s %s (HTTP %s).",
+            request.method,
+            route_path,
+            response.status_code,
+        )
+    return response
+
+
+@app.get("/health", tags=["Health"])
+def health():
+    return {"status": "ok", "application": settings.APP_NAME}
+
+
+@app.get("/ready", tags=["Health"])
+async def readiness(request: Request):
+    try:
+        async with engine.connect() as connection:
+            await connection.execute(text("SELECT 1"))
+
+        await request.app.state.redis.ping()
+    except (SQLAlchemyError, RedisError):
+        logger.exception("Identity readiness check failed")
+        return JSONResponse({"status": "not_ready"}, status_code=503)
+    return {"status": "ready"}

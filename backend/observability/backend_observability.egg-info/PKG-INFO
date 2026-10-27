@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: backend-observability
+Version: 0.1.0
+Requires-Python: >=3.12
+Requires-Dist: opentelemetry-api<2,>=1.28
+Requires-Dist: opentelemetry-sdk<2,>=1.28
+Requires-Dist: opentelemetry-exporter-otlp-proto-http<2,>=1.28
+Requires-Dist: opentelemetry-instrumentation-fastapi<1,>=0.49b0
+Requires-Dist: opentelemetry-instrumentation-httpx<1,>=0.49b0
+Requires-Dist: opentelemetry-instrumentation-logging<1,>=0.49b0
+Requires-Dist: opentelemetry-instrumentation-sqlalchemy<1,>=0.49b0
+Requires-Dist: prometheus-client<1,>=0.21

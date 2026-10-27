@@ -1,0 +1,16 @@
+# Données vocales et corpus bruts/transformés (souvent volumineux ou privés)
+/data/raw/**
+/data/processed/**
+!/data/raw/.gitkeep
+!/data/processed/.gitkeep
+
+# Checkpoints et artefacts calculés
+/models/**
+/artifacts/**
+/experiments/runs/**
+!/models/.gitkeep
+!/artifacts/.gitkeep
+
+__pycache__/
+*.py[cod]
+.venv/

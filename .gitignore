@@ -1,7 +1,89 @@
-data/
-models/*.bin
-models/*.pt
-*.onnx
+
+# =========================
+# Variables d'environnement et secrets
+# =========================
 .env
+.env.*
+!.env.example
+!.env.template
+
+# Clés privées et certificats
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+
+# =========================
+# Python
+# =========================
+.venv/
+venv/
+env/
 __pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# =========================
+# Frontend / Node.js
+# =========================
 node_modules/
+dist/
+build/
+.npm/
+
+# =========================
+# IA / Machine Learning
+# =========================
+models/
+model/
+weights/
+checkpoints/
+*.pt
+*.pth
+*.onnx
+*.safetensors
+*.gguf
+*.h5
+*.keras
+*.joblib
+*.pkl
+
+# =========================
+# Données et fichiers volumineux
+# =========================
+data/raw/
+data/processed/
+datasets/
+uploads/
+storage/uploads/
+*.wav
+*.mp3
+*.flac
+*.mp4
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# =========================
+# Bases de données locales
+# =========================
+*.db
+*.sqlite
+*.sqlite3
+
+# =========================
+# Logs et fichiers temporaires
+# =========================
+*.log
+tmp/
+temp/
+.cache/
+
+# =========================
