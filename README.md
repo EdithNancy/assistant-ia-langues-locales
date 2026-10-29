@@ -54,6 +54,22 @@ cp .env.example .env.local   # puis renseigner VITE_API_URL
 npm run dev                  # http://localhost:3000
 ```
 
+### Connexion au Gateway API
+
+Le front utilise les routes d'authentification du Gateway décrites dans la collection Postman :
+
+- `POST /api/auth/register` avec `full_name`, `email`, `phone_number` et `password`
+- `POST /api/auth/login` avec `email` et `password`
+- `GET /api/users/me` avec `Authorization: Bearer <access_token>`
+- `POST /api/auth/refresh` avec `refresh_token`
+- `POST /api/auth/logout` avec le Bearer token à la déconnexion
+
+Pour créer un compte depuis l'interface, renseignez l'e-mail et le numéro ivoirien. La connexion utilise l'adresse e-mail, conformément au contrat actuel du Gateway. Les jetons sont gardés dans `sessionStorage` et effacés à la déconnexion ; ils ne doivent jamais être placés dans une variable `VITE_*`. `sessionStorage` n'est pas protégé contre une faille XSS : pour une mise en production, privilégiez une session par cookie `HttpOnly`, `Secure` et `SameSite`, si le backend la prend en charge.
+
+Le client renouvelle automatiquement l'access token lorsqu'il approche de son expiration (`expires_in`) ou lorsqu'une route protégée renvoie `401`, puis retente cette requête une seule fois. Si le refresh token est refusé, la session locale est effacée et l'utilisateur est renvoyé à la connexion. Au rechargement de la page, le front vérifie le profil côté Gateway avant de restaurer l'état connecté.
+
+Les autres fonctions de l'application (chat, traduction, audio) utilisent encore les anciennes routes du client front (`/chat`, `/translate`, etc.). Elles devront être raccordées séparément aux routes de conversations du Gateway avant que ces fonctions puissent être considérées comme intégrées.
+
 ### 3. Lancer avec Docker
 
 ```bash

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Flag } from '../Flag';
 import { useUserProfile } from '../UserProfile';
 import { Language } from '../../types';
+import { ApiError, authApi, clearAuthTokens, saveAuthTokens } from '../../services';
+import type { UserProfile } from '../../utils/profile';
 import {
   AppleIcon,
   AuthHeader,
@@ -46,7 +48,6 @@ const LANGUAGE_CHOICES = [
 export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onGoToLogin, onBack }) => {
   const [language, setLanguage] = useState<Language>('baoule');
   const [fullName, setFullName] = useState('');
-  const [useEmail, setUseEmail] = useState(false);
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -56,27 +57,54 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
 
   const { updateProfile } = useUserProfile();
   const score = passwordScore(password);
-  const isContactValid = useEmail
-    ? /^\S+@\S+\.\S+$/.test(email)
-    : phoneDigits(phone).length === 10;
+  const isEmailValid = /^\S+@\S+\.\S+$/.test(email);
+  const isPhoneValid = phoneDigits(phone).length === 10;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName.trim()) return setError('Indiquez votre nom ou prénom.');
-    if (!isContactValid)
-      return setError(useEmail ? 'Entrez une adresse email valide.' : 'Entrez un numéro ivoirien valide à 10 chiffres.');
+    if (!isEmailValid) return setError('Entrez une adresse email valide.');
+    if (!isPhoneValid) return setError('Entrez un numéro ivoirien valide à 10 chiffres.');
     if (score < 3) return setError('Mot de passe : 8 caractères minimum, avec un chiffre et un symbole.');
     if (!acceptedTerms) return setError('Veuillez accepter les conditions d’utilisation.');
     setError(null);
     setIsLoading(true);
-    // TODO: brancher sur l'API d'inscription réelle (le mot de passe n'est pas conservé ici)
-    updateProfile({
-      fullName: fullName.trim(),
-      email: useEmail ? email.trim() : '',
-      phone: useEmail ? '' : phoneDigits(phone),
-      photo: null,
-    });
-    setTimeout(() => onAuthenticated(language), 900);
+    let accountCreated = false;
+    try {
+      const normalizedEmail = email.trim();
+      const normalizedPhone = `+225${phoneDigits(phone)}`;
+      await authApi.register({
+        full_name: fullName.trim(),
+        email: normalizedEmail,
+        phone_number: normalizedPhone,
+        password,
+      });
+      accountCreated = true;
+
+      const tokens = await authApi.login(normalizedEmail, password);
+      saveAuthTokens(tokens);
+      const user = await authApi.profile(tokens.accessToken);
+      const profile: UserProfile = {
+        fullName: user.full_name ?? fullName.trim(),
+        email: user.email ?? normalizedEmail,
+        phone: user.phone_number?.replace(/^\+225/, '').replace(/\D/g, '') ?? phoneDigits(phone),
+        photo: null,
+      };
+      if (!updateProfile(profile)) {
+        throw new ApiError('Impossible d’enregistrer le profil dans le navigateur.', null);
+      }
+      onAuthenticated(language);
+    } catch (cause) {
+      clearAuthTokens();
+      const message = cause instanceof Error ? cause.message : 'Réessayez.';
+      setError(
+        accountCreated
+          ? `Compte créé, mais connexion automatique impossible. Connectez-vous avec votre adresse e-mail. ${message}`
+          : message
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -183,68 +211,48 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onAuthenticated, onG
             </div>
           </div>
 
-          {/* Phone or email */}
           <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between gap-2">
-              <label htmlFor="register-contact" className="text-[14px] font-medium text-on-surface">
-                {useEmail ? 'Adresse email' : 'Numéro WhatsApp / Téléphone'}
-              </label>
-              <button
-                type="button"
-                onClick={() => {
-                  setUseEmail((v) => !v);
-                  setError(null);
-                }}
-                className="shrink-0 text-[12px] font-semibold text-secondary hover:underline"
-              >
-                {useEmail ? 'Utiliser un numéro' : 'Utiliser un email'}
-              </button>
+            <label htmlFor="register-email" className="text-[14px] font-medium text-on-surface">
+              Adresse email (utilisée pour la connexion)
+            </label>
+            <div className="h-13 rounded-2xl bg-surface-container-low flex items-center gap-3 px-4 focus-within:ring-2 focus-within:ring-primary-container/30 transition-all">
+              <span className="material-symbols-outlined text-[22px] text-on-surface-variant">mail</span>
+              <input
+                id="register-email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="aya.kouassi@email.ci"
+                className="flex-1 min-w-0 bg-transparent outline-none text-[16px] text-on-surface placeholder:text-outline-variant"
+              />
+              {isEmailValid && <span className="material-symbols-outlined text-[22px] text-on-surface">check_circle</span>}
             </div>
+          </div>
 
-            {useEmail ? (
-              <div className="h-13 rounded-2xl bg-surface-container-low flex items-center gap-3 px-4 focus-within:ring-2 focus-within:ring-primary-container/30 transition-all">
-                <span className="material-symbols-outlined text-[22px] text-on-surface-variant">mail</span>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="register-phone" className="text-[14px] font-medium text-on-surface">
+              Numéro WhatsApp / Téléphone
+            </label>
+            <div className="flex gap-2">
+              <div className="h-13 shrink-0 rounded-2xl bg-surface-container-low flex items-center gap-1.5 px-3 min-[400px]:gap-2 min-[400px]:px-4">
+                <Flag country="ci" className="w-6" labelled />
+                <span className="text-[15px] font-medium text-on-surface">+225</span>
+              </div>
+              <div className="h-13 flex-1 min-w-0 rounded-2xl bg-surface-container-low flex items-center gap-1.5 px-3 focus-within:ring-2 focus-within:ring-primary-container/30 transition-all">
                 <input
-                  id="register-contact"
-                  type="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="aya.kouassi@email.ci"
+                  id="register-phone"
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="tel-national"
+                  value={phone}
+                  onChange={(e) => setPhone(formatIvorianPhone(e.target.value))}
+                  placeholder="05 84 92 10 33"
                   className="flex-1 min-w-0 bg-transparent outline-none text-[16px] text-on-surface placeholder:text-outline-variant"
                 />
-                {isContactValid && <span className="material-symbols-outlined text-[22px] text-on-surface">check_circle</span>}
+                {isPhoneValid && <span className="material-symbols-outlined text-[22px] text-on-surface">check_circle</span>}
               </div>
-            ) : (
-              <div className="flex gap-2">
-                <div className="h-13 shrink-0 rounded-2xl bg-surface-container-low flex items-center gap-1.5 px-3 min-[400px]:gap-2 min-[400px]:px-4">
-                  <Flag country="ci" className="w-6" labelled />
-                  <span className="text-[15px] font-medium text-on-surface">+225</span>
-                  {/* Wrapper : la feuille Google des icônes impose display:inline-block sur l'icône elle-même */}
-                  <span className="flex max-[359px]:hidden">
-                    <span className="material-symbols-outlined text-[18px] text-on-surface-variant">expand_more</span>
-                  </span>
-                </div>
-                <div className="h-13 flex-1 min-w-0 rounded-2xl bg-surface-container-low flex items-center gap-1.5 px-3 focus-within:ring-2 focus-within:ring-primary-container/30 transition-all">
-                  <input
-                    id="register-contact"
-                    type="tel"
-                    inputMode="numeric"
-                    autoComplete="tel-national"
-                    value={phone}
-                    onChange={(e) => setPhone(formatIvorianPhone(e.target.value))}
-                    placeholder="05 84 92 10 33"
-                    className="flex-1 min-w-0 bg-transparent outline-none text-[16px] text-on-surface placeholder:text-outline-variant"
-                  />
-                  {/* Coche masquée sur très petit écran : elle couperait le numéro */}
-                  {isContactValid && (
-                    <span className="flex max-[369px]:hidden">
-                      <span className="material-symbols-outlined text-[22px] text-on-surface">check_circle</span>
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
+            </div>
           </div>
 
           {/* Password + strength meter */}

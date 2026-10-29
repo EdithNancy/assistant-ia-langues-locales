@@ -2,7 +2,7 @@ import { Language } from '../types';
 
 /**
  * Session conservée dans le navigateur pour survivre au rafraîchissement.
- * À remplacer par le jeton renvoyé par l'API d'authentification quand elle existera.
+ * Les jetons d'authentification sont conservés séparément dans sessionStorage.
  */
 export interface Session {
   language: Language;

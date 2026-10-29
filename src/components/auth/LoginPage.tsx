@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Flag } from '../Flag';
 import { Language } from '../../types';
 import {
   AuthHeader,
@@ -7,18 +6,16 @@ import {
   FormError,
   GoogleIcon,
   PasswordField,
-  formatIvorianPhone,
-  phoneDigits,
 } from './AuthShared';
 import { useUserProfile } from '../UserProfile';
+import { ApiError, authApi, clearAuthTokens, saveAuthTokens } from '../../services';
+import type { UserProfile } from '../../utils/profile';
 
 interface LoginPageProps {
   onAuthenticated: (language: Language) => void;
   onGoToRegister: () => void;
   onBack?: () => void;
 }
-
-type LoginMethod = 'phone' | 'email';
 
 /** Hero emblem: soundwave bars inside a gradient ring with a dashed halo. */
 const LoginEmblem = () => (
@@ -40,8 +37,6 @@ const LoginEmblem = () => (
 );
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToRegister, onBack }) => {
-  const [method, setMethod] = useState<LoginMethod>('phone');
-  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [language, setLanguage] = useState<Language>('baoule');
@@ -49,13 +44,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
   const [isLoading, setIsLoading] = useState(false);
   const { updateProfile } = useUserProfile();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (method === 'phone' && phoneDigits(phone).length !== 10) {
-      setError('Entrez un numéro ivoirien valide à 10 chiffres.');
-      return;
-    }
-    if (method === 'email' && !/^\S+@\S+\.\S+$/.test(email)) {
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
       setError('Entrez une adresse email valide.');
       return;
     }
@@ -65,9 +56,27 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
     }
     setError(null);
     setIsLoading(true);
-    // TODO: brancher sur l'API d'authentification réelle (elle renverra le profil complet)
-    updateProfile(method === 'phone' ? { phone: phoneDigits(phone) } : { email: email.trim() });
-    setTimeout(() => onAuthenticated(language), 900);
+    try {
+      const normalizedEmail = email.trim();
+      const tokens = await authApi.login(normalizedEmail, password);
+      saveAuthTokens(tokens);
+      const user = await authApi.profile(tokens.accessToken);
+      const profile: UserProfile = {
+        fullName: user.full_name ?? '',
+        email: user.email ?? normalizedEmail,
+        phone: user.phone_number?.replace(/^\+225/, '').replace(/\D/g, '') ?? '',
+        photo: null,
+      };
+      if (!updateProfile(profile)) {
+        throw new ApiError('Impossible d’enregistrer le profil dans le navigateur.', null);
+      }
+      onAuthenticated(language);
+    } catch (cause) {
+      clearAuthTokens();
+      setError(cause instanceof Error ? cause.message : 'Connexion impossible. Réessayez.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -97,70 +106,23 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onAuthenticated, onGoToReg
           noValidate
           className="mt-8 w-full rounded-3xl bg-surface-container-lowest p-5 shadow-soft flex flex-col gap-5"
         >
-          {/* Phone / email switch */}
-          <div className="grid grid-cols-2 p-1.5 rounded-full bg-surface-container">
-            {(
-              [
-                { key: 'phone', icon: 'smartphone', label: 'Numéro (+225)' },
-                { key: 'email', icon: 'alternate_email', label: 'Email' },
-              ] as const
-            ).map((tab) => (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => {
-                  setMethod(tab.key);
-                  setError(null);
-                }}
-                className={`h-12 rounded-full flex items-center justify-center gap-1.5 sm:gap-2 text-[13px] min-[380px]:text-[15px] font-medium transition-all ${
-                  method === tab.key ? 'bg-surface-container-lowest text-on-surface shadow-soft' : 'text-on-surface-variant'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[22px]">{tab.icon}</span>
-                {tab.label}
-              </button>
-            ))}
+          <div className="flex flex-col gap-2">
+            <label htmlFor="login-email" className="text-[13px] font-semibold text-on-surface-variant uppercase tracking-wide">
+              Adresse email
+            </label>
+            <div className="h-14 rounded-2xl bg-surface-container-low flex items-center gap-3 px-4 focus-within:ring-2 focus-within:ring-primary-container/30 transition-all">
+              <span className="material-symbols-outlined text-[22px] text-on-surface-variant">mail</span>
+              <input
+                id="login-email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="aya.kouassi@email.ci"
+                className="flex-1 min-w-0 bg-transparent outline-none text-[16px] text-on-surface placeholder:text-outline-variant"
+              />
+            </div>
           </div>
-
-          {method === 'phone' ? (
-            <div className="flex flex-col gap-2">
-              <label htmlFor="login-phone" className="text-[13px] font-semibold text-on-surface-variant uppercase tracking-wide">
-                Numéro mobile
-              </label>
-              <div className="h-14 rounded-2xl bg-surface-container-low flex items-center gap-3 px-4 focus-within:ring-2 focus-within:ring-primary-container/30 transition-all">
-                <Flag country="ci" className="w-6" labelled />
-                <span className="text-[17px] font-semibold text-on-surface">+225</span>
-                <input
-                  id="login-phone"
-                  type="tel"
-                  inputMode="numeric"
-                  autoComplete="tel-national"
-                  value={phone}
-                  onChange={(e) => setPhone(formatIvorianPhone(e.target.value))}
-                  placeholder="07 01 23 45 67"
-                  className="flex-1 min-w-0 ml-3 bg-transparent outline-none text-[18px] tracking-wider text-on-surface placeholder:text-outline-variant"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-2">
-              <label htmlFor="login-email" className="text-[13px] font-semibold text-on-surface-variant uppercase tracking-wide">
-                Adresse email
-              </label>
-              <div className="h-14 rounded-2xl bg-surface-container-low flex items-center gap-3 px-4 focus-within:ring-2 focus-within:ring-primary-container/30 transition-all">
-                <span className="material-symbols-outlined text-[22px] text-on-surface-variant">mail</span>
-                <input
-                  id="login-email"
-                  type="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="aya.kouassi@email.ci"
-                  className="flex-1 min-w-0 bg-transparent outline-none text-[16px] text-on-surface placeholder:text-outline-variant"
-                />
-              </div>
-            </div>
-          )}
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 import { Header } from './components/Header';
 import { BottomNav, NavTabKey, TabKey } from './components/BottomNav';
@@ -23,6 +23,15 @@ import { Language } from './types';
 import { soundEngine } from './utils/audio';
 import { loadPreferences, savePreferences } from './utils/preferences';
 import { clearSession, loadSession, saveSession } from './utils/session';
+import {
+  ApiError,
+  AUTH_SESSION_EXPIRED_EVENT,
+  authApi,
+  clearAuthTokens,
+  getAccessToken,
+} from './services';
+import { useUserProfile } from './components/UserProfile';
+import { loadProfile, UserProfile } from './utils/profile';
 
 /** Une URL par onglet : le rafraîchissement et le bouton Retour fonctionnent. */
 const TAB_PATHS: Record<NavTabKey, string> = {
@@ -43,10 +52,12 @@ const tabFromPath = (pathname: string): NavTabKey | null =>
 export default function App() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [isAuthenticated, setIsAuthenticated] = useState(() => loadSession() !== null);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => getAccessToken() !== null);
+  const [isAuthChecking, setIsAuthChecking] = useState(() => getAccessToken() !== null);
   const [currentLanguage, setCurrentLanguage] = useState<Language>(
     () => loadSession()?.language ?? 'baoule'
   );
+  const { updateProfile } = useUserProfile();
   const [voiceFirst, setVoiceFirst] = useState(() => loadPreferences().voiceFirst);
   const isOnline = useOnlineStatus();
   const { theme, setTheme, toggleTheme } = useTheme();
@@ -61,6 +72,71 @@ export default function App() {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const notifications = useNotifications();
   const { toast: notificationToast, showToast } = useToast(3000);
+  const updateProfileRef = useRef(updateProfile);
+
+  useEffect(() => {
+    updateProfileRef.current = updateProfile;
+  }, [updateProfile]);
+
+  useEffect(() => {
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      clearSession();
+      return;
+    }
+
+    let cancelled = false;
+    void authApi
+      .profile(accessToken)
+      .then((user) => {
+        if (cancelled) return;
+        const savedProfile = loadProfile();
+        const profile: Partial<UserProfile> = {
+          fullName: user.full_name ?? savedProfile?.fullName ?? '',
+          email: user.email ?? savedProfile?.email ?? '',
+          phone:
+            user.phone_number?.replace(/^\+225/, '').replace(/\D/g, '') ??
+            savedProfile?.phone ??
+            '',
+        };
+        updateProfileRef.current(profile);
+        const session = loadSession();
+        const language = session?.language ?? 'baoule';
+        if (!session) saveSession({ language });
+        setCurrentLanguage(language);
+        setIsAuthenticated(true);
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        if (error instanceof ApiError && error.status === 401) {
+          clearAuthTokens();
+          clearSession();
+          setIsAuthenticated(false);
+          navigate(AUTH_PATHS.login, { replace: true });
+        } else {
+          setIsAuthenticated(true);
+          showToast('Session conservée, mais le profil n’a pas pu être vérifié. Vérifiez votre connexion.');
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setIsAuthChecking(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [navigate, showToast]);
+
+  useEffect(() => {
+    const handleExpiredSession = () => {
+      clearSession();
+      setIsAuthenticated(false);
+      navigate(AUTH_PATHS.login, { replace: true });
+      showToast('Votre session a expiré. Veuillez vous reconnecter.');
+    };
+    window.addEventListener(AUTH_SESSION_EXPIRED_EVENT, handleExpiredSession);
+    return () => window.removeEventListener(AUTH_SESSION_EXPIRED_EVENT, handleExpiredSession);
+  }, [navigate, showToast]);
 
   const showNotification = (msg: string) => {
     soundEngine.playTone(540, 0.15);
@@ -88,11 +164,20 @@ export default function App() {
     );
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const accessToken = getAccessToken();
     clearSession();
+    clearAuthTokens();
     setIsProfileModalOpen(false);
     setIsAuthenticated(false);
     navigate(AUTH_PATHS.login, { replace: true });
+    if (accessToken) {
+      try {
+        await authApi.logout(accessToken);
+      } catch {
+        showToast('Session fermée sur cet appareil, mais la révocation serveur a échoué.');
+      }
+    }
   };
 
   const handleToggleVoiceFirst = () => {
@@ -127,6 +212,15 @@ export default function App() {
     window.scrollTo({ top: 0 });
     showNotification(lang === 'dioula' ? 'I ni ce ! Bienvenue sur IvoirAI' : 'Akwaba ! Bienvenue sur IvoirAI');
   };
+
+  if (isAuthChecking) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-surface text-on-surface" aria-live="polite">
+        <span className="w-8 h-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+        <span className="sr-only">Vérification de la session…</span>
+      </main>
+    );
+  }
 
   if (!isAuthenticated) {
     const isRegister = pathname === AUTH_PATHS.register;
