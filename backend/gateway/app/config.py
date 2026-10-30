@@ -8,6 +8,7 @@ from dotenv import dotenv_values
 REQUIRED_CORS_ORIGINS = (
     "http://localhost:3000",
     "http://192.168.252.23:3000",
+    "https://frontend-one-olive-vutn25pf1s.vercel.app",
 )
 
 
