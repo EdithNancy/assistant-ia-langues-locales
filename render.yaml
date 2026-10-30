@@ -21,7 +21,7 @@ services:
           name: djorssi-express-redis
           property: connectionString
       - key: CORS_ORIGINS
-        value: https://ton-frontend.vercel.app,http://localhost:3000
+        value: https://frontend-one-olive-vutn25pf1s.vercel.app,http://localhost:3000
       - key: OTEL_SDK_DISABLED
         value: "true"
       - key: JWT_SECRET_KEY
