@@ -26,7 +26,12 @@ class Settings(BaseSettings):
     FREE_TOKEN_REFILL_DAYS: int = Field(default=1, ge=1)
     GOOGLE_CLIENT_IDS: str = ""
     APPLE_CLIENT_IDS: str = ""
-    CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:5173"]
+    CORS_ORIGINS: list[str] = [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://192.168.252.23:3000",
+        "https://frontend-one-olive-vutn25pf1s.vercel.app",
+    ]
     model_config = SettingsConfigDict(
         env_file=(str(_IDENTITY_ENV_PATH), str(_BACKEND_ENV_PATH)),
         env_file_encoding="utf-8",

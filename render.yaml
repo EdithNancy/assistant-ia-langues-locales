@@ -41,6 +41,8 @@ services:
         sync: false
       - key: JWT_SECRET_KEY
         sync: false
+      - key: CORS_ORIGINS
+        value: '["http://localhost:3000","http://localhost:5173","http://192.168.252.23:3000","https://frontend-one-olive-vutn25pf1s.vercel.app"]'
       - key: OTEL_SDK_DISABLED
         value: "true"
 
